@@ -12,6 +12,8 @@
  * - Toolbar: Provides table controls and actions
  * - Pagination: Handles table pagination and page navigation
  * - DataTableColumnHeader: Interactive column header with sorting, filtering and more
+ * - GroupingPanel: Panel for configuring and managing grouping
+ * - GroupingControls: Controls for activating and managing grouping
  * 
  * Features:
  * - Modular table structure
@@ -28,4 +30,6 @@ export { TableBodyComponent as TableBody } from './table-body'
 export { TableCell } from './table-cell'
 export { Toolbar } from './toolbar'
 export { Pagination } from './pagination'
-export { DataTableColumnHeader } from './column-header' 
+export { DataTableColumnHeader } from './column-header'
+export { GroupingPanel } from './grouping-panel'
+export { GroupingControls } from './grouping-controls' 

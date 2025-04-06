@@ -5,7 +5,7 @@
  * It provides type definitions for renderer functions, their props, and configuration options.
  */
 
-import React from "react";
+import * as React from "react";
 
 /**
  * Base props passed to all cell renderer functions.
@@ -143,6 +143,16 @@ export interface BooleanRendererConfig extends BaseRendererConfig {
 }
 
 /**
+ * Configuration options for the null renderer.
+ * Controls how null or undefined values are displayed.
+ * 
+ * @property placeholder Text to display for null values
+ */
+export interface NullRendererConfig extends BaseRendererConfig {
+  placeholder?: string;
+}
+
+/**
  * Function type for cell renderers.
  * Defines the signature that all cell renderer functions must implement.
  * 
@@ -150,14 +160,6 @@ export interface BooleanRendererConfig extends BaseRendererConfig {
  * @param props Props containing cell value and context
  * @param config Optional configuration object
  * @returns React node to render in the cell
- * 
- * @example
- * ```tsx
- * const myRenderer: CellRendererFunction<MyConfig> = (props, config) => {
- *   const value = props.getValue();
- *   return <div className={config?.className}>{value}</div>;
- * };
- * ```
  */
 export type CellRendererFunction<TConfig extends BaseRendererConfig = BaseRendererConfig> = (
   props: CellRendererProps,

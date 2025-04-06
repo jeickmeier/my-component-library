@@ -1,6 +1,6 @@
 import { deserializeSchema } from "../components/data-table/schema"
 import { SerializableDataTableSchema } from "../components/data-table/types"
-import { getGlobalCellRendererRegistry } from "../components/data-table/cell-renderers"
+import { getGlobalCellRendererRegistry } from "@/components/data-table/cell-renderers"
 import fs from 'fs'
 import path from 'path'
 

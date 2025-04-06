@@ -13,7 +13,7 @@
  * - Responsive design
  * - Keyboard accessibility
  * 
- * @module data-table/grouping/grouping-controls
+ * @module data-table/parts/grouping-controls
  */
 
 import * as React from "react"

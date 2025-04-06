@@ -2,31 +2,14 @@
  * Cell Renderers Module
  * 
  * A comprehensive system for rendering table cell content with different formats and styles.
- * This module implements a registry pattern that allows for:
- * 
- * - Easy registration of custom cell renderers
- * - Built-in renderers for common data types
- * - Global and local registry instances
- * - Configurable rendering behavior
- * 
- * Built-in renderers include:
- * - text: Basic text display with optional truncation
- * - status: Status indicators with configurable colors
- * - currency: Formatted currency values
- * - date: Localized date formatting
- * - boolean: Yes/No or custom boolean representations
- * - null: Customizable null value display
- * 
- * @module cell-renderers
+ * This module implements a simplified approach using React Context and hooks.
  */
 
-// Export all core types and utilities
-export * from './core';
+import * as React from 'react';
+import { createContext, useContext, useState } from 'react';
 
-// Export all renderers
-export * from './renderers';
-
-// Re-export specific renderers for backward compatibility
+// Import types and renderers
+import type { CellRendererProps, CellRendererFunction, BaseRendererConfig } from './types';
 import { 
   textRenderer,
   statusRenderer,
@@ -36,61 +19,125 @@ import {
   nullRenderer
 } from './renderers';
 
-import { 
-  CellRendererRegistry, 
-  getGlobalRegistry 
-} from './core';
+// Export for external use
+export * from './types';
+export * from './renderers';
+
+// Context for cell renderers
+type CellRendererContextType = {
+  getRenderer: (type: string) => CellRendererFunction | undefined;
+  registerRenderer: (type: string, renderer: CellRendererFunction) => void;
+};
+
+const CellRendererContext = createContext<CellRendererContextType | undefined>(undefined);
+
+// Global registry (singleton) for backward compatibility
+let globalRegistry: Record<string, CellRendererFunction> = {
+  text: textRenderer,
+  status: statusRenderer,
+  currency: currencyRenderer,
+  date: dateRenderer,
+  boolean: booleanRenderer,
+  null: nullRenderer
+};
 
 /**
- * Creates a new cell renderer registry pre-loaded with common renderers.
- * 
- * This is the recommended way to create a new registry instance when you need
- * a separate registry from the global one. The registry comes pre-configured with
- * all built-in renderers.
- * 
- * @example
- * ```tsx
- * const registry = createCellRendererRegistry();
- * 
- * // Add a custom renderer
- * registry.register('custom', (props, config) => {
- *   return <div className={config.className}>{props.getValue()}</div>
- * });
- * ```
- * 
- * @returns A new CellRendererRegistry instance with built-in renderers
+ * Gets the global renderer registry instance
+ * @deprecated Use the React Context API and hooks instead
  */
-export function createCellRendererRegistry(): CellRendererRegistry {
-  const registry = new CellRendererRegistry();
-  
-  // Register all renderers
-  registry.register('text', textRenderer);
-  registry.register('status', statusRenderer);
-  registry.register('currency', currencyRenderer);
-  registry.register('date', dateRenderer);
-  registry.register('boolean', booleanRenderer);
-  registry.register('null', nullRenderer);
-  
-  return registry;
+export function getGlobalCellRendererRegistry() {
+  return {
+    get: (type: string) => globalRegistry[type],
+    register: (type: string, renderer: CellRendererFunction) => {
+      globalRegistry[type] = renderer;
+    },
+    clear: () => {
+      globalRegistry = {
+        text: textRenderer,
+        status: statusRenderer,
+        currency: currencyRenderer,
+        date: dateRenderer,
+        boolean: booleanRenderer,
+        null: nullRenderer
+      };
+    }
+  };
 }
 
 /**
- * Returns the global singleton instance of the cell renderer registry.
- * 
- * The global registry is useful when you want to share the same set of renderers
- * across different parts of your application. It's pre-loaded with all built-in
- * renderers and can be extended with custom ones.
- * 
- * @example
- * ```tsx
- * const globalRegistry = getGlobalCellRendererRegistry();
- * 
- * // Register a custom renderer globally
- * globalRegistry.register('custom', myCustomRenderer);
- * ```
- * 
- * @returns The global CellRendererRegistry instance
+ * Provider component for cell renderers
  */
-export function getGlobalCellRendererRegistry(): CellRendererRegistry {
-  return getGlobalRegistry();
+export function CellRendererProvider({ children, initialRenderers = {} }: { 
+  children: React.ReactNode; 
+  initialRenderers?: Record<string, CellRendererFunction>;
+}) {
+  const [renderers, setRenderers] = useState<Record<string, CellRendererFunction>>({
+    ...globalRegistry,
+    ...initialRenderers
+  });
+  
+  const registerRenderer = (type: string, renderer: CellRendererFunction) => {
+    setRenderers(prev => ({
+      ...prev,
+      [type]: renderer
+    }));
+  };
+  
+  const getRenderer = (type: string) => renderers[type];
+  
+  return (
+    <CellRendererContext.Provider value={{ getRenderer, registerRenderer }}>
+      {children}
+    </CellRendererContext.Provider>
+  );
+}
+
+/**
+ * Hook to use and register cell renderers
+ */
+export function useCellRenderers() {
+  const context = useContext(CellRendererContext);
+  
+  if (!context) {
+    throw new Error('useCellRenderers must be used within a CellRendererProvider');
+  }
+  
+  return context;
+}
+
+/**
+ * Hook to render a cell with the appropriate renderer
+ */
+export function useCellRenderer(type: string, defaultRenderer?: CellRendererFunction) {
+  const { getRenderer } = useCellRenderers();
+  
+  return (props: CellRendererProps, config?: BaseRendererConfig) => {
+    const renderer = getRenderer(type) || defaultRenderer;
+    if (!renderer) {
+      console.warn(`No renderer found for type: ${type}`);
+      return props.getValue();
+    }
+    
+    return renderer(props, config);
+  };
+}
+
+/**
+ * Creates and returns a pre-configured CellRendererProvider with all built-in renderers
+ */
+export function createDefaultCellRendererProvider(children: React.ReactNode) {
+  return (
+    <CellRendererProvider 
+      initialRenderers={{
+        text: textRenderer,
+        status: statusRenderer,
+        currency: currencyRenderer,
+        date: dateRenderer,
+        boolean: booleanRenderer,
+        null: nullRenderer
+      }}
+    >
+      {children}
+    </CellRendererProvider>
+  );
 } 

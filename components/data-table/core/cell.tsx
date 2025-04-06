@@ -2,8 +2,8 @@
 
 import React from "react"
 import { Cell, Row, ColumnDef } from "@tanstack/react-table"
-import { getGlobalCellRendererRegistry } from "../cell-renderers"
-import { CellRendererProps } from "../cell-renderers/core/types"
+import { getGlobalCellRendererRegistry } from "@/components/data-table/cell-renderers"
+import { CellRendererProps } from "@/components/data-table/cell-renderers/types"
 
 /**
  * Props for the DataTableCell component.

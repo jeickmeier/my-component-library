@@ -22,6 +22,8 @@ components/data-table/
 │   ├── toolbar.tsx          # Table toolbar implementation
 │   ├── pagination.tsx       # Pagination controls
 │   ├── column-header.tsx    # Column header with sorting, filtering, etc.
+│   ├── grouping-panel.tsx   # Panel for managing grouping settings
+│   ├── grouping-controls.tsx # Controls for group management
 │   └── index.ts             # Parts module exports
 ├── schema/                  # Schema management
 │   ├── schema-utils.ts      # Utilities for working with schemas
@@ -37,10 +39,6 @@ components/data-table/
 │   ├── filter-factory.tsx   # Factory for creating filter UI
 │   ├── components/          # Individual filter type components
 │   └── index.ts             # Filter module exports
-├── grouping/                # Grouping functionality
-│   ├── grouping-panel.tsx   # Panel for configuring grouping
-│   ├── grouping-controls.tsx # Grouping controls UI
-│   └── index.ts             # Grouping module exports
 ├── cell-renderers/          # Cell renderer system
 │   ├── core/                # Core renderer implementation
 │   ├── renderers/           # Individual cell renderers

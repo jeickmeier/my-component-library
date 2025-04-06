@@ -12,7 +12,7 @@
 
 import { deserializeSchema } from "./serialization"
 import { SerializableDataTableSchema } from "../types"
-import { getGlobalCellRendererRegistry } from "../cell-renderers"
+import { getGlobalCellRendererRegistry } from "@/components/data-table/cell-renderers"
 
 /**
  * Saves a table schema to a file via API.

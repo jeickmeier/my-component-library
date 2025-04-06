@@ -48,9 +48,6 @@ export * from "./filters"
 // Export schema utilities
 export * from "./schema"
 
-// Export grouping functionality
-export * from "./grouping"
-
 // Export UI parts
 export * from "./parts"
 
@@ -78,5 +75,6 @@ export type {
 
 // Re-export for backward compatibility
 export { DataTableColumnHeader } from "./parts/column-header"
+export { GroupingPanel, GroupingControls } from "./parts"
 export { createColumn, createColumns } from "./utils/column-helper"
 export { saveSchemaToFile, loadSchemaFromFile } from "./schema/column-serialization" 

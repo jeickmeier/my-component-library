@@ -32,7 +32,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { GroupingPanel } from "../grouping"
+import { GroupingPanel } from "./grouping-panel"
 import { getGroupableColumns } from "../schema"
 import { hasAccessorKey, exportToCSV } from "../utils"
 import { GroupableColumn } from "../types"
