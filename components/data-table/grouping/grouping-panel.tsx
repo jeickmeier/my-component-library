@@ -29,11 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-
-interface GroupableColumn {
-  id: string
-  label: string
-}
+import { GroupableColumn } from "../types"
 
 interface SortableItemProps {
   id: string
@@ -174,4 +170,4 @@ export function GroupingPanel({
       </div>
     </div>
   )
-}
+} 

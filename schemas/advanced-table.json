@@ -1,0 +1,206 @@
+{
+  "columns": [
+    {
+      "id": "id",
+      "accessorKey": "id",
+      "header": "ID",
+      "enableSorting": true,
+      "enableGrouping": false,
+      "alignment": "left"
+    },
+    {
+      "id": "name",
+      "accessorKey": "name",
+      "header": "Name",
+      "enableSorting": true,
+      "enableGrouping": true,
+      "filter": {
+        "type": "select",
+        "options": [
+          { "label": "John", "value": "John" },
+          { "label": "Jane", "value": "Jane" },
+          { "label": "Bob", "value": "Bob" }
+        ],
+        "getOptionsFromData": true
+      },
+      "aggregationType": "count"
+    },
+    {
+      "id": "department",
+      "accessorKey": "department",
+      "header": "Department",
+      "enableSorting": true,
+      "enableGrouping": true,
+      "filter": {
+        "type": "multi-select",
+        "options": [
+          { "label": "Engineering", "value": "engineering" },
+          { "label": "Marketing", "value": "marketing" },
+          { "label": "Sales", "value": "sales" },
+          { "label": "HR", "value": "hr" }
+        ]
+      },
+      "cellRenderer": {
+        "type": "badge",
+        "config": {
+          "colorMap": {
+            "engineering": "blue",
+            "marketing": "purple",
+            "sales": "green",
+            "hr": "yellow"
+          }
+        }
+      },
+      "aggregationType": "uniqueCount"
+    },
+    {
+      "id": "salary",
+      "accessorKey": "salary",
+      "header": "Salary",
+      "enableSorting": true,
+      "enableGrouping": false,
+      "alignment": "right",
+      "filter": {
+        "type": "range",
+        "min": 30000,
+        "max": 200000
+      },
+      "cellRenderer": {
+        "type": "currency",
+        "config": {
+          "currency": "USD",
+          "locale": "en-US"
+        }
+      },
+      "aggregationType": "first",
+      "aggregationConfig": {
+        "currency": "USD",
+        "locale": "en-US"
+      }
+    },
+    {
+      "id": "startDate",
+      "accessorKey": "startDate",
+      "header": "Start Date",
+      "enableSorting": true,
+      "enableGrouping": true,
+      "alignment": "center",
+      "filter": {
+        "type": "date-range",
+        "min": "2020-01-01",
+        "max": "2023-12-31"
+      },
+      "cellRenderer": {
+        "type": "date",
+        "config": {
+          "format": {
+            "year": "numeric",
+            "month": "short",
+            "day": "numeric"
+          }
+        }
+      },
+      "aggregationType": "extend"
+    },
+    {
+      "id": "status",
+      "accessorKey": "status",
+      "header": "Status",
+      "enableSorting": true,
+      "enableGrouping": true,
+      "filter": {
+        "type": "select",
+        "options": [
+          { "label": "Active", "value": "active" },
+          { "label": "On Leave", "value": "onLeave" },
+          { "label": "Terminated", "value": "terminated" }
+        ]
+      },
+      "cellRenderer": {
+        "type": "status",
+        "config": {
+          "statusMap": {
+            "active": { "color": "green", "label": "Active" },
+            "onLeave": { "color": "yellow", "label": "On Leave" },
+            "terminated": { "color": "red", "label": "Terminated" }
+          }
+        }
+      },
+      "aggregationType": "mode"
+    },
+    {
+      "id": "performance",
+      "accessorKey": "performance",
+      "header": "Performance Rating",
+      "enableSorting": true,
+      "enableGrouping": true,
+      "filter": {
+        "type": "range",
+        "min": 1,
+        "max": 5
+      },
+      "cellRenderer": {
+        "type": "rating",
+        "config": {
+          "max": 5,
+          "icon": "star"
+        }
+      },
+      "aggregationType": "mean"
+    },
+    {
+      "id": "fullTime",
+      "accessorKey": "fullTime",
+      "header": "Full Time",
+      "enableSorting": true,
+      "enableGrouping": true,
+      "filter": {
+        "type": "boolean"
+      },
+      "cellRenderer": {
+        "type": "boolean",
+        "config": {
+          "trueText": "Yes",
+          "falseText": "No",
+          "trueIcon": "✓",
+          "falseIcon": "✗"
+        }
+      }
+    },
+    {
+      "id": "projectCount",
+      "accessorKey": "projectCount",
+      "header": "Projects",
+      "enableSorting": true,
+      "enableGrouping": false,
+      "alignment": "center",
+      "filter": {
+        "type": "range",
+        "min": 0,
+        "max": 20
+      },
+      "cellRenderer": {
+        "type": "numeric",
+        "config": {
+          "format": {
+            "style": "decimal",
+            "minimumFractionDigits": 0,
+            "maximumFractionDigits": 0
+          }
+        }
+      },
+      "aggregationType": "sum"
+    }
+  ],
+  "defaultSorting": [
+    { "id": "startDate", "desc": true }
+  ],
+  "defaultGrouping": ["department"],
+  "defaultColumnVisibility": {
+    "id": false
+  },
+  "enableGrouping": true,
+  "enableGlobalFilter": true,
+  "enablePagination": false,
+  "defaultPageSize": 25
+} 

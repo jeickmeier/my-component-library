@@ -1,0 +1,167 @@
+[
+  {
+    "id": "emp001",
+    "name": "John Smith",
+    "department": "engineering",
+    "salary": 95000,
+    "startDate": "2020-03-15",
+    "status": "active",
+    "performance": 4,
+    "fullTime": true,
+    "projectCount": 5
+  },
+  {
+    "id": "emp002",
+    "name": "Jane Doe",
+    "department": "marketing",
+    "salary": 82500,
+    "startDate": "2021-05-10",
+    "status": "active",
+    "performance": 5,
+    "fullTime": true,
+    "projectCount": 3
+  },
+  {
+    "id": "emp003",
+    "name": "Bob Johnson",
+    "department": "sales",
+    "salary": 78000,
+    "startDate": "2019-11-22",
+    "status": "onLeave",
+    "performance": 3,
+    "fullTime": true,
+    "projectCount": 8
+  },
+  {
+    "id": "emp004",
+    "name": "Alice Williams",
+    "department": "engineering",
+    "salary": 110000,
+    "startDate": "2018-07-05",
+    "status": "active",
+    "performance": 5,
+    "fullTime": true,
+    "projectCount": 7
+  },
+  {
+    "id": "emp005",
+    "name": "Michael Brown",
+    "department": "hr",
+    "salary": 65000,
+    "startDate": "2022-01-15",
+    "status": "active",
+    "performance": 4,
+    "fullTime": true,
+    "projectCount": 2
+  },
+  {
+    "id": "emp006",
+    "name": "Sarah Miller",
+    "department": "marketing",
+    "salary": 75000,
+    "startDate": "2021-08-30",
+    "status": "active",
+    "performance": 4,
+    "fullTime": false,
+    "projectCount": 4
+  },
+  {
+    "id": "emp007",
+    "name": "David Wilson",
+    "department": "engineering",
+    "salary": 125000, 
+    "startDate": "2017-04-12",
+    "status": "active",
+    "performance": 5,
+    "fullTime": true,
+    "projectCount": 12
+  },
+  {
+    "id": "emp008",
+    "name": "Jennifer Garcia",
+    "department": "sales",
+    "salary": 92000,
+    "startDate": "2020-09-08",
+    "status": "active",
+    "performance": 4,
+    "fullTime": true,
+    "projectCount": 6
+  },
+  {
+    "id": "emp009",
+    "name": "Thomas Rodriguez",
+    "department": "engineering",
+    "salary": 98500,
+    "startDate": "2019-02-28",
+    "status": "terminated",
+    "performance": 2,
+    "fullTime": true,
+    "projectCount": 3
+  },
+  {
+    "id": "emp010",
+    "name": "Emily Martinez",
+    "department": "hr",
+    "salary": 72000,
+    "startDate": "2021-11-15",
+    "status": "active",
+    "performance": 3,
+    "fullTime": false,
+    "projectCount": 1
+  },
+  {
+    "id": "emp011",
+    "name": "Daniel Anderson",
+    "department": "engineering",
+    "salary": 115000,
+    "startDate": "2018-10-10",
+    "status": "onLeave",
+    "performance": 4,
+    "fullTime": true,
+    "projectCount": 9
+  },
+  {
+    "id": "emp012",
+    "name": "Lisa Taylor",
+    "department": "marketing",
+    "salary": 88000,
+    "startDate": "2020-07-20",
+    "status": "active",
+    "performance": 5,
+    "fullTime": true,
+    "projectCount": 5
+  },
+  {
+    "id": "emp013",
+    "name": "Robert White",
+    "department": "sales",
+    "salary": 79500,
+    "startDate": "2021-03-14",
+    "status": "active",
+    "performance": 3,
+    "fullTime": true,
+    "projectCount": 4
+  },
+  {
+    "id": "emp014",
+    "name": "Karen Harris",
+    "department": "engineering",
+    "salary": 105000,
+    "startDate": "2019-05-22",
+    "status": "active",
+    "performance": 4,
+    "fullTime": true,
+    "projectCount": 8
+  },
+  {
+    "id": "emp015",
+    "name": "Christopher Lewis",
+    "department": "hr",
+    "salary": 68000,
+    "startDate": "2022-02-18",
+    "status": "active",
+    "performance": 3,
+    "fullTime": true,
+    "projectCount": 2
+  }
+] 
