@@ -15,11 +15,23 @@ components/data-table/
 │   ├── context.tsx          # Table context provider
 │   ├── data-table.tsx       # Main DataTable component
 │   └── index.ts             # Core module exports
-├── column/                  # Column-related functionality
+├── parts/                   # UI components for the table
+│   ├── table-header.tsx     # Table header implementation
+│   ├── table-body.tsx       # Table body implementation
+│   ├── table-cell.tsx       # Table cell implementation 
+│   ├── toolbar.tsx          # Table toolbar implementation
+│   ├── pagination.tsx       # Pagination controls
 │   ├── column-header.tsx    # Column header with sorting, filtering, etc.
+│   └── index.ts             # Parts module exports
+├── schema/                  # Schema management
+│   ├── schema-utils.ts      # Utilities for working with schemas
+│   ├── serialization.ts     # Schema serialization/deserialization
+│   ├── schema-builder.ts    # Fluent API for building schemas
+│   ├── column-serialization.tsx # Schema persistence for columns
+│   └── index.ts             # Schema module exports
+├── utils/                   # Utility functions
 │   ├── column-helper.ts     # Utilities for creating column definitions
-│   ├── serialized-columns.tsx # Schema serialization for columns
-│   └── index.ts             # Column module exports
+│   └── index.ts             # Utils module exports
 ├── filters/                 # Filter system
 │   ├── filter-functions.ts  # Custom filter implementation
 │   ├── filter-factory.tsx   # Factory for creating filter UI
@@ -29,25 +41,10 @@ components/data-table/
 │   ├── grouping-panel.tsx   # Panel for configuring grouping
 │   ├── grouping-controls.tsx # Grouping controls UI
 │   └── index.ts             # Grouping module exports
-├── pagination/              # Pagination controls
-│   ├── pagination-controls.tsx # Pagination UI
-│   └── index.ts             # Pagination module exports
-├── schema/                  # Schema management
-│   ├── schema-utils.ts      # Utilities for working with schemas
-│   ├── serialization.ts     # Schema serialization/deserialization
-│   ├── schema-builder.ts    # Fluent API for building schemas
-│   └── index.ts             # Schema module exports
-├── parts/                   # UI components for the table
-│   ├── table-header.tsx     # Table header implementation
-│   ├── table-body.tsx       # Table body implementation
-│   └── index.ts             # Parts module exports
 ├── cell-renderers/          # Cell renderer system
 │   ├── core/                # Core renderer implementation
 │   ├── renderers/           # Individual cell renderers
 │   └── index.tsx            # Renderer module exports
-├── cell/                    # Cell components
-│   ├── cell.tsx             # Unified cell component that handles normal and aggregated cells
-│   └── index.ts             # Cell module exports
 └── aggregation/             # Aggregation functionality
     ├── core/                # Core aggregation implementation
     ├── functions/           # Aggregation functions

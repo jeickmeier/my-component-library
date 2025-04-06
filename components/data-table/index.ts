@@ -45,20 +45,14 @@ export * from "./utils"
 // Export filter functionality
 export * from "./filters"
 
-// Export column functionality
-export * from "./column"
-
 // Export schema utilities
 export * from "./schema"
 
 // Export grouping functionality
 export * from "./grouping"
 
-// Export pagination functionality
-export { Pagination } from "./parts/pagination"
-
-// Export cell functionality - Now handled through core
-// export * from "./cell"
+// Export UI parts
+export * from "./parts"
 
 // Export aggregation functionality
 export * from "./aggregation"
@@ -82,5 +76,7 @@ export type {
   SerializableColumnDef
 } from "./types"
 
-// Re-export from column for backward compatibility
-export { DataTableColumnHeader } from "./column" 
+// Re-export for backward compatibility
+export { DataTableColumnHeader } from "./parts/column-header"
+export { createColumn, createColumns } from "./utils/column-helper"
+export { saveSchemaToFile, loadSchemaFromFile } from "./schema/column-serialization" 

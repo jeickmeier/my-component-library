@@ -10,7 +10,7 @@
 
 "use client"
 
-import { deserializeSchema } from "../schema/serialization"
+import { deserializeSchema } from "./serialization"
 import { SerializableDataTableSchema } from "../types"
 import { getGlobalCellRendererRegistry } from "../cell-renderers"
 

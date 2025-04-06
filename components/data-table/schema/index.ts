@@ -9,6 +9,7 @@
  * - Schema Utilities: Helper functions for schema manipulation and validation
  * - Serialization: Functions for converting schemas to/from different formats
  * - Schema Builder: Tools for programmatically creating and modifying schemas
+ * - Column Serialization: Functions for saving and loading column schema configurations
  * 
  * Features:
  * - Type-safe schema definitions
@@ -16,10 +17,12 @@
  * - Serialization/deserialization support
  * - Programmatic schema building
  * - Column configuration management
+ * - Schema persistence
  * 
  * @module data-table/schema
  */
 
 export * from "./schema-utils"
 export * from "./serialization"
-export * from "./schema-builder" 
+export * from "./schema-builder"
+export * from "./column-serialization" 

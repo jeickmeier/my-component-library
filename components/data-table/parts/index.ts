@@ -11,6 +11,7 @@
  * - TableCell: Renders individual table cells with proper formatting
  * - Toolbar: Provides table controls and actions
  * - Pagination: Handles table pagination and page navigation
+ * - DataTableColumnHeader: Interactive column header with sorting, filtering and more
  * 
  * Features:
  * - Modular table structure
@@ -26,4 +27,5 @@ export { TableHeaderComponent as TableHeader } from './table-header'
 export { TableBodyComponent as TableBody } from './table-body'
 export { TableCell } from './table-cell'
 export { Toolbar } from './toolbar'
-export { Pagination } from './pagination' 
+export { Pagination } from './pagination'
+export { DataTableColumnHeader } from './column-header' 

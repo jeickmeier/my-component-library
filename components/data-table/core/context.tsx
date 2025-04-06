@@ -39,7 +39,7 @@ import {
 } from "@tanstack/react-table"
 import { DataTableSchema } from "../types"
 import { createMultiSelectFilterFn, createDateRangeFilterFn, createBooleanFilterFn } from "../filters"
-import { DataTableColumnHeader } from "../column/column-header"
+import { DataTableColumnHeader } from "../parts/column-header"
 import { createAggregationFunctionRegistry, getGlobalAggregationFunctionRegistry } from "../aggregation"
 
 /**
