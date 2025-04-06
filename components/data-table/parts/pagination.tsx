@@ -150,6 +150,7 @@ export function Pagination() {
             }
           }}
           disabled={!typedTable.getCanPreviousPage()}
+          aria-label="Previous page"
         >
           <span className="sr-only">Previous page</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
@@ -168,6 +169,7 @@ export function Pagination() {
             }
           }}
           disabled={!typedTable.getCanNextPage()}
+          aria-label="Next page"
         >
           <span className="sr-only">Next page</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">

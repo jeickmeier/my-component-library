@@ -55,10 +55,10 @@ export * from "./schema"
 export * from "./grouping"
 
 // Export pagination functionality
-export * from "./pagination"
+export { Pagination } from "./parts/pagination"
 
-// Export cell functionality
-export * from "./cell"
+// Export cell functionality - Now handled through core
+// export * from "./cell"
 
 // Export aggregation functionality
 export * from "./aggregation"

@@ -7,7 +7,7 @@ export async function GET(
   { params }: { params: { name: string } }
 ) {
   try {
-    const schemaName = params.name
+    const { name: schemaName } = params
     const filePath = path.join(process.cwd(), 'schemas', `${schemaName}.json`)
     
     // Check if file exists

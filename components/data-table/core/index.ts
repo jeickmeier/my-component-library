@@ -9,6 +9,7 @@
  * - DataTable: The main component for rendering data tables
  * - DataTableProvider: Context provider for table state management
  * - useDataTable: Hook for accessing table state and operations
+ * - DataTableCell: Cell component for rendering table cells
  * 
  * The core module implements a composable architecture where the main DataTable
  * component serves as a facade, while the context provider manages the complex
@@ -18,4 +19,5 @@
  */
 
 export { DataTable } from "./data-table"
-export { DataTableProvider, useDataTable } from "./context" 
+export { DataTableProvider, useDataTable } from "./context"
+export { DataTableCell } from "./cell" 

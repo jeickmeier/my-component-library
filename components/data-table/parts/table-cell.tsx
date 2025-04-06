@@ -18,7 +18,7 @@
 
 import * as React from "react"
 import { Cell, flexRender, ColumnDef } from "@tanstack/react-table"
-import { DataTableCell } from "../cell"
+import { DataTableCell } from "../core"
 
 /**
  * Props for the TableCell component

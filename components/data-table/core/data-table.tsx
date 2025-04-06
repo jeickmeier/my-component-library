@@ -25,8 +25,7 @@ import * as React from "react"
 import { DataTableProvider } from "./context"
 import { DataTableProps } from "../types"
 import { Table } from "@/components/ui/table"
-import { TableHeader, TableBody, Toolbar } from "../parts"
-import { PaginationControls } from "../pagination"
+import { TableHeader, TableBody, Toolbar, Pagination } from "../parts"
 
 /**
  * Main DataTable component
@@ -140,7 +139,7 @@ function DataTableContent() {
           <TableBody />
         </Table>
       </div>
-      <PaginationControls />
+      <Pagination />
     </div>
   )
 } 
