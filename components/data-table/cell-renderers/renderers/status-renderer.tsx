@@ -2,7 +2,20 @@ import React from "react";
 import { CellRendererProps, StatusRendererConfig } from "../core/types";
 
 /**
- * Default color map for common status values
+ * Default color mappings for common status values.
+ * These colors use Tailwind CSS classes and provide a sensible default
+ * for common status states.
+ * 
+ * @example
+ * ```ts
+ * // Override or extend these defaults in your config:
+ * {
+ *   colorMap: {
+ *     ...DEFAULT_COLOR_MAP,
+ *     'custom-status': 'bg-purple-500'
+ *   }
+ * }
+ * ```
  */
 const DEFAULT_COLOR_MAP: Record<string, string> = {
   pending: "bg-yellow-500",
@@ -15,10 +28,40 @@ const DEFAULT_COLOR_MAP: Record<string, string> = {
 };
 
 /**
- * Renders a status value with a color indicator
- * @param props - Cell renderer props
- * @param config - Status renderer configuration
- * @returns Rendered status cell
+ * Status Cell Renderer
+ * 
+ * Renders a status value with a colored indicator dot and capitalized text.
+ * This renderer is ideal for displaying state, status, or progress indicators
+ * in a visually appealing and consistent way.
+ * 
+ * Features:
+ * - Colored dot indicator
+ * - Capitalized status text
+ * - Configurable color mapping
+ * - Default colors for common statuses
+ * - Custom CSS class support
+ * - Empty value handling
+ * 
+ * @param props - Cell renderer props containing the status value
+ * @param config - Configuration options for status rendering
+ * 
+ * @example
+ * ```tsx
+ * // Basic usage with default colors
+ * statusRenderer(props)
+ * 
+ * // With custom color mapping
+ * statusRenderer(props, {
+ *   colorMap: {
+ *     active: 'bg-green-500',
+ *     inactive: 'bg-red-500',
+ *     maintenance: 'bg-yellow-500'
+ *   },
+ *   className: 'my-status-cell'
+ * })
+ * ```
+ * 
+ * @returns A div element containing the status indicator and text
  */
 export function statusRenderer(
   props: CellRendererProps,

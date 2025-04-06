@@ -1,5 +1,24 @@
 "use client"
 
+/**
+ * Table Body Module
+ * 
+ * This module provides the table body component that renders the data rows and cells
+ * of the table. It handles row rendering, cell alignment, grouping, aggregation,
+ * and expandable rows.
+ * 
+ * Features:
+ * - Row and cell rendering
+ * - Automatic cell alignment
+ * - Grouping support
+ * - Aggregation display
+ * - Expandable rows
+ * - Empty state handling
+ * - Responsive design
+ * 
+ * @module data-table/parts/table-body
+ */
+
 import * as React from "react"
 import { flexRender, Row, Cell, Table } from "@tanstack/react-table"
 import { useDataTable } from "../core/context"
@@ -8,9 +27,47 @@ import { Button } from "@/components/ui/button"
 import { ChevronDown, ChevronRight } from "lucide-react"
 
 /**
- * TableBody component for the data table
+ * Table Body Component
  * 
- * Renders the table body with rows and cells.
+ * Renders the body section of the data table, including all rows and cells.
+ * The component handles various cell types (grouped, aggregated, placeholder)
+ * and provides automatic alignment based on data type.
+ * 
+ * Features:
+ * - Row and cell rendering
+ * - Automatic cell alignment based on data type
+ * - Grouping support with expand/collapse
+ * - Aggregation display
+ * - Empty state handling
+ * - Responsive design
+ * 
+ * The component automatically:
+ * - Renders all rows and cells
+ * - Applies appropriate alignment
+ * - Handles grouped and aggregated cells
+ * - Shows expand/collapse buttons for grouped rows
+ * - Displays row counts for grouped cells
+ * - Shows an empty state when no data is available
+ * 
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <TableBody />
+ * 
+ * // With grouping
+ * const columns = [
+ *   {
+ *     id: 'category',
+ *     header: 'Category',
+ *     enableGrouping: true
+ *   },
+ *   {
+ *     id: 'value',
+ *     header: 'Value',
+ *     aggregationFn: 'sum'
+ *   }
+ * ]
+ * ```
  */
 export function TableBodyComponent() {
   const { 

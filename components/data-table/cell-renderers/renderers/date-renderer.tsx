@@ -2,10 +2,53 @@ import React from "react";
 import { CellRendererProps, DateRendererConfig } from "../core/types";
 
 /**
- * Renders a date value with customizable formatting
- * @param props - Cell renderer props
- * @param config - Date renderer configuration
- * @returns Rendered date cell
+ * Date Cell Renderer
+ * 
+ * Renders date values with localized formatting using Intl.DateTimeFormat.
+ * This renderer handles various date formats and provides extensive
+ * configuration options for date and time display.
+ * 
+ * Features:
+ * - Locale-aware date formatting
+ * - Configurable date/time components
+ * - Multiple date format styles
+ * - Timezone support
+ * - Invalid date handling
+ * - Custom CSS class support
+ * 
+ * @param props - Cell renderer props containing the date value
+ * @param config - Configuration options for date formatting
+ * 
+ * @example
+ * ```tsx
+ * // Basic usage (defaults to short date format)
+ * dateRenderer(props)
+ * 
+ * // Full date and time in French
+ * dateRenderer(props, {
+ *   locale: 'fr-FR',
+ *   options: {
+ *     dateStyle: 'full',
+ *     timeStyle: 'long'
+ *   }
+ * })
+ * 
+ * // Custom format
+ * dateRenderer(props, {
+ *   locale: 'en-US',
+ *   options: {
+ *     weekday: 'long',
+ *     year: 'numeric',
+ *     month: 'long',
+ *     day: 'numeric',
+ *     hour: '2-digit',
+ *     minute: '2-digit',
+ *     timeZone: 'UTC'
+ *   }
+ * })
+ * ```
+ * 
+ * @returns A div element containing the formatted date
  */
 export function dateRenderer(
   props: CellRendererProps,

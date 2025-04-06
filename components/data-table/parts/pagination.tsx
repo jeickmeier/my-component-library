@@ -1,5 +1,24 @@
 "use client"
 
+/**
+ * Pagination Module
+ * 
+ * This module provides the pagination component for the data table, which includes
+ * page navigation controls, page size selection, and entry count display. The
+ * component integrates with the table's context to provide a consistent interface
+ * for pagination operations.
+ * 
+ * Features:
+ * - Page navigation controls
+ * - Page size selection
+ * - Entry count display
+ * - Grouping information display
+ * - Responsive design
+ * - Accessibility support
+ * 
+ * @module data-table/parts/pagination
+ */
+
 import * as React from "react"
 import { useDataTable } from "../core/context"
 import { Table } from "@tanstack/react-table"
@@ -12,9 +31,45 @@ import {
 } from "@/components/ui/select"
 
 /**
- * Pagination component for the data table
+ * Pagination Component
  * 
- * Shows pagination controls and page size selector.
+ * A comprehensive pagination component that provides page navigation, size selection,
+ * and entry count display for the data table. It integrates with the table's context
+ * to manage pagination state and display grouping information when applicable.
+ * 
+ * Features:
+ * - Page navigation with previous/next buttons
+ * - Page size selection (25, 50, 100, 250, 500, 1000)
+ * - Current page and total pages display
+ * - Total entries count
+ * - Grouping information display
+ * - Responsive design
+ * - Accessibility support
+ * 
+ * The component automatically:
+ * - Renders pagination controls when enabled
+ * - Shows entry count and grouping information
+ * - Provides page size selection
+ * - Handles page navigation
+ * - Disables navigation buttons when at limits
+ * 
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <Pagination />
+ * 
+ * // With custom configuration
+ * const schema = {
+ *   enablePagination: true,
+ *   columns: [
+ *     {
+ *       id: 'name',
+ *       header: 'Name',
+ *       enableGrouping: true
+ *     }
+ *   ]
+ * }
+ * ```
  */
 export function Pagination() {
   const {
@@ -31,7 +86,12 @@ export function Pagination() {
     return null
   }
 
-  // Get the label for a grouped column
+  /**
+   * Gets the display label for a grouped column
+   * 
+   * @param columnId - The ID of the column to get the label for
+   * @returns The display label for the column
+   */
   const getGroupedColumnLabel = (columnId: string) => {
     const column = schema.columns.find(c => c.id === columnId) ||
       schema.columns.find(c => 'accessorKey' in c && c.accessorKey === columnId)

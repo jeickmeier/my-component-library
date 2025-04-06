@@ -1,5 +1,23 @@
 "use client"
 
+/**
+ * Toolbar Module
+ * 
+ * This module provides the toolbar component for the data table, which includes
+ * search functionality, export controls, and grouping management. The toolbar
+ * integrates with the data table's context to provide a consistent interface
+ * for table operations.
+ * 
+ * Features:
+ * - Global search functionality
+ * - CSV export capability
+ * - Grouping management
+ * - Responsive design
+ * - Accessibility support
+ * 
+ * @module data-table/parts/toolbar
+ */
+
 import * as React from "react"
 import { useDataTable } from "../core/context"
 import { Input } from "@/components/ui/input"
@@ -20,9 +38,46 @@ import { hasAccessorKey, exportToCSV } from "../utils"
 import { GroupableColumn } from "../types"
 
 /**
- * Toolbar component for the data table
+ * Toolbar Component
  * 
- * Contains the search input, export button, and grouping controls.
+ * A comprehensive toolbar component that provides search, export, and grouping
+ * functionality for the data table. It integrates with the table's context to
+ * manage global filtering, data export, and column grouping.
+ * 
+ * Features:
+ * - Global search with customizable placeholder
+ * - CSV export with automatic filename generation
+ * - Grouping management with drag-and-drop support
+ * - Visual feedback for active groups
+ * - Responsive design
+ * - Accessibility support
+ * 
+ * The component automatically:
+ * - Renders search input when enabled
+ * - Provides export functionality when enabled
+ * - Shows grouping controls when enabled
+ * - Displays active group count
+ * - Manages grouping dialog state
+ * 
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <Toolbar />
+ * 
+ * // With custom configuration
+ * const schema = {
+ *   enableGlobalFilter: true,
+ *   enableExport: true,
+ *   enableGrouping: true,
+ *   columns: [
+ *     {
+ *       id: 'name',
+ *       header: 'Name',
+ *       enableGrouping: true
+ *     }
+ *   ]
+ * }
+ * ```
  */
 export function Toolbar() {
   const {

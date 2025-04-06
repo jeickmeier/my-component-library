@@ -1,5 +1,15 @@
 "use client";
 
+/**
+ * Column Header Module
+ * 
+ * This module provides the interactive column header component used in the data table.
+ * It includes functionality for column operations like sorting, filtering, grouping,
+ * and aggregation, with a dropdown menu for easy access to these features.
+ * 
+ * @module column-header
+ */
+
 import * as React from "react";
 import type { Column } from "@tanstack/react-table";
 import {
@@ -37,14 +47,67 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 
+/**
+ * Props for the DataTableColumnHeader component.
+ * 
+ * @template TData The type of data in the table rows
+ * @template TValue The type of value in this column
+ */
 interface DataTableColumnHeaderProps<TData, TValue> {
+  /** The column instance from TanStack Table */
   column: Column<TData, TValue>;
+  /** The display title for the column */
   title: React.ReactNode;
+  /** Optional CSS class name for styling */
   className?: string;
+  /** Optional filter configuration for the column */
   filter?: ColumnFilter;
+  /** Optional text alignment within the header */
   alignment?: string;
 }
 
+/**
+ * Column Header Component
+ * 
+ * A comprehensive header component for data table columns that provides
+ * interactive controls for column manipulation and data analysis.
+ * 
+ * Features:
+ * - Sorting controls (ascending, descending, clear)
+ * - Column visibility toggle
+ * - Filter management
+ * - Aggregation controls
+ * - Grouping support
+ * - Visual indicators for active features
+ * - Responsive dropdown menu
+ * - Keyboard accessibility
+ * 
+ * The component integrates with TanStack Table's column API and provides
+ * a user-friendly interface for all column operations.
+ * 
+ * @template TData The type of data in the table rows
+ * @template TValue The type of value in this column
+ * 
+ * @param props Component props
+ * @param props.column The column instance from TanStack Table
+ * @param props.title Display title for the column
+ * @param props.className Optional CSS class name
+ * @param props.filter Optional filter configuration
+ * @param props.alignment Optional text alignment
+ * 
+ * @example
+ * ```tsx
+ * <DataTableColumnHeader
+ *   column={column}
+ *   title="User Name"
+ *   filter={{
+ *     type: 'text',
+ *     placeholder: 'Filter names...'
+ *   }}
+ *   alignment="left"
+ * />
+ * ```
+ */
 export function DataTableColumnHeader<TData, TValue>({
   column,
   title,
@@ -56,21 +119,22 @@ export function DataTableColumnHeader<TData, TValue>({
   const [isAddingAggregation, setIsAddingAggregation] = React.useState(false);
   const [showSuccess, setShowSuccess] = React.useState(false);
   
-  // Make sure the registry is initialized correctly with standard functions
+  // Initialize registry with standard functions on mount
   React.useEffect(() => {
-    // Ensure registry is populated on component mount
     createAggregationFunctionRegistry();
   }, []);
   
-  // Get aggregation registry
+  // Get aggregation registry and available types
   const aggregationRegistry = React.useMemo(() => 
     getGlobalAggregationFunctionRegistry(), []);
   
-  // Get available aggregation types
   const aggregationTypes = React.useMemo(() => 
     aggregationRegistry.getTypes(), [aggregationRegistry]);
   
-  // Get current aggregation type from context state
+  /**
+   * Gets the current aggregation type for the column.
+   * Checks both runtime state and schema defaults.
+   */
   const currentAggregationType = React.useMemo(() => {
     const columnId = column.id;
     if (!columnId) return undefined;
@@ -87,13 +151,14 @@ export function DataTableColumnHeader<TData, TValue>({
     return schemaColumn?.aggregationType;
   }, [column.id, columnAggregations, schema.columns]);
 
-  // Check if there's an active filter
+  // Track active states
   const hasActiveFilter = column.getFilterValue() !== undefined;
-  
-  // Check if column has aggregation function
   const hasAggregation = !!currentAggregationType;
 
-  // Format aggregation type name for display
+  /**
+   * Formats an aggregation type name for display.
+   * Uses registry labels when available, falls back to camelCase formatting.
+   */
   const formatAggregationType = (type: string): string => {
     if (!type) return '';
     // Get from registry if possible for a more user-friendly name
@@ -106,7 +171,10 @@ export function DataTableColumnHeader<TData, TValue>({
       .replace(/^./, str => str.toUpperCase());
   };
   
-  // Handle change of aggregation type
+  /**
+   * Handles change of aggregation type.
+   * Updates the column's aggregation and shows success feedback.
+   */
   const handleAggregationChange = (type: string) => {
     if (setColumnAggregation && column.id) {
       setColumnAggregation(column.id, type);
@@ -120,7 +188,10 @@ export function DataTableColumnHeader<TData, TValue>({
     }
   };
   
-  // Handle remove aggregation
+  /**
+   * Handles removal of aggregation.
+   * Clears the column's aggregation settings.
+   */
   const handleRemoveAggregation = () => {
     if (setColumnAggregation && column.id) {
       setColumnAggregation(column.id, undefined);
@@ -128,6 +199,7 @@ export function DataTableColumnHeader<TData, TValue>({
     }
   };
 
+  // Render simple header if no interactive features are enabled
   if (!column.getCanSort() && !column.getCanHide() && !filter && !hasAggregation && !schema.enableGrouping) {
     return <div className={cn(className)}>{title}</div>;
   }

@@ -1,5 +1,21 @@
 "use client"
 
+/**
+ * Grouping Controls Module
+ * 
+ * This module provides a button and dialog interface for managing table grouping.
+ * It integrates with the data table context to provide a seamless grouping experience.
+ * 
+ * Features:
+ * - Group management dialog
+ * - Active group count display
+ * - Schema-based group validation
+ * - Responsive design
+ * - Keyboard accessibility
+ * 
+ * @module data-table/grouping/grouping-controls
+ */
+
 import * as React from "react"
 import { useDataTable } from "../core/context"
 import { Button } from "@/components/ui/button"
@@ -19,9 +35,28 @@ import { hasAccessorKey } from "../utils"
 import { GroupableColumn } from "../types"
 
 /**
- * Grouping Controls component
+ * Grouping Controls Component
  * 
- * Provides a button to open the grouping dialog and show active groups.
+ * A component that provides a button to open the grouping dialog and displays the
+ * number of active groups. It integrates with the data table context to manage
+ * grouping state and provides a user-friendly interface for group management.
+ * 
+ * Features:
+ * - Group management dialog
+ * - Active group count display
+ * - Schema-based group validation
+ * - Responsive design
+ * - Keyboard accessibility
+ * 
+ * The component automatically hides itself if:
+ * - Grouping is disabled in the schema
+ * - There are no groupable columns available
+ * 
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <GroupingControls />
+ * ```
  */
 export function GroupingControls() {
   const {

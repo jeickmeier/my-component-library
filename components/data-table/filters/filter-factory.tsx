@@ -1,5 +1,21 @@
 "use client"
 
+/**
+ * Filter Factory Module
+ * 
+ * This module provides a factory component that dynamically creates the appropriate
+ * filter interface based on the column's filter configuration. It serves as a bridge
+ * between the table's column configuration and the actual filter components.
+ * 
+ * The factory handles:
+ * - Filter type detection
+ * - Component selection
+ * - Filter state management
+ * - Clear filter functionality
+ * 
+ * @module data-table/filters/filter-factory
+ */
+
 import * as React from "react"
 import { Column } from "@tanstack/react-table"
 import { X } from "lucide-react"
@@ -12,14 +28,68 @@ import {
   BooleanFilterComponent
 } from "./components"
 
+/**
+ * Props for the FilterFactory component
+ * 
+ * @template TData The type of data in the table rows
+ */
 interface FilterFactoryProps<TData> {
+  /** The column instance from TanStack Table */
   column: Column<TData, unknown>
+  /** The filter configuration for the column */
   filter: ColumnFilter
+  /** Whether to show the clear filter button */
   showClearButton?: boolean
 }
 
 /**
- * Factory component that renders the appropriate filter component based on filter type
+ * Filter Factory Component
+ * 
+ * A factory component that renders the appropriate filter interface based on
+ * the column's filter configuration. It supports various filter types and
+ * provides a consistent interface for filter management.
+ * 
+ * Features:
+ * - Dynamic filter component selection
+ * - Filter state management
+ * - Clear filter functionality
+ * - Consistent styling and behavior
+ * 
+ * Supported Filter Types:
+ * - Select (single choice)
+ * - Multi-select (multiple choices)
+ * - Range (numeric ranges)
+ * - Date Range (date ranges)
+ * - Boolean (true/false)
+ * 
+ * @template TData The type of data in the table rows
+ * 
+ * @param props Component properties
+ * @param props.column The column instance from TanStack Table
+ * @param props.filter The filter configuration for the column
+ * @param props.showClearButton Whether to show the clear filter button
+ * 
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <FilterFactory
+ *   column={column}
+ *   filter={{
+ *     type: 'select',
+ *     options: ['Active', 'Inactive']
+ *   }}
+ * />
+ * 
+ * // With clear button
+ * <FilterFactory
+ *   column={column}
+ *   filter={{
+ *     type: 'dateRange',
+ *     format: 'YYYY-MM-DD'
+ *   }}
+ *   showClearButton={true}
+ * />
+ * ```
  */
 export function FilterFactory<TData>({
   column,

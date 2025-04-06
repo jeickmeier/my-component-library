@@ -1,8 +1,24 @@
 /**
- * Data Table Types
+ * Data Table Types Module
  * 
- * This file contains all type definitions used across the data table components.
- * It centralizes types to avoid duplication and ensure consistency.
+ * This module contains all type definitions used across the data table components.
+ * It centralizes types to avoid duplication and ensure consistency throughout the codebase.
+ * 
+ * Key Type Categories:
+ * - Filter Types: Define various filter configurations (select, multi-select, range, etc.)
+ * - Column Types: Define column structure and behavior
+ * - Schema Types: Define table structure and configuration
+ * - Context Types: Define state management and context values
+ * - Serialization Types: Define serializable versions of complex types
+ * 
+ * Features:
+ * - Type-safe filter configurations
+ * - Flexible column definitions
+ * - Comprehensive schema structure
+ * - Serializable data structures
+ * - Type guards for runtime type checking
+ * 
+ * @module data-table-types
  */
 
 import { ColumnDef, ColumnFiltersState, SortingState, VisibilityState, GroupingState, ExpandedState, HeaderContext } from "@tanstack/react-table"
@@ -10,7 +26,17 @@ import * as React from "react"
 import { AggregationFunctionType, AggregationFunctionConfig } from "./aggregation"
 
 /**
- * Filter Option Types
+ * Filter Option Type
+ * 
+ * Represents a single option in a filter dropdown or selection.
+ * 
+ * @example
+ * ```typescript
+ * const options: FilterOption[] = [
+ *   { label: 'Active', value: 'active' },
+ *   { label: 'Inactive', value: 'inactive' }
+ * ];
+ * ```
  */
 export interface FilterOption {
   label: string
@@ -18,7 +44,17 @@ export interface FilterOption {
 }
 
 /**
- * Column Filter Base Type
+ * Base Filter Type
+ * 
+ * Common properties shared by all filter types.
+ * 
+ * @example
+ * ```typescript
+ * const baseFilter: BaseFilter = {
+ *   type: 'select',
+ *   column: 'status'
+ * };
+ * ```
  */
 export interface BaseFilter {
   type: string;
@@ -27,6 +63,19 @@ export interface BaseFilter {
 
 /**
  * Select Filter Type
+ * 
+ * Represents a single-select filter configuration.
+ * 
+ * @example
+ * ```typescript
+ * const selectFilter: SelectFilter = {
+ *   type: 'select',
+ *   options: [
+ *     { label: 'Active', value: 'active' },
+ *     { label: 'Inactive', value: 'inactive' }
+ *   ]
+ * };
+ * ```
  */
 export interface SelectFilter extends BaseFilter {
   type: 'select';
@@ -36,6 +85,20 @@ export interface SelectFilter extends BaseFilter {
 
 /**
  * Multi-Select Filter Type
+ * 
+ * Represents a multi-select filter configuration.
+ * 
+ * @example
+ * ```typescript
+ * const multiSelectFilter: MultiSelectFilter = {
+ *   type: 'multi-select',
+ *   options: [
+ *     { label: 'Red', value: 'red' },
+ *     { label: 'Blue', value: 'blue' },
+ *     { label: 'Green', value: 'green' }
+ *   ]
+ * };
+ * ```
  */
 export interface MultiSelectFilter extends BaseFilter {
   type: 'multi-select';
@@ -45,6 +108,17 @@ export interface MultiSelectFilter extends BaseFilter {
 
 /**
  * Numeric Range Filter Type
+ * 
+ * Represents a numeric range filter configuration.
+ * 
+ * @example
+ * ```typescript
+ * const rangeFilter: RangeFilter = {
+ *   type: 'range',
+ *   min: 0,
+ *   max: 100
+ * };
+ * ```
  */
 export interface RangeFilter extends BaseFilter {
   type: 'range';
@@ -54,6 +128,17 @@ export interface RangeFilter extends BaseFilter {
 
 /**
  * Date Range Filter Type
+ * 
+ * Represents a date range filter configuration.
+ * 
+ * @example
+ * ```typescript
+ * const dateRangeFilter: DateRangeFilter = {
+ *   type: 'date-range',
+ *   min: '2023-01-01',
+ *   max: '2023-12-31'
+ * };
+ * ```
  */
 export interface DateRangeFilter extends BaseFilter {
   type: 'date-range';
@@ -63,6 +148,16 @@ export interface DateRangeFilter extends BaseFilter {
 
 /**
  * Boolean Filter Type
+ * 
+ * Represents a boolean filter configuration.
+ * 
+ * @example
+ * ```typescript
+ * const booleanFilter: BooleanFilter = {
+ *   type: 'boolean',
+ *   value: true
+ * };
+ * ```
  */
 export interface BooleanFilter extends BaseFilter {
   type: 'boolean';
@@ -71,6 +166,18 @@ export interface BooleanFilter extends BaseFilter {
 
 /**
  * Union type for all column filters
+ * 
+ * Represents any valid filter type that can be applied to a column.
+ * 
+ * @example
+ * ```typescript
+ * const filter: ColumnFilter = {
+ *   type: 'select',
+ *   options: [
+ *     { label: 'Active', value: 'active' }
+ *   ]
+ * };
+ * ```
  */
 export type ColumnFilter = 
   | SelectFilter 
@@ -80,30 +187,81 @@ export type ColumnFilter =
   | BooleanFilter
 
 /**
- * Type guards for column filters
+ * Type guard for SelectFilter
+ * 
+ * @param filter - The filter to check
+ * @returns true if the filter is a SelectFilter
  */
 export function isSelectFilter(filter: ColumnFilter): filter is SelectFilter {
   return filter.type === 'select';
 }
 
+/**
+ * Type guard for MultiSelectFilter
+ * 
+ * @param filter - The filter to check
+ * @returns true if the filter is a MultiSelectFilter
+ */
 export function isMultiSelectFilter(filter: ColumnFilter): filter is MultiSelectFilter {
   return filter.type === 'multi-select';
 }
 
+/**
+ * Type guard for RangeFilter
+ * 
+ * @param filter - The filter to check
+ * @returns true if the filter is a RangeFilter
+ */
 export function isRangeFilter(filter: ColumnFilter): filter is RangeFilter {
   return filter.type === 'range';
 }
 
+/**
+ * Type guard for DateRangeFilter
+ * 
+ * @param filter - The filter to check
+ * @returns true if the filter is a DateRangeFilter
+ */
 export function isDateRangeFilter(filter: ColumnFilter): filter is DateRangeFilter {
   return filter.type === 'date-range';
 }
 
+/**
+ * Type guard for BooleanFilter
+ * 
+ * @param filter - The filter to check
+ * @returns true if the filter is a BooleanFilter
+ */
 export function isBooleanFilter(filter: ColumnFilter): filter is BooleanFilter {
   return filter.type === 'boolean';
 }
 
 /**
  * Enhanced column definition that includes filtering and grouping metadata
+ * 
+ * Extends TanStack Table's ColumnDef with additional features:
+ * - Filter configuration
+ * - Grouping support
+ * - Cell alignment
+ * - Custom cell rendering
+ * - Aggregation support
+ * 
+ * @example
+ * ```typescript
+ * const column: DataTableColumnDef<User> = {
+ *   id: 'name',
+ *   header: 'Name',
+ *   accessorKey: 'name',
+ *   enableGrouping: true,
+ *   filter: {
+ *     type: 'select',
+ *     options: [
+ *       { label: 'John', value: 'John' },
+ *       { label: 'Jane', value: 'Jane' }
+ *     ]
+ *   }
+ * };
+ * ```
  */
 export interface DataTableColumnDef<TData, TValue = unknown> extends Omit<ColumnDef<TData, TValue>, "id"> {
   id?: string
@@ -135,6 +293,28 @@ export interface DataTableColumnDef<TData, TValue = unknown> extends Omit<Column
 
 /**
  * Complete schema for a data table
+ * 
+ * Defines the structure and behavior of a data table, including:
+ * - Column definitions
+ * - Default sorting
+ * - Default grouping
+ * - Column visibility
+ * - Feature flags
+ * - Pagination settings
+ * 
+ * @example
+ * ```typescript
+ * const schema: DataTableSchema<User> = {
+ *   columns: [
+ *     { id: 'name', header: 'Name', accessorKey: 'name' },
+ *     { id: 'age', header: 'Age', accessorKey: 'age' }
+ *   ],
+ *   defaultSorting: [{ id: 'name', desc: false }],
+ *   enableGrouping: true,
+ *   enablePagination: true,
+ *   defaultPageSize: 10
+ * };
+ * ```
  */
 export interface DataTableSchema<TData> {
   columns: DataTableColumnDef<TData>[]
@@ -150,6 +330,14 @@ export interface DataTableSchema<TData> {
 
 /**
  * Interface for the data table props
+ * 
+ * @example
+ * ```typescript
+ * const props: DataTableProps<User> = {
+ *   schema: userSchema,
+ *   data: users
+ * };
+ * ```
  */
 export interface DataTableProps<TData> {
   schema: DataTableSchema<TData>
@@ -158,6 +346,16 @@ export interface DataTableProps<TData> {
 
 /**
  * Serializable cell renderer configuration
+ * 
+ * Defines a cell renderer that can be serialized and stored.
+ * 
+ * @example
+ * ```typescript
+ * const renderer: SerializableCellRenderer = {
+ *   type: 'progress',
+ *   config: { min: 0, max: 100 }
+ * };
+ * ```
  */
 export interface SerializableCellRenderer {
   type: string
@@ -166,6 +364,18 @@ export interface SerializableCellRenderer {
 
 /**
  * Serializable version of a column definition
+ * 
+ * A simplified version of DataTableColumnDef that can be serialized.
+ * 
+ * @example
+ * ```typescript
+ * const column: SerializableColumnDef = {
+ *   id: 'name',
+ *   header: 'Name',
+ *   accessorKey: 'name',
+ *   enableGrouping: true
+ * };
+ * ```
  */
 export interface SerializableColumnDef {
   id?: string
@@ -188,6 +398,19 @@ export interface SerializableColumnDef {
 
 /**
  * Serializable version of a data table schema
+ * 
+ * A simplified version of DataTableSchema that can be serialized.
+ * 
+ * @example
+ * ```typescript
+ * const schema: SerializableDataTableSchema = {
+ *   columns: [
+ *     { id: 'name', header: 'Name', accessorKey: 'name' }
+ *   ],
+ *   defaultSorting: [{ id: 'name', desc: false }],
+ *   enableGrouping: true
+ * };
+ * ```
  */
 export interface SerializableDataTableSchema {
   columns: SerializableColumnDef[]
@@ -203,6 +426,14 @@ export interface SerializableDataTableSchema {
 
 /**
  * Interface for groupable column objects used in the GroupingPanel component
+ * 
+ * @example
+ * ```typescript
+ * const column: GroupableColumn = {
+ *   id: 'department',
+ *   label: 'Department'
+ * };
+ * ```
  */
 export interface GroupableColumn {
   id: string
@@ -211,6 +442,31 @@ export interface GroupableColumn {
 
 /**
  * DataTable Context Value interface
+ * 
+ * Defines the shape of the context value provided by the DataTable context.
+ * Includes all state management functions and current state values.
+ * 
+ * @example
+ * ```typescript
+ * const context: DataTableContextValue<User> = {
+ *   schema: userSchema,
+ *   data: users,
+ *   sorting: [{ id: 'name', desc: false }],
+ *   setSorting: (sorting) => {},
+ *   columnFilters: [],
+ *   setColumnFilters: (filters) => {},
+ *   globalFilter: '',
+ *   setGlobalFilter: (filter) => {},
+ *   columnVisibility: {},
+ *   setColumnVisibility: (visibility) => {},
+ *   grouping: [],
+ *   setGrouping: (grouping) => {},
+ *   expanded: {},
+ *   setExpanded: (expanded) => {},
+ *   table: null,
+ *   isInitialized: true
+ * };
+ * ```
  */
 export interface DataTableContextValue<TData> {
   schema: DataTableSchema<TData>

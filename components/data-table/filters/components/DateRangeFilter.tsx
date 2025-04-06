@@ -1,5 +1,22 @@
 "use client"
 
+/**
+ * Date Range Filter Component
+ * 
+ * A component that provides a date range selection interface for filtering table data.
+ * It allows users to select start and end dates to filter table rows within a specific
+ * date range.
+ * 
+ * Features:
+ * - Calendar-based date selection
+ * - Start and end date inputs
+ * - Date formatting
+ * - Real-time filter updates
+ * - Consistent styling with the design system
+ * 
+ * @module data-table/filters/components/DateRangeFilter
+ */
+
 import * as React from "react"
 import { Column } from "@tanstack/react-table"
 import { format } from "date-fns"
@@ -14,11 +31,43 @@ import { CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { DateRangeFilter } from "../../types"
 
+/**
+ * Props for the DateRangeFilterComponent
+ * 
+ * @template TData The type of data in the table rows
+ */
 interface DateRangeFilterProps<TData> {
+  /** The column instance from TanStack Table */
   column: Column<TData, unknown>
+  /** The filter configuration */
   filter: DateRangeFilter
 }
 
+/**
+ * Date Range Filter Component
+ * 
+ * Renders calendar popovers for selecting start and end dates to filter table data
+ * within a date range. The component integrates with TanStack Table's filtering system
+ * and provides a user-friendly interface for selecting date ranges.
+ * 
+ * @template TData The type of data in the table rows
+ * 
+ * @param props Component properties
+ * @param props.column The column instance from TanStack Table
+ * @param props.filter The filter configuration
+ * 
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <DateRangeFilterComponent
+ *   column={column}
+ *   filter={{
+ *     type: 'dateRange',
+ *     format: 'yyyy-MM-dd'
+ *   }}
+ * />
+ * ```
+ */
 export function DateRangeFilterComponent<TData>({
   column,
 }: DateRangeFilterProps<TData>) {

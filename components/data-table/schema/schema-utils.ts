@@ -1,14 +1,43 @@
 /**
- * Schema Utilities
+ * Schema Utilities Module
  * 
- * This file contains utility functions for working with data table schemas.
+ * This module provides utility functions for working with data table schemas.
+ * It includes functions for schema creation, column filtering, and grouping
+ * configuration.
+ * 
+ * Features:
+ * - Schema creation and normalization
+ * - Column filtering configuration
+ * - Grouping column extraction
+ * - Type-safe schema manipulation
+ * 
+ * @module data-table/schema/schema-utils
  */
 
 import { DataTableSchema } from "../types"
 import { hasAccessorKey } from "../utils"
 
 /**
- * Creates a complete DataTable schema
+ * Creates a complete DataTable schema from partial options
+ * 
+ * This function normalizes and completes a partial schema configuration,
+ * providing default values for optional properties and ensuring type safety.
+ * 
+ * @template TData - The type of data in the table
+ * @param options - Partial schema configuration
+ * @returns Complete DataTableSchema with defaults applied
+ * 
+ * @example
+ * ```tsx
+ * const schema = createDataTableSchema({
+ *   columns: [
+ *     { id: 'name', header: 'Name' },
+ *     { id: 'age', header: 'Age' }
+ *   ],
+ *   enablePagination: true,
+ *   defaultPageSize: 25
+ * })
+ * ```
  */
 export function createDataTableSchema<TData>(
   options: Partial<DataTableSchema<TData>>
@@ -29,7 +58,20 @@ export function createDataTableSchema<TData>(
 }
 
 /**
- * Helper function to extract groupable column IDs from schema
+ * Extracts groupable column IDs from a schema
+ * 
+ * This function identifies columns that are enabled for grouping and returns
+ * their IDs. It handles both direct ID references and accessorKey-based columns.
+ * 
+ * @template TData - The type of data in the table
+ * @param schema - The DataTable schema
+ * @returns Array of groupable column IDs
+ * 
+ * @example
+ * ```tsx
+ * const groupableColumns = getGroupableColumns(schema)
+ * // Returns: ['category', 'status']
+ * ```
  */
 export function getGroupableColumns<TData>(schema: DataTableSchema<TData>): string[] {
   return schema.columns
@@ -39,7 +81,31 @@ export function getGroupableColumns<TData>(schema: DataTableSchema<TData>): stri
 }
 
 /**
- * Helper function to extract column filters from schema
+ * Extracts column filter configurations from a schema
+ * 
+ * This function processes the schema to identify columns with filter configurations
+ * and returns a normalized array of filter settings. It supports multiple filter
+ * types and handles various configuration options.
+ * 
+ * @template TData - The type of data in the table
+ * @param schema - The DataTable schema
+ * @returns Array of column filter configurations
+ * 
+ * @example
+ * ```tsx
+ * const filters = getColumnFilters(schema)
+ * // Returns: [
+ * //   {
+ * //     type: 'select',
+ * //     column: 'status',
+ * //     label: 'Status',
+ * //     options: [
+ * //       { label: 'Active', value: 'active' },
+ * //       { label: 'Inactive', value: 'inactive' }
+ * //     ]
+ * //   }
+ * // ]
+ * ```
  */
 export function getColumnFilters<TData>(schema: DataTableSchema<TData>): {
   type: 'select' | 'multi-select' | 'range' | 'date-range' | 'boolean'

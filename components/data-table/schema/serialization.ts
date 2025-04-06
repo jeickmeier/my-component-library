@@ -1,7 +1,18 @@
 /**
- * Schema Serialization
+ * Schema Serialization Module
  * 
- * This file contains functions to serialize and deserialize data table schemas.
+ * This module provides functions for serializing and deserializing data table schemas.
+ * It enables storing table configurations in databases or other storage systems and
+ * restoring them to their runtime form.
+ * 
+ * Features:
+ * - Schema serialization to JSON-compatible format
+ * - Schema deserialization with runtime restoration
+ * - Cell renderer registry integration
+ * - Aggregation function restoration
+ * - Type-safe serialization/deserialization
+ * 
+ * @module data-table/schema/serialization
  */
 
 import { DataTableSchema, SerializableDataTableSchema, DataTableColumnDef, SerializableColumnDef } from "../types"
@@ -9,7 +20,31 @@ import { CellRendererRegistry } from "../cell-renderers/core"
 import { getGlobalAggregationFunctionRegistry } from "../aggregation"
 
 /**
- * Converts a runtime schema to a serializable schema that can be stored in a database
+ * Serializes a runtime schema to a JSON-compatible format
+ * 
+ * This function converts a runtime schema into a format that can be safely stored
+ * in a database or transmitted over a network. It handles complex types like
+ * functions and objects by converting them to serializable representations.
+ * 
+ * @template TData - The type of data in the table
+ * @param schema - The runtime schema to serialize
+ * @returns A serializable version of the schema
+ * 
+ * @example
+ * ```tsx
+ * const runtimeSchema = {
+ *   columns: [
+ *     {
+ *       id: 'name',
+ *       header: 'Name',
+ *       cellRenderer: { type: 'badge', config: { color: 'blue' } }
+ *     }
+ *   ]
+ * }
+ * 
+ * const serialized = serializeSchema(runtimeSchema)
+ * // Can now be stored in a database
+ * ```
  */
 export function serializeSchema<TData>(schema: DataTableSchema<TData>): SerializableDataTableSchema {
   return {
@@ -34,7 +69,32 @@ export function serializeSchema<TData>(schema: DataTableSchema<TData>): Serializ
 }
 
 /**
- * Converts a serializable schema back to a runtime schema
+ * Deserializes a stored schema back to its runtime form
+ * 
+ * This function converts a serialized schema back into a runtime schema with
+ * all functions and complex types restored. It uses registries to restore
+ * cell renderers and aggregation functions.
+ * 
+ * @template TData - The type of data in the table
+ * @param serialized - The serialized schema to restore
+ * @param registry - The cell renderer registry to use for restoration
+ * @returns The restored runtime schema
+ * 
+ * @example
+ * ```tsx
+ * const serializedSchema = {
+ *   columns: [
+ *     {
+ *       id: 'name',
+ *       header: 'Name',
+ *       cellRenderer: { type: 'badge', config: { color: 'blue' } }
+ *     }
+ *   ]
+ * }
+ * 
+ * const runtimeSchema = deserializeSchema(serializedSchema, cellRendererRegistry)
+ * // Can now be used with the data table
+ * ```
  */
 export function deserializeSchema<TData>(
   serialized: SerializableDataTableSchema,

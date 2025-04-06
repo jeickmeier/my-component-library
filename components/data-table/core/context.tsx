@@ -1,5 +1,24 @@
 "use client"
 
+/**
+ * Data Table Context Module
+ * 
+ * This module implements the state management and context system for the data table.
+ * It provides a comprehensive solution for managing:
+ * - Table configuration and schema
+ * - Data and row models
+ * - Sorting state
+ * - Filtering (column and global)
+ * - Column visibility
+ * - Grouping and expansion
+ * - Aggregation functions
+ * 
+ * The implementation uses React Context and TanStack Table's core functionality
+ * to provide a powerful yet flexible state management solution.
+ * 
+ * @module data-table/core/context
+ */
+
 import * as React from "react"
 import {
   ColumnFiltersState,
@@ -24,44 +43,127 @@ import { DataTableColumnHeader } from "../column/column-header"
 import { createAggregationFunctionRegistry, getGlobalAggregationFunctionRegistry } from "../aggregation"
 
 /**
- * DataTable context value interface
+ * Data Table Context Value Interface
+ * 
+ * Defines the shape of the context value that will be shared throughout the
+ * data table component tree. This interface provides access to:
+ * 
+ * State:
+ * - Table configuration (schema)
+ * - Data array
+ * - Sorting configuration
+ * - Filter states (column and global)
+ * - Column visibility settings
+ * - Grouping configuration
+ * - Expansion state
+ * - Aggregation settings
+ * 
+ * Operations:
+ * - State setters for all managed states
+ * - Table instance access
+ * - Initialization status
+ * 
+ * @template TData The type of data in the table rows
  */
 export interface DataTableContextValue<TData> {
+  /** Table configuration schema */
   schema: DataTableSchema<TData>
+  /** Array of data items to display */
   data: TData[]
+  /** Current sorting state */
   sorting: SortingState
+  /** Function to update sorting state */
   setSorting: (sorting: SortingState) => void
+  /** Current column filter state */
   columnFilters: ColumnFiltersState
+  /** Function to update column filters */
   setColumnFilters: (filters: ColumnFiltersState) => void
+  /** Current global filter value */
   globalFilter: string
+  /** Function to update global filter */
   setGlobalFilter: (filter: string) => void
+  /** Current column visibility state */
   columnVisibility: VisibilityState
+  /** Function to update column visibility */
   setColumnVisibility: (visibility: VisibilityState) => void
+  /** Current grouping state */
   grouping: GroupingState
+  /** Function to update grouping */
   setGrouping: (grouping: GroupingState) => void
+  /** Current row expansion state */
   expanded: ExpandedState
+  /** Function to update expansion state */
   setExpanded: (expanded: ExpandedState) => void
+  /** TanStack Table instance */
   table: Table<TData>
+  /** Whether the table has completed initialization */
   isInitialized: boolean
+  /** Function to update column aggregation */
   setColumnAggregation: (columnId: string, aggregationType?: string) => void
+  /** Current column aggregation settings */
   columnAggregations: Record<string, string | undefined>
 }
 
 /**
- * DataTable context
+ * Data Table Context
+ * 
+ * React Context instance for the data table state management system.
+ * This context is consumed by all data table components to access shared state.
+ * 
+ * @private
  */
 const DataTableContext = React.createContext<DataTableContextValue<unknown> | undefined>(undefined)
 
+/**
+ * Props for the DataTableProvider component
+ * 
+ * @template TData The type of data in the table rows
+ */
 interface DataTableProviderProps<TData> {
+  /** Child components that will have access to the context */
   children: React.ReactNode
+  /** Table configuration schema */
   schema: DataTableSchema<TData>
+  /** Array of data items to display */
   data: TData[]
 }
 
 /**
- * DataTable Context Provider
+ * Data Table Context Provider
  * 
- * Provides table state and actions to all child components.
+ * This component manages the state and operations for the entire data table.
+ * It combines React's Context API with TanStack Table to provide a complete
+ * state management solution.
+ * 
+ * Features:
+ * - Automatic aggregation registry initialization
+ * - State management for all table features
+ * - Custom filter function creation
+ * - Column definition processing
+ * - Aggregation function management
+ * 
+ * The provider handles all complex state interactions and provides a clean
+ * interface for child components to access and modify table state.
+ * 
+ * @template TData The type of data in the table rows
+ * 
+ * @example
+ * ```tsx
+ * function MyTable({ data }) {
+ *   const schema = {
+ *     columns: [
+ *       { accessorKey: 'name', header: 'Name' },
+ *       { accessorKey: 'age', header: 'Age' }
+ *     ]
+ *   };
+ * 
+ *   return (
+ *     <DataTableProvider schema={schema} data={data}>
+ *       <TableContent />
+ *     </DataTableProvider>
+ *   );
+ * }
+ * ```
  */
 export function DataTableProvider<TData>({
   children,
@@ -373,14 +475,37 @@ export function DataTableProvider<TData>({
 }
 
 /**
- * Hook to use the DataTable context
+ * Data Table Hook
+ * 
+ * A custom hook that provides access to the data table context. This hook
+ * enables components to interact with the table state and operations in a
+ * type-safe manner.
+ * 
+ * Features:
+ * - Type-safe access to table state
+ * - Access to all table operations
+ * - Automatic error handling for missing context
+ * 
+ * @template TData The type of data in the table rows
+ * @throws {Error} If used outside of a DataTableProvider
+ * 
+ * @example
+ * ```tsx
+ * function TableAction() {
+ *   const { sorting, setSorting } = useDataTable<MyDataType>();
+ * 
+ *   return (
+ *     <button onClick={() => setSorting([{ id: 'name', desc: false }])}>
+ *       Sort by Name
+ *     </button>
+ *   );
+ * }
+ * ```
  */
 export function useDataTable<TData>() {
   const context = React.useContext(DataTableContext)
-  
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useDataTable must be used within a DataTableProvider")
   }
-  
   return context as DataTableContextValue<TData>
 } 

@@ -1,16 +1,77 @@
 "use client"
 
+/**
+ * Table Cell Module
+ * 
+ * This module provides a flexible table cell component that supports both custom
+ * cell renderers and default rendering. It integrates with the data table's
+ * cell rendering system and provides a consistent interface for cell content.
+ * 
+ * Features:
+ * - Custom cell renderer support
+ * - Default cell rendering
+ * - Type-safe props
+ * - Consistent styling
+ * 
+ * @module data-table/parts/table-cell
+ */
+
 import * as React from "react"
 import { Cell, flexRender, ColumnDef } from "@tanstack/react-table"
 import { DataTableCell } from "../cell"
 
+/**
+ * Props for the TableCell component
+ * 
+ * @interface DataTableCellProps
+ * @template TData - The type of data in the table
+ */
 interface DataTableCellProps<TData> {
+  /** The cell to render */
   cell: Cell<TData, unknown>
 }
 
 /**
- * Table cell component that determines whether to use the DataTableCell renderer
- * or the default flexRender based on configuration
+ * Table Cell Component
+ * 
+ * A flexible component that renders table cells with support for both custom
+ * cell renderers and default rendering. It automatically determines the appropriate
+ * rendering method based on the column configuration.
+ * 
+ * Features:
+ * - Custom cell renderer support
+ * - Default cell rendering
+ * - Type-safe props
+ * - Consistent styling
+ * 
+ * The component automatically:
+ * - Checks for custom cell renderer configuration
+ * - Uses DataTableCell for custom renderers
+ * - Falls back to default rendering
+ * - Applies consistent styling
+ * 
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <TableCell cell={cell} />
+ * 
+ * // With custom renderer
+ * const columns = [
+ *   {
+ *     id: 'status',
+ *     header: 'Status',
+ *     cellRenderer: {
+ *       type: 'badge',
+ *       config: {
+ *         colorMap: {
+ *           active: 'green',
+ *           inactive: 'red'
+ *         }
+ *       }
+ *     }
+ *   }
+ * ]
+ * ```
  */
 export function TableCell<TData>({
   cell,

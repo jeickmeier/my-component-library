@@ -2,10 +2,46 @@ import React from "react";
 import { CellRendererProps, CurrencyRendererConfig } from "../core/types";
 
 /**
- * Renders a currency value with proper formatting
- * @param props - Cell renderer props 
- * @param config - Currency renderer configuration
- * @returns Rendered currency cell
+ * Currency Cell Renderer
+ * 
+ * Renders numeric values as formatted currency amounts using Intl.NumberFormat.
+ * This renderer provides locale-aware currency formatting with configurable options
+ * for precision, currency code, and display style.
+ * 
+ * Features:
+ * - Locale-aware currency formatting
+ * - Configurable currency code (ISO 4217)
+ * - Customizable decimal places
+ * - Automatic symbol placement based on locale
+ * - Fallback handling for invalid values
+ * - Custom CSS class support
+ * 
+ * @param props - Cell renderer props containing the numeric value
+ * @param config - Configuration options for currency formatting
+ * 
+ * @example
+ * ```tsx
+ * // Basic usage (defaults to USD)
+ * currencyRenderer(props)
+ * 
+ * // Euro with German locale
+ * currencyRenderer(props, {
+ *   currency: 'EUR',
+ *   locale: 'de-DE'
+ * })
+ * 
+ * // Custom formatting
+ * currencyRenderer(props, {
+ *   currency: 'JPY',
+ *   locale: 'ja-JP',
+ *   options: {
+ *     minimumFractionDigits: 0,
+ *     currencyDisplay: 'name'
+ *   }
+ * })
+ * ```
+ * 
+ * @returns A div element containing the formatted currency value
  */
 export function currencyRenderer(
   props: CellRendererProps,

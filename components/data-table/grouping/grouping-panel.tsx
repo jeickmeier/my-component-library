@@ -1,5 +1,21 @@
 "use client"
 
+/**
+ * Grouping Panel Module
+ * 
+ * This module provides components for managing table row grouping through a user interface.
+ * It includes a draggable list of active groups and controls for adding/removing groups.
+ * 
+ * Features:
+ * - Drag-and-drop group reordering
+ * - Visual group management
+ * - Group addition/removal
+ * - Keyboard accessibility
+ * - Responsive design
+ * 
+ * @module data-table/grouping/grouping-panel
+ */
+
 import * as React from "react"
 import {
   DndContext,
@@ -31,13 +47,29 @@ import {
 } from "@/components/ui/select"
 import { GroupableColumn } from "../types"
 
+/**
+ * Props for the SortableItem component
+ */
 interface SortableItemProps {
+  /** Unique identifier for the group */
   id: string
+  /** Display label for the group */
   label: string
+  /** Callback function when the group is removed */
   onRemove: (id: string) => void
 }
 
-// Sortable Item component for group by
+/**
+ * Sortable Item Component
+ * 
+ * A draggable item representing a group in the grouping panel. It includes a drag handle,
+ * label, and remove button.
+ * 
+ * @param props Component properties
+ * @param props.id Unique identifier for the group
+ * @param props.label Display label for the group
+ * @param props.onRemove Callback function when the group is removed
+ */
 const SortableItem = ({ id, label, onRemove }: SortableItemProps) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id })
 
@@ -68,12 +100,46 @@ const SortableItem = ({ id, label, onRemove }: SortableItemProps) => {
   )
 }
 
+/**
+ * Props for the GroupingPanel component
+ */
 interface GroupingPanelProps {
+  /** List of columns that can be used for grouping */
   availableColumns: GroupableColumn[]
+  /** Current grouping state */
   grouping: GroupingState
+  /** Callback function when grouping changes */
   onGroupingChange: (grouping: GroupingState) => void
 }
 
+/**
+ * Grouping Panel Component
+ * 
+ * A panel component that provides a user interface for managing table row grouping.
+ * It allows users to add, remove, and reorder groups through a drag-and-drop interface.
+ * 
+ * Features:
+ * - Visual representation of active groups
+ * - Drag-and-drop reordering
+ * - Add/remove group controls
+ * - Keyboard accessibility
+ * - Responsive design
+ * 
+ * @param props Component properties
+ * @param props.availableColumns List of columns that can be used for grouping
+ * @param props.grouping Current grouping state
+ * @param props.onGroupingChange Callback function when grouping changes
+ * 
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <GroupingPanel
+ *   availableColumns={columns}
+ *   grouping={grouping}
+ *   onGroupingChange={setGrouping}
+ * />
+ * ```
+ */
 export function GroupingPanel({ 
   availableColumns, 
   grouping, 

@@ -1,8 +1,33 @@
 /**
- * Data Table
+ * Data Table Module
  * 
- * This is the main entry point for the data table component.
- * This file handles re-exports to maintain backward compatibility.
+ * This module serves as the main entry point for the data table component system.
+ * It provides a comprehensive set of tools for building and managing data tables
+ * with advanced features like filtering, sorting, grouping, and pagination.
+ * 
+ * Key Components:
+ * - Core DataTable component
+ * - Context and hooks for state management
+ * - Schema utilities for table configuration
+ * - Filter functionality for data filtering
+ * - Column management tools
+ * - Grouping capabilities
+ * - Pagination controls
+ * - Cell rendering system
+ * - Aggregation functions
+ * 
+ * Features:
+ * - Type-safe table configuration
+ * - Flexible data handling
+ * - Customizable column definitions
+ * - Advanced filtering options
+ * - Multi-level grouping
+ * - Responsive pagination
+ * - Custom cell rendering
+ * - Data aggregation
+ * - Backward compatibility support
+ * 
+ * @module data-table
  */
 
 // Export the main DataTable component

@@ -1,7 +1,17 @@
 /**
  * Aggregation Module
  * 
- * This module provides a system for aggregating data in tables.
+ * This module provides a comprehensive system for aggregating data in tables. It includes:
+ * 
+ * - A registry system for managing aggregation functions
+ * - Standard aggregation functions (sum, average, min, max, etc.)
+ * - Advanced aggregation functions (weighted average, percentiles, etc.)
+ * - Type definitions and interfaces for extending functionality
+ * 
+ * The module is designed to work with TanStack Table but can be used independently.
+ * It supports both synchronous and asynchronous aggregation operations.
+ * 
+ * @module aggregation
  */
 
 // Export core types and registry
@@ -39,7 +49,16 @@ import {
 } from './functions'
 
 /**
- * Create an aggregation function registry with standard functions
+ * Creates a new aggregation function registry pre-loaded with standard functions.
+ * This is the recommended way to create a new registry instance with common aggregations.
+ * 
+ * @returns {AggregationFunctionRegistry} A new registry instance with standard functions
+ * 
+ * @example
+ * ```ts
+ * const registry = createAggregationFunctionRegistry();
+ * const sumFn = registry.get('sum');
+ * ```
  */
 export function createAggregationFunctionRegistry(): AggregationFunctionRegistry {
   const registry = new AggregationFunctionRegistry()
@@ -89,7 +108,16 @@ export function createAggregationFunctionRegistry(): AggregationFunctionRegistry
 }
 
 /**
- * Get or create the global aggregation function registry
+ * Returns the global singleton instance of the aggregation function registry.
+ * This is useful when you need to share the same registry across different parts of your application.
+ * 
+ * @returns {AggregationFunctionRegistry} The global registry instance
+ * 
+ * @example
+ * ```ts
+ * const globalRegistry = getGlobalAggregationFunctionRegistry();
+ * globalRegistry.register('custom', myCustomAggregation);
+ * ```
  */
 export function getGlobalAggregationFunctionRegistry(): AggregationFunctionRegistry {
   return getGlobalRegistry()

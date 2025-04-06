@@ -1,15 +1,63 @@
 "use client"
 
+/**
+ * Range Filter Component
+ * 
+ * A component that provides a numeric range selection interface for filtering table data.
+ * It allows users to specify minimum and maximum values to filter table rows within a
+ * numeric range.
+ * 
+ * Features:
+ * - Minimum and maximum value inputs
+ * - Numeric input validation
+ * - Real-time filter updates
+ * - Keyboard support (Enter key)
+ * - Consistent styling with the design system
+ * 
+ * @module data-table/filters/components/RangeFilter
+ */
+
 import * as React from "react"
 import { Column } from "@tanstack/react-table"
 import { Input } from "@/components/ui/input"
 import { RangeFilter } from "../../types"
 
+/**
+ * Props for the RangeFilterComponent
+ * 
+ * @template TData The type of data in the table rows
+ */
 interface RangeFilterProps<TData> {
+  /** The column instance from TanStack Table */
   column: Column<TData, unknown>
+  /** The filter configuration */
   filter: RangeFilter
 }
 
+/**
+ * Range Filter Component
+ * 
+ * Renders input fields for minimum and maximum values to filter table data within a
+ * numeric range. The component integrates with TanStack Table's filtering system and
+ * provides a user-friendly interface for specifying range boundaries.
+ * 
+ * @template TData The type of data in the table rows
+ * 
+ * @param props Component properties
+ * @param props.column The column instance from TanStack Table
+ * @param props.filter The filter configuration
+ * 
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <RangeFilterComponent
+ *   column={column}
+ *   filter={{
+ *     type: 'range'
+ *   }}
+ * />
+ * ```
+ */
 export function RangeFilterComponent<TData>({
   column,
 }: RangeFilterProps<TData>) {

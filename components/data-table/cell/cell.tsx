@@ -5,12 +5,49 @@ import { Cell, Row, ColumnDef } from "@tanstack/react-table"
 import { getGlobalCellRendererRegistry } from "../cell-renderers"
 import { CellRendererProps } from "../cell-renderers/core/types"
 
+/**
+ * Props for the DataTableCell component.
+ * 
+ * @template TData The type of data in the table rows
+ * @property cell The TanStack Table cell instance containing value and context
+ */
 interface DataTableCellProps<TData> {
   cell: Cell<TData, unknown>
 }
 
 /**
- * A unified cell component that handles both normal and aggregated cells
+ * A unified cell component that handles rendering of table cells.
+ * 
+ * This component acts as a smart wrapper around cell rendering, supporting:
+ * - Regular cell values
+ * - Aggregated values (when using grouping)
+ * - Custom cell renderers through a registry system
+ * - Grouped and expanded states
+ * 
+ * The component uses a cell renderer registry to determine how to display cell content.
+ * If no specific renderer is defined, it falls back to basic text rendering.
+ * 
+ * @template TData The type of data in the table rows
+ * 
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <DataTableCell cell={cell} />
+ * 
+ * // With custom renderer in column definition
+ * const columns = [{
+ *   id: 'status',
+ *   cellRenderer: {
+ *     type: 'badge',
+ *     config: { colors: { active: 'green' } }
+ *   }
+ * }]
+ * ```
+ * 
+ * @param props The component props
+ * @param props.cell The TanStack Table cell instance
+ * 
+ * @returns A rendered cell with appropriate content based on configuration
  */
 export function DataTableCell<TData>({ cell }: DataTableCellProps<TData>) {
   const registry = getGlobalCellRendererRegistry()
@@ -42,11 +79,11 @@ export function DataTableCell<TData>({ cell }: DataTableCellProps<TData>) {
     isExpanded: Boolean(row.getIsExpanded && row.getIsExpanded()),
   }
   
-  // Render the cell
+  // Render the cell using the appropriate renderer
   if (renderer) {
     return <>{renderer(rendererProps, rendererConfig)}</>
   }
   
-  // Fallback rendering
+  // Fallback to basic text rendering if no renderer found
   return <>{String(cell.getValue() ?? '')}</>
 } 

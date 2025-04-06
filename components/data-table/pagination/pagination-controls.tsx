@@ -1,5 +1,24 @@
 "use client"
 
+/**
+ * Pagination Controls Module
+ * 
+ * This module provides a component for managing table pagination through a user interface.
+ * It includes controls for page navigation, page size selection, and displays current
+ * pagination state information.
+ * 
+ * Features:
+ * - Page navigation controls
+ * - Page size selection
+ * - Current page indicator
+ * - Total entries count
+ * - Grouping information display
+ * - Responsive design
+ * - Keyboard accessibility
+ * 
+ * @module data-table/pagination/pagination-controls
+ */
+
 import * as React from "react"
 import { useDataTable } from "../core/context"
 import { Table } from "@tanstack/react-table"
@@ -12,9 +31,28 @@ import {
 } from "@/components/ui/select"
 
 /**
- * PaginationControls component
+ * Pagination Controls Component
  * 
- * Shows pagination controls and page size selector.
+ * A component that provides a comprehensive interface for managing table pagination.
+ * It displays the current pagination state and provides controls for navigating through
+ * pages and adjusting the page size.
+ * 
+ * Features:
+ * - Page navigation (previous/next)
+ * - Page size selection (25, 50, 100, 250, 500, 1000)
+ * - Current page and total pages display
+ * - Total entries count
+ * - Grouping information display
+ * - Responsive design
+ * - Keyboard accessibility
+ * 
+ * The component automatically hides itself if pagination is disabled in the schema.
+ * 
+ * @example
+ * ```tsx
+ * // Basic usage
+ * <PaginationControls />
+ * ```
  */
 export function PaginationControls() {
   const {
@@ -31,7 +69,12 @@ export function PaginationControls() {
     return null
   }
 
-  // Get the label for a grouped column
+  /**
+   * Gets the display label for a grouped column
+   * 
+   * @param columnId The ID of the column to get the label for
+   * @returns The display label for the column
+   */
   const getGroupedColumnLabel = (columnId: string) => {
     const column = schema.columns.find(c => c.id === columnId) ||
       schema.columns.find(c => 'accessorKey' in c && c.accessorKey === columnId)
