@@ -41,6 +41,7 @@ import {
   uniqueAggregation,
   uniqueCountAggregation,
   modeAggregation,
+  listAggregation,
   
   // Statistical functions
   medianAggregation,
@@ -80,6 +81,7 @@ export function createRegistry(): AggregationFunctionRegistry {
   registry.register('unique', uniqueAggregation, { label: 'Unique Values', description: 'List of unique values' })
   registry.register('uniqueCount', uniqueCountAggregation, { label: 'Unique Count', description: 'Count of unique values' })
   registry.register('mode', modeAggregation, { label: 'Mode', description: 'Most frequent value' })
+  registry.register('list', listAggregation, { label: 'List', description: 'List of all values' })
   
   // Register statistical functions
   registry.register('median', medianAggregation, { label: 'Median', description: 'Median value' })

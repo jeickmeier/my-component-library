@@ -17,7 +17,7 @@
 
 import { DataTableSchema, DataTableColumnDef, ColumnFilter } from "../types"
 import { createDataTableSchema } from "./schema-utils"
-import { AggregationFunctionType, AggregationFunctionConfig } from "../aggregation"
+import { AggregationFunctionType } from "../aggregation"
 
 /**
  * Schema Builder Class
@@ -125,29 +125,39 @@ export class SchemaBuilder<TData> {
    * 
    * @param columnId - The ID of the column to set aggregation for
    * @param aggregationType - The type of aggregation function to use
-   * @param aggregationConfig - Optional configuration for the aggregation function
+   * @param aggregationRendererType - Optional type for the aggregation cell renderer
+   * @param aggregationRendererConfig - Optional configuration for the aggregation cell renderer
    * @returns The builder instance for method chaining
    */
   setAggregation(
-    columnId: string, 
+    columnId: string,
     aggregationType: AggregationFunctionType,
-    aggregationConfig?: AggregationFunctionConfig
+    aggregationRendererType?: string,
+    aggregationRendererConfig?: Record<string, unknown>
   ): SchemaBuilder<TData> {
     if (this.schema.columns) {
       this.schema.columns = this.schema.columns.map(column => {
         const id = column.id || column.accessorKey as string
         if (id === columnId) {
-          return { 
-            ...column, 
-            aggregationType,
-            ...(aggregationConfig ? { aggregationConfig } : {})
-          }
+          // Construct the aggregationRenderer object only if a type is provided
+          const aggregationRenderer = aggregationRendererType
+            ? {
+                type: aggregationRendererType,
+                ...(aggregationRendererConfig ? { config: aggregationRendererConfig } : {})
+              }
+            : undefined; // Set to undefined if no type is given
+
+          return {
+            ...column,
+            aggregationType, // Keep the aggregation function type
+            ...(aggregationRenderer ? { aggregationRenderer } : {}) // Add the renderer object conditionally
+          };
         }
-        return column
-      })
+        return column;
+      });
     }
-    
-    return this
+
+    return this;
   }
 
   /**

@@ -16,8 +16,13 @@
  */
 
 import { DataTableSchema, SerializableDataTableSchema, DataTableColumnDef, SerializableColumnDef } from "../types"
-import { CellRendererRegistry } from "../cell-renderers/core"
+import { CellRendererFunction } from "../cell-renderers"
 import { getGlobalAggregationFunctionRegistry } from "../aggregation"
+
+// Define a minimal type for the registry based on usage
+interface CellRendererRegistry {
+  get: (type: string) => CellRendererFunction | undefined;
+}
 
 /**
  * Serializes a runtime schema to a JSON-compatible format
@@ -60,7 +65,7 @@ export function serializeSchema<TData>(schema: DataTableSchema<TData>): Serializ
         filter: column.filter,
         cellRenderer: column.cellRenderer,
         aggregationType: column.aggregationType,
-        aggregationConfig: column.aggregationConfig as Record<string, unknown>
+        aggregationRenderer: column.aggregationRenderer
       }
       
       return serializedColumn
@@ -135,7 +140,7 @@ export function deserializeSchema<TData>(
         const aggregationFn = aggregationRegistry.get(col.aggregationType)
         if (aggregationFn) {
           column.aggregationFn = (columnId, leafRows, childRows) => 
-            aggregationFn(columnId, leafRows, childRows, col.aggregationConfig)
+            aggregationFn(columnId, leafRows, childRows, col.aggregationRenderer?.config)
         }
       }
       

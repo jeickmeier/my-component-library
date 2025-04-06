@@ -31,10 +31,10 @@
  */
 
 // Export the main DataTable component
-export { DataTable } from "./core"
+export * from "./core"
 
 // Export context and hooks
-export { useDataTable } from "./core"
+export * from "./core"
 
 // Export types
 export * from "./types"
@@ -54,27 +54,14 @@ export * from "./parts"
 // Export aggregation functionality
 export * from "./aggregation"
 
-// BACKWARD COMPATIBILITY EXPORTS
-// These exports maintain compatibility with existing code
-export { DataTable as default } from "./core"
+// Export cell renderers
+export * from "./cell-renderers"
 
-// Re-export from schema for backward compatibility
-export { 
-  createDataTableSchema,
-  getGroupableColumns,
-  getColumnFilters,
-  serializeSchema,
-  deserializeSchema
-} from "./schema"
-export type { 
-  DataTableSchema,
-  DataTableColumnDef,
-  SerializableDataTableSchema,
-  SerializableColumnDef
-} from "./types"
+// Export default registry
+export * from "./cell-renderers/defaultRegistry"
 
-// Re-export for backward compatibility
-export { DataTableColumnHeader } from "./parts/column-header"
-export { GroupingPanel, GroupingControls } from "./parts"
-export { createColumn, createColumns } from "./utils/column-helper"
-export { saveSchemaToFile, loadSchemaFromFile } from "./schema/column-serialization" 
+// Export schema utils
+export * from "./schema/schema-utils"
+
+// Export serialization utils
+export * from "./schema/serialization"

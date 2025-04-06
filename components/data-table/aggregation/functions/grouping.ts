@@ -9,20 +9,20 @@
  */
 
 import { AggregationFunction } from "../types"
-import { getNumericValues, getUniqueValues } from "../utils"
+import { getNumericValues, getUniqueValuesFromRows } from "../utils"
 
 /**
  * Returns an array of unique values from a column.
  */
 export const uniqueAggregation: AggregationFunction = (columnId, leafRows) => {
-  return getUniqueValues(columnId, leafRows);
+  return getUniqueValuesFromRows(columnId, leafRows);
 }
 
 /**
  * Counts the number of unique values in a column.
  */
 export const uniqueCountAggregation: AggregationFunction = (columnId, leafRows) => {
-  const uniqueValues = getUniqueValues(columnId, leafRows);
+  const uniqueValues = getUniqueValuesFromRows(columnId, leafRows);
   return uniqueValues.length;
 }
 
@@ -59,4 +59,11 @@ export const rangeAggregation: AggregationFunction = (columnId, leafRows) => {
   const max = Math.max(...values);
   
   return `${min} - ${max}`;
-} 
+}
+
+/**
+ * Returns an array of all underlying values for the column in the group.
+ */
+export const listAggregation: AggregationFunction = (columnId, leafRows) => {
+  return leafRows.map(row => row.getValue(columnId));
+}; 

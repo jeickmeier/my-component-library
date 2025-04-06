@@ -10,8 +10,8 @@
 
 import * as React from "react";
 import { CellContext, ColumnDef, AccessorFn, AggregationFn } from "@tanstack/react-table";
-import { ColumnFilter } from "../types";
-import { AggregationFunctionType, AggregationFunctionConfig } from "../aggregation";
+import { ColumnFilter, SerializableCellRenderer } from "../types";
+import { AggregationFunctionType } from "../aggregation";
 
 /**
  * Creates a single column definition with enhanced functionality.
@@ -43,7 +43,7 @@ import { AggregationFunctionType, AggregationFunctionConfig } from "../aggregati
  * @param options.alignment Text alignment within cells
  * @param options.filter Column filter configuration
  * @param options.aggregationType Type of aggregation to apply
- * @param options.aggregationConfig Configuration for aggregation
+ * @param options.aggregationRenderer Custom renderer for aggregation
  * @param options.meta Additional metadata for the column
  * 
  * @returns A configured column definition compatible with TanStack Table
@@ -80,7 +80,7 @@ export function createColumn<T>(options: {
   alignment?: 'left' | 'center' | 'right';
   filter?: ColumnFilter;
   aggregationType?: AggregationFunctionType;
-  aggregationConfig?: AggregationFunctionConfig;
+  aggregationRenderer?: SerializableCellRenderer;
   meta?: Record<string, unknown>;
 }): ColumnDef<T, unknown> {
   return {
@@ -98,7 +98,7 @@ export function createColumn<T>(options: {
       ...options.meta,
       alignment: options.alignment,
       filter: options.filter,
-      aggregationConfig: options.aggregationConfig,
+      aggregationRenderer: options.aggregationRenderer,
     },
   };
 }

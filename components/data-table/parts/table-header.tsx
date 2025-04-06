@@ -18,8 +18,9 @@
  */
 
 import * as React from "react"
-import { flexRender, HeaderGroup, Header, ColumnDef, Table } from "@tanstack/react-table"
+import { flexRender, HeaderGroup, Header, Table } from "@tanstack/react-table"
 import { useDataTable } from "../core/context"
+import { DataTableColumnDef } from "../types"
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 /**
@@ -63,25 +64,21 @@ import { TableHead, TableHeader, TableRow } from "@/components/ui/table"
  */
 export function TableHeaderComponent() {
   const { table } = useDataTable<unknown>()
+  const typedTable = table as Table<unknown>
 
   return (
     <TableHeader>
-      {(table as Table<unknown>).getHeaderGroups().map((headerGroup: HeaderGroup<unknown>) => (
-        <TableRow key={headerGroup.id} className="h-8">
+      {typedTable.getHeaderGroups().map((headerGroup: HeaderGroup<unknown>) => (
+        <TableRow key={headerGroup.id}>
           {headerGroup.headers.map((header: Header<unknown, unknown>) => {
-            // Determine alignment based on the column data type
-            let alignmentClass = ''
-            
-            // Get explicit column alignment if set
-            const columnDef = header.column.columnDef as ColumnDef<unknown> & { alignment?: 'left' | 'center' | 'right' }
-            if (columnDef.alignment) {
-              alignmentClass = `text-${columnDef.alignment}`
-            }
+            const columnDef = header.column.columnDef as DataTableColumnDef<unknown>
+            const alignmentClass = columnDef.alignment ? `text-${columnDef.alignment}` : 'text-left';
             
             return (
               <TableHead 
                 key={header.id} 
-                className={`p-1 py-1.5 align-middle ${alignmentClass}`}
+                className={`p-2 align-middle ${alignmentClass}`}
+                style={{ width: header.getSize() !== 150 ? header.getSize() : undefined }}
               >
                 {header.isPlaceholder ? null : (
                   flexRender(

@@ -231,7 +231,7 @@ export function DataTableProvider<TData>({
           );
           
           // Get the aggregation config
-          const config = schemaColumn?.aggregationConfig;
+          const config = schemaColumn?.aggregationRenderer?.config;
           
           // Call our aggregation function with the right parameters
           return fn(columnId, leafRows, childRows, config);
@@ -275,16 +275,12 @@ export function DataTableProvider<TData>({
       // If header is a string, replace it with DataTableColumnHeader component
       if (typeof column.header === 'string') {
         const headerText = column.header
-        const columnFilter = column.filter
-        const columnAlignment = column.alignment
         
         // Replace header with DataTableColumnHeader component
         columnDef.header = ({ column: tableColumn }) => (
           <DataTableColumnHeader
             column={tableColumn}
             title={headerText}
-            filter={columnFilter}
-            alignment={columnAlignment}
           />
         )
       } else {
@@ -322,7 +318,7 @@ export function DataTableProvider<TData>({
       // Ensure meta includes aggregationConfig and other relevant properties
       columnDef.meta = {
         ...(column.meta || {}), // Preserve original meta from schema
-        aggregationConfig: column.aggregationConfig,
+        aggregationRenderer: column.aggregationRenderer,
         alignment: column.alignment, 
         filter: column.filter,
       };

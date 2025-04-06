@@ -27,7 +27,7 @@
 
 export { TableHeaderComponent as TableHeader } from './table-header'
 export { TableBodyComponent as TableBody } from './table-body'
-export { TableCell } from './table-cell'
+export { DataTablePartCell as TableCell } from './data-table-part-cell'
 export { Toolbar } from './toolbar'
 export { Pagination } from './pagination'
 export { DataTableColumnHeader } from './column-header'

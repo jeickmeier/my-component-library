@@ -253,4 +253,30 @@ export function exportToCSV<TData>(
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
+}
+
+/**
+ * Formats an aggregation type name for display.
+ * Uses registry labels when available, falls back to camelCase formatting.
+ *
+ * @param type - The aggregation type string (e.g., 'sum', 'mean')
+ * @param aggregationRegistry - An instance of the aggregation function registry
+ * @returns A formatted string for display
+ */
+export function formatAggregationType(
+  type: string,
+  aggregationRegistry?: { getConfig: (type: string) => { label?: string } | undefined }
+): string {
+  if (!type) return '';
+
+  // Get from registry if possible for a more user-friendly name
+  if (aggregationRegistry) {
+    const config = aggregationRegistry.getConfig(type);
+    if (config?.label) return config.label;
+  }
+
+  // Otherwise format from camelCase (e.g., 'totalCount' -> 'Total Count')
+  return type
+    .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+    .replace(/^./, (str) => str.toUpperCase()); // Capitalize first letter
 } 

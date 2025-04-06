@@ -25,6 +25,7 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  UniqueIdentifier,
 } from "@dnd-kit/core"
 import {
   arrayMove,
@@ -34,9 +35,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { GroupingState } from "@tanstack/react-table"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import type { GroupingState } from "@tanstack/react-table"
 import { GripVertical, Plus, X } from "lucide-react"
 import {
   Select,
@@ -46,13 +45,15 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { GroupableColumn } from "../types"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 
 /**
  * Props for the SortableItem component
  */
 interface SortableItemProps {
   /** Unique identifier for the group */
-  id: string
+  id: UniqueIdentifier
   /** Display label for the group */
   label: string
   /** Callback function when the group is removed */
@@ -78,23 +79,33 @@ const SortableItem = ({ id, label, onRemove }: SortableItemProps) => {
     transition,
   }
 
+  const handleRemove = React.useCallback(() => {
+    onRemove(id as string)
+  }, [id, onRemove])
+
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center gap-1 bg-accent text-accent-foreground rounded-md px-2 py-1"
+      className="flex h-7 items-center gap-1 rounded-md bg-accent px-2 py-1 text-sm text-accent-foreground"
     >
-      <span {...attributes} {...listeners} className="cursor-grab">
+      <span
+        {...attributes}
+        {...listeners}
+        className="cursor-grab touch-none p-1"
+        aria-label={`Drag ${label}`}
+      >
         <GripVertical className="h-4 w-4" />
       </span>
-      <span className="text-sm">{label}</span>
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        className="h-4 w-4 p-0 ml-1 hover:bg-muted"
-        onClick={() => onRemove(id)}
+      <span className="select-none">{label}</span>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="ml-1 h-6 w-6 hover:bg-muted"
+        onClick={handleRemove}
+        aria-label={`Remove ${label} group`}
       >
-        <X className="h-3 w-3" />
+        <X className="h-3.5 w-3.5" />
       </Button>
     </div>
   )
@@ -145,45 +156,35 @@ export function GroupingPanel({
   grouping, 
   onGroupingChange 
 }: GroupingPanelProps) {
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  )
+  const { sensors, handleDragEnd } = useGroupingDnD(grouping, onGroupingChange)
+  const activeGroupItems = React.useMemo(() => grouping.map(id => ({ id })), [grouping])
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-    
-    if (over && active.id !== over.id) {
-      const oldIndex = grouping.indexOf(active.id as string)
-      const newIndex = grouping.indexOf(over.id as string)
-      
-      onGroupingChange(arrayMove(grouping, oldIndex, newIndex))
-    }
-  }
+  const handleRemoveGroup = React.useCallback((columnId: string) => {
+    onGroupingChange(grouping.filter((g) => g !== columnId))
+  }, [grouping, onGroupingChange])
 
-  const handleRemoveGroup = (columnId: string) => {
-    onGroupingChange(grouping.filter(g => g !== columnId))
-  }
-
-  const handleAddGroup = (columnId: string) => {
+  const handleAddGroup = React.useCallback((columnId: string) => {
     if (columnId && !grouping.includes(columnId)) {
       onGroupingChange([...grouping, columnId])
     }
-  }
+  }, [grouping, onGroupingChange])
+
+  const columnsToAdd = React.useMemo(() => 
+    availableColumns.filter(column => !grouping.includes(column.id)),
+    [availableColumns, grouping]
+  )
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <span className="text-sm font-medium">Active groups:</span>
+    <div className="space-y-4 p-1">
+      <div className="space-y-2">
+        <span className="text-xs font-medium text-muted-foreground">Active groups (drag to reorder):</span>
         {grouping.length > 0 ? (
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <SortableContext items={grouping} strategy={verticalListSortingStrategy}>
+            <SortableContext items={activeGroupItems} strategy={verticalListSortingStrategy}>
               <div className="flex flex-wrap gap-2">
                 {grouping.map((columnId) => {
                   const column = availableColumns.find(col => col.id === columnId)
@@ -200,40 +201,72 @@ export function GroupingPanel({
             </SortableContext>
           </DndContext>
         ) : (
-          <Badge variant="outline" className="text-muted-foreground">
+          <Badge variant="outline" className="text-xs font-normal">
             No grouping applied
           </Badge>
         )}
       </div>
-      {availableColumns.length > grouping.length && (
-        <div className="flex items-center gap-2">
-          <span className="text-sm">Add group:</span>
-          <Select
-            value=""
-            onValueChange={handleAddGroup}
-          >
-            <SelectTrigger className="h-8 w-[180px]">
+      {columnsToAdd.length > 0 && (
+        <div className="space-y-2">
+          <span className="text-xs font-medium text-muted-foreground">Add group:</span>
+          <Select value="" onValueChange={handleAddGroup}>
+            <SelectTrigger className="h-8 w-full sm:w-[200px] text-sm">
               <div className="flex items-center gap-2">
-                <Plus className="h-3.5 w-3.5" />
-                <SelectValue placeholder="Add column..." />
+                <Plus className="h-4 w-4" />
+                <SelectValue placeholder="Select column..." />
               </div>
             </SelectTrigger>
             <SelectContent>
-              {availableColumns
-                .filter(column => !grouping.includes(column.id))
-                .map(column => (
-                  <SelectItem key={column.id} value={column.id}>
-                    {column.label}
-                  </SelectItem>
-                ))}
+              {columnsToAdd.map((column) => (
+                <SelectItem key={column.id} value={column.id}>
+                  {column.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
       )}
-      
-      <div className="pt-4 text-xs text-muted-foreground">
-        <p>Drag groups to reorder • Click X to remove a group</p>
-      </div>
+      {grouping.length > 0 && (
+        <div className="pt-2 text-xs text-muted-foreground">
+          Drag grip to reorder • Click X to remove
+        </div>
+      )}
     </div>
   )
+}
+
+/**
+ * Hook to manage drag-and-drop state and logic for the grouping panel.
+ * @param grouping Current grouping state (array of column IDs).
+ * @param onGroupingChange Callback to update the grouping state.
+ * @returns DndContext sensors and handleDragEnd function.
+ */
+function useGroupingDnD(
+  grouping: GroupingState,
+  onGroupingChange: (grouping: GroupingState) => void
+) {
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  const handleDragEnd = React.useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event
+      
+      if (over && active.id !== over.id) {
+        const oldIndex = grouping.indexOf(active.id as string)
+        const newIndex = grouping.indexOf(over.id as string)
+        
+        if (oldIndex !== -1 && newIndex !== -1) {
+          onGroupingChange(arrayMove(grouping, oldIndex, newIndex))
+        }
+      }
+    },
+    [grouping, onGroupingChange]
+  )
+
+  return { sensors, handleDragEnd }
 } 

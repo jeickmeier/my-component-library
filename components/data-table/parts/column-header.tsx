@@ -1,15 +1,11 @@
 "use client";
 
 /**
- * Column Header Module
- * 
- * This module provides the interactive column header component used in the data table.
- * It includes functionality for column operations like sorting, filtering, grouping,
- * and aggregation, with a dropdown menu for easy access to these features.
- * 
- * @module column-header
+ * @module data-table/parts/column-header
+ * @description Interactive column header with sorting, filtering, aggregation, and visibility controls.
  */
 
+// React + Lib Imports
 import * as React from "react";
 import type { Column } from "@tanstack/react-table";
 import {
@@ -24,6 +20,15 @@ import {
   CheckCircle,
 } from "lucide-react";
 
+// Internal Imports
+import { useDataTable } from "../core/context";
+import { getGlobalAggregationFunctionRegistry, createAggregationFunctionRegistry } from "../aggregation";
+import { FilterFactory } from "../filters/filter-factory";
+import { cn } from "@/lib/utils";
+import { formatAggregationType } from "../utils"; // Use extracted utility
+import type { DataTableColumnDef, ColumnFilter } from "../types";
+
+// UI Imports
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -32,373 +37,391 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
-import { ColumnFilter } from "../types";
-import { FilterFactory } from "../filters/filter-factory";
 import { Badge } from "@/components/ui/badge";
-import { useDataTable } from "../core/context";
-import { getGlobalAggregationFunctionRegistry, createAggregationFunctionRegistry } from "../aggregation";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 
-/**
- * Props for the DataTableColumnHeader component.
- * 
- * @template TData The type of data in the table rows
- * @template TValue The type of value in this column
- */
-interface DataTableColumnHeaderProps<TData, TValue> {
-  /** The column instance from TanStack Table */
-  column: Column<TData, TValue>;
-  /** The display title for the column */
+// --- Sub Components for Composition ---
+
+interface ColumnHeaderTriggerProps<TData> {
+  column: Column<TData, unknown>;
   title: React.ReactNode;
-  /** Optional CSS class name for styling */
+  alignment?: 'left' | 'center' | 'right';
   className?: string;
-  /** Optional filter configuration for the column */
-  filter?: ColumnFilter;
-  /** Optional text alignment within the header */
-  alignment?: string;
+  hasAggregation: boolean;
 }
 
-/**
- * Column Header Component
- * 
- * A comprehensive header component for data table columns that provides
- * interactive controls for column manipulation and data analysis.
- * 
- * Features:
- * - Sorting controls (ascending, descending, clear)
- * - Column visibility toggle
- * - Filter management
- * - Aggregation controls
- * - Grouping support
- * - Visual indicators for active features
- * - Responsive dropdown menu
- * - Keyboard accessibility
- * 
- * The component integrates with TanStack Table's column API and provides
- * a user-friendly interface for all column operations.
- * 
- * @template TData The type of data in the table rows
- * @template TValue The type of value in this column
- * 
- * @param props Component props
- * @param props.column The column instance from TanStack Table
- * @param props.title Display title for the column
- * @param props.className Optional CSS class name
- * @param props.filter Optional filter configuration
- * @param props.alignment Optional text alignment
- * 
- * @example
- * ```tsx
- * <DataTableColumnHeader
- *   column={column}
- *   title="User Name"
- *   filter={{
- *     type: 'text',
- *     placeholder: 'Filter names...'
- *   }}
- *   alignment="left"
- * />
- * ```
- */
-export function DataTableColumnHeader<TData, TValue>({
-  column,
-  title,
-  className,
-  filter,
-  alignment,
-}: DataTableColumnHeaderProps<TData, TValue>) {
-  const { schema, setColumnAggregation, columnAggregations } = useDataTable<TData>();
+/** Renders the trigger element for the column header dropdown */
+const ColumnHeaderTrigger = <TData,>({ column, title, alignment, className }: ColumnHeaderTriggerProps<TData>) => {
+  const hasActiveFilter = column.getFilterValue() !== undefined;
+  const canSort = column.getCanSort();
+
+  // Consistent styling for trigger and icons
+  const triggerClass = cn(
+    "flex h-8 items-center gap-1.5 rounded-md px-2 py-1.5 hover:bg-accent focus:outline-none focus:ring-1 focus:ring-ring data-[state=open]:bg-accent w-full",
+    className
+  );
+  const iconClass = "h-4 w-4 shrink-0 text-muted-foreground";
+  const activeIconClass = "h-3.5 w-3.5";
+
+  return (
+    <DropdownMenuTrigger className={triggerClass}>
+      <div className="flex w-full items-center justify-between">
+        {/* Title with alignment */}
+        <span className={cn("truncate", alignment ? `text-${alignment}` : 'text-left')}>{title}</span>
+
+        {/* Status Icons */}
+        <span className="flex items-center ml-1 gap-0.5">
+          {canSort && column.getIsSorted() && (
+            column.getIsSorted() === "desc" ? (
+              <ChevronDown className={activeIconClass} />
+            ) : (
+              <ChevronUp className={activeIconClass} />
+            )
+          )}
+          {hasActiveFilter && (
+            <Filter className={cn(activeIconClass, "text-primary")} />
+          )}
+          {/* Show default sort icon only if sortable and not currently sorted */}
+          {canSort && !column.getIsSorted() && (
+            <ChevronsUpDown className={cn(iconClass, "opacity-50")} />
+          )}
+        </span>
+      </div>
+    </DropdownMenuTrigger>
+  );
+};
+
+interface SortMenuItemsProps<TData> {
+  column: Column<TData, unknown>;
+}
+
+/** Renders the sort-related menu items */
+const SortMenuItems = <TData,>({ column }: SortMenuItemsProps<TData>) => {
+  const iconClass = "h-4 w-4 shrink-0 text-muted-foreground";
+  const handleSortAsc = React.useCallback(() => column.toggleSorting(false), [column]);
+  const handleSortDesc = React.useCallback(() => column.toggleSorting(true), [column]);
+  const handleResetSort = React.useCallback(() => column.clearSorting(), [column]);
+
+  return (
+    <>
+      <DropdownMenuCheckboxItem
+        className="relative pr-8 pl-2 text-xs [&>span:first-child]:right-2 [&>span:first-child]:left-auto"
+        checked={column.getIsSorted() === "asc"}
+        onSelect={handleSortAsc}
+      >
+        <ChevronUp className={iconClass} />
+        Asc
+      </DropdownMenuCheckboxItem>
+      <DropdownMenuCheckboxItem
+        className="relative pr-8 pl-2 text-xs [&>span:first-child]:right-2 [&>span:first-child]:left-auto"
+        checked={column.getIsSorted() === "desc"}
+        onSelect={handleSortDesc}
+      >
+        <ChevronDown className={iconClass} />
+        Desc
+      </DropdownMenuCheckboxItem>
+      {column.getIsSorted() && (
+        <DropdownMenuItem
+          className="pl-2 text-xs"
+          onSelect={handleResetSort}
+        >
+          <X className={iconClass} />
+          Reset Sort
+        </DropdownMenuItem>
+      )}
+    </>
+  );
+};
+
+interface AggregationSectionProps<TData> {
+  column: Column<TData, unknown>;
+}
+
+/** Renders the aggregation section in the dropdown menu */
+const AggregationSection = <TData,>({ column }: AggregationSectionProps<TData>) => {
+  const { setColumnAggregation, columnAggregations } = useDataTable<TData>();
+  const columnDef = column.columnDef as DataTableColumnDef<TData>;
   const [isAddingAggregation, setIsAddingAggregation] = React.useState(false);
   const [showSuccess, setShowSuccess] = React.useState(false);
-  
-  // Initialize registry with standard functions on mount
+
+  // Initialize registry (consider moving to context/provider if used globally)
   React.useEffect(() => {
     createAggregationFunctionRegistry();
   }, []);
-  
-  // Get aggregation registry and available types
-  const aggregationRegistry = React.useMemo(() => 
-    getGlobalAggregationFunctionRegistry(), []);
-  
-  const aggregationTypes = React.useMemo(() => 
-    aggregationRegistry.getTypes(), [aggregationRegistry]);
-  
-  /**
-   * Gets the current aggregation type for the column.
-   * Checks both runtime state and schema defaults.
-   */
+
+  const aggregationRegistry = React.useMemo(() => getGlobalAggregationFunctionRegistry(), []);
+  const aggregationTypes = React.useMemo(() => aggregationRegistry?.getTypes() ?? [], [aggregationRegistry]);
+
   const currentAggregationType = React.useMemo(() => {
     const columnId = column.id;
-    if (!columnId) return undefined;
-    
-    // First check columnAggregations state
-    if (columnAggregations[columnId] !== undefined) {
-      return columnAggregations[columnId];
-    }
-    
-    // Fall back to schema default if exists
-    const schemaColumn = schema.columns.find(col => 
-      (col.id === columnId) || (col.accessorKey === columnId)
-    );
-    return schemaColumn?.aggregationType;
-  }, [column.id, columnAggregations, schema.columns]);
+    return columnAggregations?.[columnId] ?? columnDef.aggregationType;
+  }, [column.id, columnAggregations, columnDef.aggregationType]);
 
-  // Track active states
-  const hasActiveFilter = column.getFilterValue() !== undefined;
   const hasAggregation = !!currentAggregationType;
 
-  /**
-   * Formats an aggregation type name for display.
-   * Uses registry labels when available, falls back to camelCase formatting.
-   */
-  const formatAggregationType = (type: string): string => {
-    if (!type) return '';
-    // Get from registry if possible for a more user-friendly name
-    const config = aggregationRegistry.getConfig(type);
-    if (config?.label) return config.label;
-    
-    // Otherwise format from camelCase
-    return type
-      .replace(/([A-Z])/g, ' $1')
-      .replace(/^./, str => str.toUpperCase());
-  };
-  
-  /**
-   * Handles change of aggregation type.
-   * Updates the column's aggregation and shows success feedback.
-   */
-  const handleAggregationChange = (type: string) => {
+  const handleAggregationChange = React.useCallback((type: string) => {
     if (setColumnAggregation && column.id) {
-      setColumnAggregation(column.id, type);
+      setColumnAggregation(column.id, type || undefined);
       setIsAddingAggregation(false);
-      
-      // Show success message briefly
-      setShowSuccess(true);
-      setTimeout(() => {
-        setShowSuccess(false);
-      }, 1500);
+      if (type) {
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 1500);
+      }
     }
-  };
-  
-  /**
-   * Handles removal of aggregation.
-   * Clears the column's aggregation settings.
-   */
-  const handleRemoveAggregation = () => {
+  }, [setColumnAggregation, column.id]);
+
+  const handleRemoveAggregation = React.useCallback(() => {
     if (setColumnAggregation && column.id) {
       setColumnAggregation(column.id, undefined);
       setShowSuccess(false);
+      setIsAddingAggregation(false);
     }
-  };
+  }, [setColumnAggregation, column.id]);
 
+  return (
+    <div className="px-2 py-1.5">
+      {/* Header and Add button */}
+      <div className="text-xs font-medium mb-1 flex items-center justify-between">
+        <span className="flex items-center gap-1">
+          <Calculator className="h-3.5 w-3.5 text-indigo-500" />
+          Aggregation
+        </span>
+        {!isAddingAggregation && !hasAggregation && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-6 text-xs flex items-center gap-1"
+            onClick={() => setIsAddingAggregation(true)}
+          >
+            <PlusCircle className="h-3 w-3" />
+            Add
+          </Button>
+        )}
+      </div>
+
+      {/* Aggregation Controls: Select or Status Badge */}
+      {isAddingAggregation ? (
+        <div className="mt-1 space-y-1">
+          <Select value={currentAggregationType || ""} onValueChange={handleAggregationChange}>
+            <SelectTrigger className="w-full h-8 text-xs">
+              <SelectValue placeholder="Select function..." />
+            </SelectTrigger>
+            <SelectContent>
+              {aggregationTypes.length > 0 ? (
+                aggregationTypes.map(type => {
+                  const config = aggregationRegistry?.getConfig(type);
+                  return (
+                    <SelectItem key={type} value={type} className="text-xs">
+                      {config?.label || formatAggregationType(type, aggregationRegistry)}
+                    </SelectItem>
+                  );
+                })
+              ) : (
+                <SelectItem value="count" disabled className="text-xs text-muted-foreground">
+                  No functions available
+                </SelectItem>
+              )}
+            </SelectContent>
+          </Select>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 text-xs w-full"
+            onClick={() => setIsAddingAggregation(false)}
+          >
+            Cancel
+          </Button>
+        </div>
+      ) : hasAggregation ? (
+        <div className="mt-1 space-y-1">
+          <div className="flex justify-between items-center gap-1">
+            <Badge
+              variant="outline"
+              className={cn(
+                "justify-center flex-1 transition-colors h-7 text-xs",
+                showSuccess && "bg-green-100 text-green-800 border-green-300"
+              )}
+            >
+              {showSuccess && <CheckCircle className="h-3.5 w-3.5 mr-1 text-green-600" />}
+              {formatAggregationType(String(currentAggregationType), aggregationRegistry)}
+            </Badge>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={handleRemoveAggregation}
+              aria-label="Remove aggregation"
+            >
+              <X className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 text-xs w-full"
+            onClick={() => setIsAddingAggregation(true)}
+          >
+            Change
+          </Button>
+        </div>
+      ) : (
+        <div className="text-xs text-muted-foreground mt-1">
+          No aggregation set.
+        </div>
+      )}
+    </div>
+  );
+};
+
+interface FilterSectionProps<TData> {
+  column: Column<TData, unknown>;
+  filterConfig: ColumnFilter;
+}
+
+/** Renders the filter section in the dropdown menu */
+const FilterSection = <TData,>({ column, filterConfig }: FilterSectionProps<TData>) => {
+  return (
+    <div className="px-2 py-1.5">
+      <div className="text-xs font-medium mb-1 flex items-center gap-1">
+        <Filter className="h-3.5 w-3.5 text-primary" />
+        Filter
+      </div>
+      {/* Pass column and filter config to the factory */}
+      <FilterFactory
+        column={column}
+        filter={filterConfig}
+        showClearButton={true}
+      />
+    </div>
+  );
+};
+
+interface VisibilityToggleItemProps<TData> {
+  column: Column<TData, unknown>;
+}
+
+/** Renders the hide column menu item */
+const VisibilityToggleItem = <TData,>({ column }: VisibilityToggleItemProps<TData>) => {
+  const iconClass = "h-4 w-4 shrink-0 text-muted-foreground";
+  const handleToggleVisibility = React.useCallback(() => column.toggleVisibility(false), [column]);
+
+  return (
+    <DropdownMenuCheckboxItem
+      className="relative pr-8 pl-2 text-xs [&>span:first-child]:right-2 [&>span:first-child]:left-auto"
+      checked={!column.getIsVisible()}
+      onSelect={handleToggleVisibility}
+    >
+      <EyeOff className={iconClass} />
+      Hide Column
+    </DropdownMenuCheckboxItem>
+  );
+};
+
+interface ColumnHeaderMenuContentProps<TData> {
+  column: Column<TData, unknown>;
+}
+
+/** Renders the content of the column header dropdown menu */
+const ColumnHeaderMenuContent = <TData,>({ column }: ColumnHeaderMenuContentProps<TData>) => {
+  const { schema } = useDataTable<TData>();
+  const columnDef = column.columnDef as DataTableColumnDef<TData>;
+  const filterConfig = columnDef.filter;
+  const canSort = column.getCanSort();
+  const canHide = column.getCanHide();
+  const canFilter = column.getCanFilter() && !!filterConfig;
+  const showAggregationControls = schema.enableGrouping; // Aggregation linked to grouping
+
+  return (
+    <DropdownMenuContent align="start" className="w-64">
+      {/* Sorting Section */}
+      {canSort && <SortMenuItems column={column} />}
+
+      {/* Aggregation Section */}
+      {showAggregationControls && (
+        <>
+          {(canSort) && <DropdownMenuSeparator />}
+          <AggregationSection column={column} />
+        </>
+      )}
+
+      {/* Filter Section */}
+      {canFilter && (
+        <>
+          {(canSort || showAggregationControls) && <DropdownMenuSeparator />}
+          <FilterSection column={column} filterConfig={filterConfig!} />
+        </>
+      )}
+
+      {/* Visibility Section */}
+      {canHide && (
+        <>
+          {(canSort || canFilter || showAggregationControls) && <DropdownMenuSeparator />}
+          <VisibilityToggleItem column={column} />
+        </>
+      )}
+    </DropdownMenuContent>
+  );
+};
+
+// --- Main Component ---
+
+// Props Interface (simplified)
+interface DataTableColumnHeaderProps<TData> {
+  column: Column<TData, unknown>;
+  title: React.ReactNode;
+  className?: string;
+}
+
+/**
+ * Renders an interactive column header.
+ * Provides a dropdown menu for sorting, filtering (if configured),
+ * aggregation (if enabled), and hiding the column.
+ */
+export function DataTableColumnHeader<TData>({
+  column,
+  title,
+  className,
+}: DataTableColumnHeaderProps<TData>) {
+  // --- State & Hooks ---
+  const columnDef = column.columnDef as DataTableColumnDef<TData>;
+  const alignment = columnDef.alignment;
+  const { schema, columnAggregations } = useDataTable<TData>();
+
+  // --- Render Logic ---
   // Render simple header if no interactive features are enabled
-  if (!column.getCanSort() && !column.getCanHide() && !filter && !hasAggregation && !schema.enableGrouping) {
-    return <div className={cn(className)}>{title}</div>;
+  const canSort = column.getCanSort();
+  const canHide = column.getCanHide();
+  const canFilter = column.getCanFilter() && !!columnDef.filter;
+  const showAggregationControls = schema.enableGrouping;
+
+  // Calculate hasAggregation here using the state from the unconditional hook call
+  const hasAggregation = !!(columnDef.aggregationType || columnAggregations?.[column.id]);
+
+  if (!canSort && !canHide && !canFilter && !showAggregationControls) {
+    return (
+      <div className={cn("p-2", className, alignment ? `text-${alignment}` : 'text-left')}>
+        {title}
+      </div>
+    );
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        className={cn(
-          "flex h-8 items-center gap-1.5 rounded-md px-2 py-1.5 hover:bg-accent focus:outline-none focus:ring-1 focus:ring-ring data-[state=open]:bg-accent [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-muted-foreground w-full",
-          className,
-        )}
-      >
-        <div className="flex w-full items-center justify-between">
-          <span className={cn("truncate", alignment)}>{title}</span>
-          <span className="flex items-center ml-1">
-            {column.getCanSort() &&
-              (column.getIsSorted() === "desc" ? (
-                <ChevronDown />
-              ) : column.getIsSorted() === "asc" ? (
-                <ChevronUp />
-              ) : (
-                <ChevronsUpDown />
-              ))}
-            {hasActiveFilter && (
-              <Filter className="h-3 w-3 text-primary" />
-            )}
-            {hasAggregation && (
-              <Calculator className="h-3 w-3 text-indigo-500 ml-1" />
-            )}
-          </span>
-        </div>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-64">
-        {column.getCanSort() && (
-          <>
-            <DropdownMenuCheckboxItem
-              className="relative pr-8 pl-2 [&>span:first-child]:right-2 [&>span:first-child]:left-auto [&_svg]:text-muted-foreground"
-              checked={column.getIsSorted() === "asc"}
-              onClick={() => column.toggleSorting(false)}
-            >
-              <ChevronUp />
-              Asc
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              className="relative pr-8 pl-2 [&>span:first-child]:right-2 [&>span:first-child]:left-auto [&_svg]:text-muted-foreground"
-              checked={column.getIsSorted() === "desc"}
-              onClick={() => column.toggleSorting(true)}
-            >
-              <ChevronDown />
-              Desc
-            </DropdownMenuCheckboxItem>
-            {column.getIsSorted() && (
-              <DropdownMenuItem
-                className="pl-2 [&_svg]:text-muted-foreground"
-                onClick={() => column.clearSorting()}
-              >
-                <X />
-                Reset Sort
-              </DropdownMenuItem>
-            )}
-          </>
-        )}
-        
-        {/* Aggregation Information and Management */}
-        {schema.enableGrouping && (
-          <>
-            <DropdownMenuSeparator />
-            <div className="px-2 py-1.5">
-              <div className="text-xs font-medium mb-1 flex items-center justify-between">
-                <span className="flex items-center">
-                  <Calculator className="h-3 w-3 mr-1 text-indigo-500" />
-                  Aggregation
-                </span>
-                {!isAddingAggregation && !hasAggregation && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="h-5 text-xs flex items-center gap-1"
-                    onClick={() => setIsAddingAggregation(true)}
-                  >
-                    <PlusCircle className="h-3 w-3" />
-                    Add
-                  </Button>
-                )}
-              </div>
-              
-              {isAddingAggregation ? (
-                <div className="mt-1">
-                  <Select onValueChange={handleAggregationChange}>
-                    <SelectTrigger className="w-full h-8 text-xs">
-                      <SelectValue placeholder="Select aggregation function" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {aggregationTypes.length > 0 ? (
-                        aggregationTypes.map(type => {
-                          const config = aggregationRegistry.getConfig(type);
-                          return (
-                            <SelectItem key={type} value={type} className="text-xs">
-                              <div className="flex flex-col">
-                                <span>{config?.label || formatAggregationType(type)}</span>
-                                {config?.description && (
-                                  <span className="text-xs text-muted-foreground">
-                                    {config.description}
-                                  </span>
-                                )}
-                              </div>
-                            </SelectItem>
-                          );
-                        })
-                      ) : (
-                        <SelectItem value="count" className="text-xs">
-                          Count (Default)
-                        </SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="mt-1 h-6 text-xs w-full"
-                    onClick={() => setIsAddingAggregation(false)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              ) : hasAggregation ? (
-                <>
-                  <div className="flex justify-between items-center">
-                    <Badge 
-                      variant="outline" 
-                      className={cn(
-                        "justify-center flex-1 transition-colors",
-                        showSuccess && "bg-green-100 text-green-800 border-green-300"
-                      )}
-                    >
-                      {showSuccess && (
-                        <CheckCircle className="h-3 w-3 mr-1 text-green-600" />
-                      )}
-                      {formatAggregationType(String(currentAggregationType))}
-                    </Badge>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-5 px-1 ml-1"
-                      onClick={handleRemoveAggregation}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    This column will be aggregated when grouping data
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="mt-1 h-6 text-xs w-full"
-                    onClick={() => setIsAddingAggregation(true)}
-                  >
-                    Change
-                  </Button>
-                </>
-              ) : (
-                <div className="text-xs text-muted-foreground">
-                  No aggregation function set for this column
-                </div>
-              )}
-            </div>
-          </>
-        )}
-        
-        {/* Filter Section */}
-        {(filter && column.getCanFilter()) && (
-          <>
-            <DropdownMenuSeparator />
-            <div className="px-2 py-1.5">
-              <div className="text-xs font-medium mb-1">Filter</div>
-              <FilterFactory 
-                column={column} 
-                filter={filter} 
-                showClearButton={true}
-              />
-            </div>
-          </>
-        )}
-        
-        {column.getCanHide() && (
-          <>
-            {(column.getCanSort() || (filter && column.getCanFilter()) || hasAggregation || schema.enableGrouping) && <DropdownMenuSeparator />}
-            <DropdownMenuCheckboxItem
-              className="relative pr-8 pl-2 [&>span:first-child]:right-2 [&>span:first-child]:left-auto [&_svg]:text-muted-foreground"
-              checked={!column.getIsVisible()}
-              onClick={() => column.toggleVisibility(false)}
-            >
-              <EyeOff />
-              Hide
-            </DropdownMenuCheckboxItem>
-          </>
-        )}
-      </DropdownMenuContent>
+    <DropdownMenu modal={false}> {/* Prevent focus trap issues with filters inside */}
+      <ColumnHeaderTrigger 
+        column={column} 
+        title={title} 
+        alignment={alignment} 
+        className={className} 
+        hasAggregation={hasAggregation}
+      />
+      <ColumnHeaderMenuContent column={column} />
     </DropdownMenu>
   );
 } 

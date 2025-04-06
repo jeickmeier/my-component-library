@@ -164,4 +164,45 @@ export interface NullRendererConfig extends BaseRendererConfig {
 export type CellRendererFunction<TConfig extends BaseRendererConfig = BaseRendererConfig> = (
   props: CellRendererProps,
   config?: TConfig
-) => React.ReactNode; 
+) => React.ReactNode;
+
+/**
+ * Renderer Type
+ * 
+ * Defines the possible types of cell renderers.
+ */
+export type RendererType = 
+  | 'text' 
+  | 'status' 
+  | 'currency' 
+  | 'date' 
+  | 'boolean' 
+  | 'null'
+  | 'decimal';
+
+/**
+ * Renderer Configuration
+ * 
+ * Defines the configuration options for cell renderers.
+ */
+export interface RendererConfig {
+  text?: TextRendererConfig;
+  status?: StatusRendererConfig;
+  currency?: CurrencyRendererConfig;
+  date?: DateRendererConfig;
+  boolean?: BooleanRendererConfig;
+  null?: NullRendererConfig;
+  decimal?: DecimalRendererConfig;
+}
+
+/**
+ * Decimal Renderer Configuration
+ * 
+ * Configuration options for the decimal cell renderer.
+ */
+export interface DecimalRendererConfig {
+  decimals?: number;           // Number of decimal places to display
+  thousand_separator?: boolean; // Whether to use thousand separators
+  className?: string;          // Optional CSS class for the cell
+  locale?: string;             // Optional locale for number formatting
+} 

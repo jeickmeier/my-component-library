@@ -13,7 +13,8 @@ import {
   CurrencyRendererConfig,
   DateRendererConfig,
   BooleanRendererConfig,
-  NullRendererConfig
+  NullRendererConfig,
+  DecimalRendererConfig
 } from "./types";
 
 /**
@@ -206,4 +207,36 @@ export function nullRenderer(
   }
   
   return <div className={config?.className}>{String(value)}</div>;
+}
+
+/**
+ * Decimal Cell Renderer
+ * 
+ * Formats and displays decimal numbers.
+ */
+export function decimalRenderer(
+  props: CellRendererProps,
+  config?: DecimalRendererConfig
+): React.ReactNode {
+  const value = props.getValue();
+  if (value === null || value === undefined) {
+    return <div className={config?.className}>-</div>;
+  }
+
+  const numValue = Number(value);
+  if (isNaN(numValue)) {
+    return <div className={config?.className}>{String(value)}</div>;
+  }
+
+  const decimals = config?.decimals ?? 2;
+  const useGrouping = config?.thousand_separator ?? true;
+  const locale = config?.locale || 'en-US';
+
+  const formatted = new Intl.NumberFormat(locale, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+    useGrouping: useGrouping,
+  }).format(numValue);
+
+  return <div className={config?.className}>{formatted}</div>;
 } 

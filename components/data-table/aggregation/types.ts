@@ -49,6 +49,7 @@ export type CustomAggregationFunctionType =
   | 'first'
   | 'last'
   | 'join'
+  | 'list'
 
 /**
  * Union type of all supported aggregation function types.
@@ -87,4 +88,9 @@ export interface PercentileAggregationConfig extends AggregationFunctionConfig {
 export interface JoinAggregationConfig extends AggregationFunctionConfig {
   separator: string
   limit?: number
-} 
+}
+
+/**
+ * Configuration for list aggregation (currently empty, placeholder).
+ */
+export type ListAggregationConfig = AggregationFunctionConfig; 

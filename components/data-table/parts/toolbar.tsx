@@ -1,28 +1,24 @@
 "use client"
 
 /**
- * Toolbar Module
- * 
- * This module provides the toolbar component for the data table, which includes
- * search functionality, export controls, and grouping management. The toolbar
- * integrates with the data table's context to provide a consistent interface
- * for table operations.
- * 
- * Features:
- * - Global search functionality
- * - CSV export capability
- * - Grouping management
- * - Responsive design
- * - Accessibility support
- * 
  * @module data-table/parts/toolbar
+ * @description Provides the table toolbar with global search, export, and grouping controls.
  */
 
+// React + Lib Imports
 import * as React from "react"
+import { Layers, Download } from "lucide-react"
+
+// Internal Imports
 import { useDataTable } from "../core/context"
+import { GroupingPanel } from "./grouping-panel"
+import { getGroupableColumns } from "../schema" // Assuming this utility handles schema logic
+import { hasAccessorKey, exportToCSV } from "../utils" // Assuming general utils
+import type { GroupableColumn, DataTableColumnDef } from "../types"
+
+// UI Imports
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Layers, Download } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import {
   Dialog,
@@ -32,54 +28,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { GroupingPanel } from "./grouping-panel"
-import { getGroupableColumns } from "../schema"
-import { hasAccessorKey, exportToCSV } from "../utils"
-import { GroupableColumn } from "../types"
 
 /**
- * Toolbar Component
- * 
- * A comprehensive toolbar component that provides search, export, and grouping
- * functionality for the data table. It integrates with the table's context to
- * manage global filtering, data export, and column grouping.
- * 
- * Features:
- * - Global search with customizable placeholder
- * - CSV export with automatic filename generation
- * - Grouping management with drag-and-drop support
- * - Visual feedback for active groups
- * - Responsive design
- * - Accessibility support
- * 
- * The component automatically:
- * - Renders search input when enabled
- * - Provides export functionality when enabled
- * - Shows grouping controls when enabled
- * - Displays active group count
- * - Manages grouping dialog state
- * 
- * @example
- * ```tsx
- * // Basic usage
- * <Toolbar />
- * 
- * // With custom configuration
- * const schema = {
- *   enableGlobalFilter: true,
- *   enableExport: true,
- *   enableGrouping: true,
- *   columns: [
- *     {
- *       id: 'name',
- *       header: 'Name',
- *       enableGrouping: true
- *     }
- *   ]
- * }
- * ```
+ * Renders the toolbar for the data table.
+ * Includes optional global filter input, CSV export button, and grouping dialog trigger/content.
+ * Feature visibility is controlled by flags in the table schema.
  */
-export function Toolbar() {
+export function Toolbar<TData>() {
+  // --- State & Hooks ---
   const {
     schema,
     data,
@@ -87,87 +43,102 @@ export function Toolbar() {
     setGlobalFilter,
     grouping,
     setGrouping,
-  } = useDataTable()
+  } = useDataTable<TData>()
 
   const [isGroupingDialogOpen, setIsGroupingDialogOpen] = React.useState(false)
 
-  // Get groupable column IDs
+  // --- Memoized Calculations ---
+  // Get groupable column IDs (utility likely handles schema details)
   const groupableColumns = React.useMemo(() => getGroupableColumns(schema), [schema])
 
-  // Create a list of groupable columns with labels
+  // Create a list of groupable columns with labels for the panel
   const groupableColumnObjects = React.useMemo(() => {
     return groupableColumns.map(columnId => {
+      // Find the corresponding column definition for the label
       const col = schema.columns.find(c => {
-        if (c.id === columnId) return true;
-        // Check if column has accessorKey that matches
-        return hasAccessorKey(c) && c.accessorKey === columnId;
+        const def = c as DataTableColumnDef<TData>
+        if (def.id === columnId) return true
+        return hasAccessorKey(def) && def.accessorKey === columnId
       })
-      return {
-        id: columnId,
-        label: typeof col?.header === 'string' 
-          ? col.header 
-          : (columnId.charAt(0).toUpperCase() + columnId.slice(1)),
-      }
+      // Generate label from header or fallback to capitalized ID
+      const label = typeof col?.header === 'string' 
+        ? col.header 
+        : (columnId.charAt(0).toUpperCase() + columnId.slice(1));
+      return { id: columnId, label }
     })
-  }, [schema.columns, groupableColumns])
+    // Dependency: schema.columns for headers, groupableColumns for IDs
+  }, [schema.columns, groupableColumns]) 
 
-  // Handle CSV export
-  const handleExportCSV = () => {
-    exportToCSV(data, schema.columns, 'table-export')
-  }
+  // --- Event Handlers ---
+  const handleExportCSV = React.useCallback(() => {
+    // Pass necessary data to the utility function
+    exportToCSV(data, schema.columns, 'table-export') 
+  }, [data, schema.columns]) // Dependencies for export
+
+  const handleGlobalFilterChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setGlobalFilter(event.target.value)
+  }, [setGlobalFilter])
+
+  // --- Render Logic ---
+  const showGlobalFilter = schema.enableGlobalFilter !== false;
+  const showExport = schema.enableExport !== false;
+  const showGrouping = schema.enableGrouping && groupableColumns.length > 0;
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between py-2">
+      {/* Left Side: Global Filter */}
       <div className="flex items-center gap-1">
-        {schema.enableGlobalFilter !== false && (
+        {showGlobalFilter && (
           <Input
-            placeholder="Search..."
+            placeholder="Search all columns..."
             value={globalFilter ?? ""}
-            onChange={(event) => setGlobalFilter(event.target.value)}
-            className="w-64 h-7 text-xs"
+            onChange={handleGlobalFilterChange}
+            className="h-8 w-48 sm:w-64 text-sm" // Use h-8 text-sm
           />
         )}
       </div>
-      <div className="flex items-center gap-1">
+
+      {/* Right Side: Actions */}
+      <div className="flex items-center gap-2">
         {/* Export CSV Button */}
-        {schema.enableExport !== false && (
+        {showExport && (
           <Button
             variant="outline"
             size="sm"
-            className="gap-1 h-7 text-xs"
+            className="h-8 gap-1 text-sm" // Use h-8 text-sm
             onClick={handleExportCSV}
           >
-            <Download className="h-3 w-3" />
-            Export CSV
+            <Download className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Export CSV</span>
           </Button>
         )}
 
-        {/* Grouping Dialog */}
-        {schema.enableGrouping && groupableColumns.length > 0 && (
+        {/* Grouping Dialog Trigger/Content */}
+        {showGrouping && (
           <Dialog open={isGroupingDialogOpen} onOpenChange={setIsGroupingDialogOpen}>
             <DialogTrigger asChild>
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="gap-1 h-7 text-xs"
+                className="h-8 gap-1 text-sm" // Use h-8 text-sm
               >
-                <Layers className="h-3 w-3" />
-                Group By
+                <Layers className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Group By</span>
                 {grouping.length > 0 && (
                   <Badge 
                     variant="secondary" 
-                    className="ml-1 rounded-sm px-1 font-normal text-xs"
+                    className="ml-1.5 rounded-sm px-1.5 font-normal text-xs"
                   >
                     {grouping.length}
                   </Badge>
                 )}
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle>Table Grouping</DialogTitle>
+                <DialogTitle>Manage Column Grouping</DialogTitle>
                 <DialogDescription>
-                  Group your data by one or more columns to create hierarchical views. Drag to reorder groups.
+                  Drag columns to change group order. Add or remove columns to group by.
                 </DialogDescription>
               </DialogHeader>
               <GroupingPanel

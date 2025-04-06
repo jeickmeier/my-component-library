@@ -21,3 +21,5 @@
 export { DataTable } from "./data-table"
 export { DataTableProvider, useDataTable } from "./context"
 export { DataTableCell } from "./cell" 
+
+export { DataTableAggregatedCell } from './aggregated-cell' 

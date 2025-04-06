@@ -7,6 +7,7 @@
  */
 
 import { Row } from "@tanstack/react-table"
+import { getUniqueValues as getUniqueValuesFromArray } from "../utils"
 
 /**
  * Extracts numeric values from a column in the given rows.
@@ -48,20 +49,19 @@ export function calculateMedian(values: number[]): number | null {
  * Gets the unique values from a column in the given rows.
  * Filters out null and undefined values.
  */
-export function getUniqueValues<TData>(
+export function getUniqueValuesFromRows<TData>(
   columnId: string, 
   rows: Row<TData>[]
 ): unknown[] {
-  const uniqueValues = new Set<unknown>();
-  
+  const allValues: unknown[] = [];
   rows.forEach(row => {
     const value = row.getValue(columnId);
     if (value !== undefined && value !== null) {
-      uniqueValues.add(value);
+      allValues.push(value);
     }
   });
   
-  return Array.from(uniqueValues);
+  return getUniqueValuesFromArray(allValues);
 }
 
 /**

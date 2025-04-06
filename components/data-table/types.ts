@@ -23,7 +23,7 @@
 
 import { ColumnDef, ColumnFiltersState, SortingState, VisibilityState, GroupingState, ExpandedState, HeaderContext } from "@tanstack/react-table"
 import * as React from "react"
-import { AggregationFunctionType, AggregationFunctionConfig } from "./aggregation"
+import { AggregationFunctionType } from "./aggregation"
 
 /**
  * Filter Option Type
@@ -288,7 +288,7 @@ export interface DataTableColumnDef<TData, TValue = unknown> extends Omit<Column
   /**
    * Optional configuration for the aggregation function
    */
-  aggregationConfig?: AggregationFunctionConfig
+  aggregationRenderer?: SerializableCellRenderer
 }
 
 /**
@@ -393,7 +393,7 @@ export interface SerializableColumnDef {
   /**
    * Optional configuration for the aggregation function
    */
-  aggregationConfig?: Record<string, unknown>
+  aggregationRenderer?: SerializableCellRenderer
 }
 
 /**

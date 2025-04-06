@@ -16,7 +16,8 @@ import {
   currencyRenderer, 
   dateRenderer,
   booleanRenderer,
-  nullRenderer
+  nullRenderer,
+  decimalRenderer
 } from './renderers';
 
 // Export for external use
@@ -38,7 +39,8 @@ let globalRegistry: Record<string, CellRendererFunction> = {
   currency: currencyRenderer,
   date: dateRenderer,
   boolean: booleanRenderer,
-  null: nullRenderer
+  null: nullRenderer,
+  decimal: decimalRenderer
 };
 
 /**
@@ -58,7 +60,8 @@ export function getGlobalCellRendererRegistry() {
         currency: currencyRenderer,
         date: dateRenderer,
         boolean: booleanRenderer,
-        null: nullRenderer
+        null: nullRenderer,
+        decimal: decimalRenderer
       };
     }
   };
@@ -134,10 +137,13 @@ export function createDefaultCellRendererProvider(children: React.ReactNode) {
         currency: currencyRenderer,
         date: dateRenderer,
         boolean: booleanRenderer,
-        null: nullRenderer
+        null: nullRenderer,
+        decimal: decimalRenderer
       }}
     >
       {children}
     </CellRendererProvider>
   );
-} 
+}
+
+export default globalRegistry; 

@@ -22,8 +22,7 @@
           { "label": "Bob", "value": "Bob" }
         ],
         "getOptionsFromData": true
-      },
-      "aggregationType": "count"
+      }
     },
     {
       "id": "department",
@@ -50,8 +49,7 @@
             "hr": "yellow"
           }
         }
-      },
-      "aggregationType": "uniqueCount"
+      }
     },
     {
       "id": "salary",
@@ -69,13 +67,24 @@
         "type": "currency",
         "config": {
           "currency": "USD",
-          "locale": "en-US"
+          "locale": "en-US",
+          "options": {
+            "minimumFractionDigits": 2,
+            "maximumFractionDigits": 2
+          }
         }
       },
-      "aggregationType": "first",
-      "aggregationConfig": {
-        "currency": "USD",
-        "locale": "en-US"
+      "aggregationType": "sum",
+      "aggregationRenderer": {
+        "type": "currency",
+        "config": {
+          "currency": "USD",
+          "locale": "en-US",
+          "options": {
+            "minimumFractionDigits": 0,
+            "maximumFractionDigits": 0
+          }
+        }
       }
     },
     {
@@ -93,14 +102,15 @@
       "cellRenderer": {
         "type": "date",
         "config": {
-          "format": {
+          "locale": "sv-SE",
+          "options": {
             "year": "numeric",
-            "month": "short",
-            "day": "numeric"
+            "month": "2-digit",
+            "day": "2-digit"
           }
         }
       },
-      "aggregationType": "extend"
+      "aggregationType": "extent"
     },
     {
       "id": "status",
@@ -140,13 +150,18 @@
         "max": 5
       },
       "cellRenderer": {
-        "type": "rating",
+        "type": "decimal",
         "config": {
-          "max": 5,
-          "icon": "star"
+          "decimals": 2
         }
       },
-      "aggregationType": "mean"
+      "aggregationType": "mean",
+      "aggregationRenderer": {
+        "type": "decimal",
+        "config": {
+          "decimals": 0
+        }
+      }
     },
     {
       "id": "fullTime",
@@ -178,16 +193,6 @@
         "type": "range",
         "min": 0,
         "max": 20
-      },
-      "cellRenderer": {
-        "type": "numeric",
-        "config": {
-          "format": {
-            "style": "decimal",
-            "minimumFractionDigits": 0,
-            "maximumFractionDigits": 0
-          }
-        }
       },
       "aggregationType": "sum"
     }
