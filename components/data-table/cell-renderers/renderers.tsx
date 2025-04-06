@@ -14,8 +14,10 @@ import {
   DateRendererConfig,
   BooleanRendererConfig,
   NullRendererConfig,
-  DecimalRendererConfig
+  DecimalRendererConfig,
+  StarRatingRendererConfig
 } from "./types";
+import { StarRating } from "@/components/ui/star-rating";
 
 /**
  * Text Cell Renderer
@@ -112,7 +114,14 @@ export function currencyRenderer(
     ...config?.options
   }).format(numValue);
   
-  return <div className={config?.className}>{formatted}</div>;
+  const color = numValue >= 0 ? config?.positiveColor : config?.negativeColor;
+  const style = color ? { color, display: 'inline-block' } : undefined;
+  
+  return (
+    <div className={config?.className}>
+      <span style={style}>{formatted}</span>
+    </div>
+  );
 }
 
 /**
@@ -238,5 +247,47 @@ export function decimalRenderer(
     useGrouping: useGrouping,
   }).format(numValue);
 
-  return <div className={config?.className}>{formatted}</div>;
+  const color = numValue >= 0 ? config?.positiveColor : config?.negativeColor;
+  const style = color ? { color } : undefined;
+
+  return <div className={config?.className} style={style}>{formatted}</div>;
+}
+
+/**
+ * Star Rating Cell Renderer
+ * 
+ * Renders a cell value as a star rating using the StarRating component.
+ */
+export function starRatingRenderer(
+  props: CellRendererProps,
+  config?: StarRatingRendererConfig
+): React.ReactNode {
+  const value = props.getValue();
+  
+  // Handle null/undefined values
+  if (value === null || value === undefined) {
+    return <div className={config?.className}>-</div>;
+  }
+
+  // Convert value to number
+  const rating = Number(value);
+  
+  // Handle invalid numbers
+  if (isNaN(rating)) {
+    return <div className={config?.className}>Invalid rating</div>;
+  }
+
+  // Ensure rating is within bounds
+  const maxRating = config?.maxRating || 5;
+  const boundedRating = Math.min(Math.max(rating, 0), maxRating);
+
+  return (
+    <div className={config?.className} style={{ display: 'inline-block' }}>
+      <StarRating 
+        rating={boundedRating} 
+        maxRating={maxRating} 
+        style={{ color: config?.color }}
+      />
+    </div>
+  );
 } 

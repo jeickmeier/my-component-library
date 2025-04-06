@@ -21,9 +21,6 @@
 
 import * as React from "react"
 import {
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
@@ -31,11 +28,18 @@ import {
   useReactTable,
   getGroupedRowModel,
   getExpandedRowModel,
-  ExpandedState,
+  // Core States
+  SortingState,
+  ColumnFiltersState,
+  VisibilityState,
   GroupingState,
+  ExpandedState,
+  ColumnOrderState,
+  // Types & Defs
   ColumnDef,
   Table,
   AggregationFnOption,
+  Updater,
 } from "@tanstack/react-table"
 import { DataTableSchema } from "../types"
 import { createMultiSelectFilterFn, createDateRangeFilterFn, createBooleanFilterFn } from "../filters"
@@ -85,7 +89,7 @@ export interface DataTableContextValue<TData> {
   /** Current column visibility state */
   columnVisibility: VisibilityState
   /** Function to update column visibility */
-  setColumnVisibility: (visibility: VisibilityState) => void
+  setColumnVisibility: (updater: Updater<VisibilityState>) => void
   /** Current grouping state */
   grouping: GroupingState
   /** Function to update grouping */
@@ -102,6 +106,10 @@ export interface DataTableContextValue<TData> {
   setColumnAggregation: (columnId: string, aggregationType?: string) => void
   /** Current column aggregation settings */
   columnAggregations: Record<string, string | undefined>
+  /** Current column order state */
+  columnOrder: ColumnOrderState
+  /** Function to update column order */
+  setColumnOrder: (order: ColumnOrderState) => void
 }
 
 /**
@@ -191,6 +199,7 @@ export function DataTableProvider<TData>({
   const [grouping, setGrouping] = React.useState<GroupingState>(schema.defaultGrouping || [])
   const [expanded, setExpanded] = React.useState<ExpandedState>({})
   const [isInitialized, setIsInitialized] = React.useState(false)
+  const [columnOrder, setColumnOrder] = React.useState<ColumnOrderState>(schema.defaultColumnOrder || [])
   
   // Create state for column aggregation functions
   const [columnAggregations, setColumnAggregations] = React.useState<Record<string, string | undefined>>({})
@@ -345,6 +354,7 @@ export function DataTableProvider<TData>({
     onGroupingChange: setGrouping,
     getGroupedRowModel: schema.enableGrouping ? getGroupedRowModel() : undefined,
     onExpandedChange: setExpanded,
+    onColumnOrderChange: setColumnOrder,
     getExpandedRowModel: getExpandedRowModel(),
     filterFns: {
       multiSelect: multiSelectFilter,
@@ -360,6 +370,7 @@ export function DataTableProvider<TData>({
       columnVisibility,
       grouping,
       expanded,
+      columnOrder,
       // When pagination is disabled, set the page size to show all data
       ...(schema.enablePagination === true 
         ? {} 
@@ -389,6 +400,7 @@ export function DataTableProvider<TData>({
     columnVisibility, 
     grouping, 
     expanded,
+    columnOrder,
     multiSelectFilter,
     dateRangeFilter,
     booleanFilter,
@@ -445,6 +457,8 @@ export function DataTableProvider<TData>({
     setGrouping,
     expanded,
     setExpanded,
+    columnOrder,
+    setColumnOrder,
     table: table as Table<TData>,
     isInitialized,
     setColumnAggregation,
@@ -458,6 +472,7 @@ export function DataTableProvider<TData>({
     columnVisibility,
     grouping,
     expanded,
+    columnOrder,
     table,
     isInitialized,
     setColumnAggregation,

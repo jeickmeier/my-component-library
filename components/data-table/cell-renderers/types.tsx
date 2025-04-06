@@ -77,13 +77,17 @@ export interface StatusRendererConfig extends BaseRendererConfig {
  * @property currency ISO 4217 currency code (e.g., 'USD', 'EUR')
  * @property locale BCP 47 language tag for localization
  * @property options Additional Intl.NumberFormat options
+ * @property positiveColor Color for positive values (e.g. 'green', '#00ff00')
+ * @property negativeColor Color for negative values (e.g. 'red', '#ff0000')
  * 
  * @example
  * ```ts
  * {
  *   currency: 'USD',
  *   locale: 'en-US',
- *   options: { minimumFractionDigits: 2 }
+ *   options: { minimumFractionDigits: 2 },
+ *   positiveColor: 'green',
+ *   negativeColor: 'red'
  * }
  * ```
  */
@@ -91,6 +95,8 @@ export interface CurrencyRendererConfig extends BaseRendererConfig {
   currency?: string;
   locale?: string;
   options?: Intl.NumberFormatOptions;
+  positiveColor?: string;
+  negativeColor?: string;
 }
 
 /**
@@ -178,7 +184,8 @@ export type RendererType =
   | 'date' 
   | 'boolean' 
   | 'null'
-  | 'decimal';
+  | 'decimal'
+  | 'starRating';
 
 /**
  * Renderer Configuration
@@ -193,6 +200,7 @@ export interface RendererConfig {
   boolean?: BooleanRendererConfig;
   null?: NullRendererConfig;
   decimal?: DecimalRendererConfig;
+  starRating?: StarRatingRendererConfig;
 }
 
 /**
@@ -205,4 +213,15 @@ export interface DecimalRendererConfig {
   thousand_separator?: boolean; // Whether to use thousand separators
   className?: string;          // Optional CSS class for the cell
   locale?: string;             // Optional locale for number formatting
+  positiveColor?: string;      // Color for positive values (e.g. 'green', '#00ff00')
+  negativeColor?: string;      // Color for negative values (e.g. 'red', '#ff0000')
+}
+
+/**
+ * Configuration options for the star rating renderer.
+ * Controls how star ratings are displayed.
+ */
+export interface StarRatingRendererConfig extends BaseRendererConfig {
+  maxRating?: number;          // Maximum rating value (default: 5)
+  color?: string;              // Color of the stars (default: '#facc15')
 } 

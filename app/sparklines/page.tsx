@@ -1,6 +1,7 @@
     // Example usage in another component
     import { SparklineHistogram } from "@/components/charts/sparkline-histogram"; // Adjust path as needed
 
+    import { StarRating } from "@/components/ui/star-rating";
     export default function MyDashboard() {
       const recentSales = [12, 5, 22, 15, 8, 19, 10];
       const userActivity = [
@@ -33,6 +34,11 @@
               width="w-[200px]" 
               barColor="#8884d8" // Or use a specific hex color
             />
+          </div>
+
+          <div style={{ marginTop: '20px' }}>
+            <h3>User Activity</h3>
+            <StarRating rating={4.5} />
           </div>
         </div>
       );

@@ -14,7 +14,7 @@
     "id": "emp002",
     "name": "Jane Doe",
     "department": "marketing",
-    "salary": 82500,
+    "salary": -82500,
     "startDate": "2021-05-10",
     "status": "active",
     "performance": 5,

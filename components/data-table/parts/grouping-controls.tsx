@@ -19,7 +19,7 @@
 import * as React from "react"
 import { useDataTable } from "../core/context"
 import { Button } from "@/components/ui/button"
-import { Layers } from "lucide-react"
+import { Settings } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import {
   Dialog,
@@ -29,10 +29,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { GroupingPanel } from "./grouping-panel"
+import { TableConfigurationPanel } from "./table-configuration-panel"
 import { getGroupableColumns } from "../schema/schema-utils"
 import { hasAccessorKey } from "../utils"
-import { GroupableColumn } from "../types"
+import type { GroupableColumn as ConfigurableColumn } from "../types"
 
 /**
  * Grouping Controls Component
@@ -58,34 +58,46 @@ import { GroupableColumn } from "../types"
  * <GroupingControls />
  * ```
  */
-export function GroupingControls() {
+export function GroupingControls<TData>() {
   const {
     schema,
     grouping,
     setGrouping,
-  } = useDataTable()
+    columnOrder,
+    setColumnOrder,
+    columnVisibility,
+    setColumnVisibility,
+  } = useDataTable<TData>()
 
   const [isGroupingDialogOpen, setIsGroupingDialogOpen] = React.useState(false)
 
-  // Get groupable column IDs
+  // Get groupable column IDs (still needed for checking below)
   const groupableColumns = React.useMemo(() => getGroupableColumns(schema), [schema])
 
-  // Create a list of groupable columns with labels
-  const groupableColumnObjects = React.useMemo(() => {
-    return groupableColumns.map(columnId => {
-      const col = schema.columns.find(c => {
-        if (c.id === columnId) return true;
-        // Check if column has accessorKey that matches
-        return hasAccessorKey(c) && c.accessorKey === columnId;
-      })
+  // Create a list of ALL columns with labels and groupable status
+  const configurableColumnObjects = React.useMemo(() => {
+    // Map over all columns defined in the schema
+    return schema.columns.map(colDef => {
+      const columnId = colDef.id || (hasAccessorKey(colDef) ? colDef.accessorKey : undefined);
+      
+      // Skip if we can't determine a column ID
+      if (!columnId) return null; 
+
+      // Determine if the column is groupable (using the pre-calculated list)
+      const isGroupable = groupableColumns.includes(columnId);
+
+      // Generate label from header or fallback to capitalized ID
+      const label = typeof colDef.header === 'string' 
+        ? colDef.header 
+        : (columnId.charAt(0).toUpperCase() + columnId.slice(1));
+
       return {
         id: columnId,
-        label: typeof col?.header === 'string' 
-          ? col.header 
-          : (columnId.charAt(0).toUpperCase() + columnId.slice(1)),
+        label: label,
+        isGroupable: isGroupable // <-- Add groupable status
       }
-    })
-  }, [schema.columns, groupableColumns])
+    }).filter(Boolean); // Filter out any null entries
+  }, [schema, groupableColumns]) // Update dependencies
 
   // If grouping is not enabled or there are no groupable columns, don't render anything
   if (!schema.enableGrouping || groupableColumns.length === 0) {
@@ -100,8 +112,8 @@ export function GroupingControls() {
           size="sm" 
           className="gap-1 h-7 text-xs"
         >
-          <Layers className="h-3 w-3" />
-          Group By
+          <Settings className="h-3.5 w-3.5" />
+          Configure
           {grouping.length > 0 && (
             <Badge 
               variant="secondary" 
@@ -114,15 +126,19 @@ export function GroupingControls() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Table Grouping</DialogTitle>
+          <DialogTitle>Configure Table</DialogTitle>
           <DialogDescription>
-            Group your data by one or more columns to create hierarchical views. Drag to reorder groups.
+            Manage column visibility, order, and grouping. Drag items to reorder.
           </DialogDescription>
         </DialogHeader>
-        <GroupingPanel
-          availableColumns={groupableColumnObjects as GroupableColumn[]}
+        <TableConfigurationPanel
+          configurableColumns={configurableColumnObjects as ConfigurableColumn[]}
           grouping={grouping}
           onGroupingChange={setGrouping}
+          columnOrder={columnOrder}
+          onColumnOrderChange={setColumnOrder}
+          columnVisibility={columnVisibility}
+          onColumnVisibilityChange={setColumnVisibility}
         />
       </DialogContent>
     </Dialog>

@@ -68,6 +68,8 @@
         "config": {
           "currency": "USD",
           "locale": "en-US",
+          "positiveColor": "#00ff00",
+          "negativeColor": "#ff0000",
           "options": {
             "minimumFractionDigits": 2,
             "maximumFractionDigits": 2
@@ -80,6 +82,8 @@
         "config": {
           "currency": "USD",
           "locale": "en-US",
+          "positiveColor": "#00ff00",
+          "negativeColor": "#ff0000",
           "options": {
             "minimumFractionDigits": 0,
             "maximumFractionDigits": 0
@@ -135,8 +139,7 @@
             "terminated": { "color": "red", "label": "Terminated" }
           }
         }
-      },
-      "aggregationType": "mode"
+      }
     },
     {
       "id": "performance",
@@ -150,16 +153,16 @@
         "max": 5
       },
       "cellRenderer": {
-        "type": "decimal",
+        "type": "starRating",
         "config": {
-          "decimals": 2
+          "maxRating": 5
         }
       },
       "aggregationType": "mean",
       "aggregationRenderer": {
-        "type": "decimal",
+        "type": "starRating",
         "config": {
-          "decimals": 0
+          "maxRating": 5
         }
       }
     },
@@ -194,7 +197,13 @@
         "min": 0,
         "max": 20
       },
-      "aggregationType": "sum"
+      "aggregationType": "sum",
+      "aggregationRenderer": {
+        "type": "decimal",
+        "config": {
+          "decimals": 2
+        }
+      }
     }
   ],
   "defaultSorting": [
@@ -204,6 +213,16 @@
   "defaultColumnVisibility": {
     "id": false
   },
+  "defaultColumnOrder": [
+    "name",
+    "department",
+    "startDate",    
+    "salary",
+    "status",
+    "performance",
+    "fullTime",
+    "projectCount"
+  ],
   "enableGrouping": true,
   "enableGlobalFilter": true,
   "enablePagination": false,

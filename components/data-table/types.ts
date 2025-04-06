@@ -325,6 +325,7 @@ export interface DataTableSchema<TData> {
   enableGlobalFilter?: boolean
   enablePagination?: boolean
   enableExport?: boolean
+  defaultColumnOrder?: string[]
   defaultPageSize?: number
 }
 
@@ -438,6 +439,7 @@ export interface SerializableDataTableSchema {
 export interface GroupableColumn {
   id: string
   label: string
+  isGroupable: boolean
 }
 
 /**

@@ -16,7 +16,8 @@ import {
     dateRenderer,
     booleanRenderer,
     nullRenderer,
-    decimalRenderer
+    decimalRenderer,
+    starRatingRenderer
   } from "./renderers";
   
   // Define the structure expected by deserializeSchema
@@ -32,7 +33,8 @@ import {
     date: dateRenderer,
     boolean: booleanRenderer,
     null: nullRenderer,
-    decimal: decimalRenderer
+    decimal: decimalRenderer,
+    starRating: starRatingRenderer
     // Add other standard renderers if necessary
   };
   
