@@ -185,7 +185,8 @@ export type RendererType =
   | 'boolean' 
   | 'null'
   | 'decimal'
-  | 'starRating';
+  | 'starRating'
+  | 'sparklineHistogram';
 
 /**
  * Renderer Configuration
@@ -201,6 +202,7 @@ export interface RendererConfig {
   null?: NullRendererConfig;
   decimal?: DecimalRendererConfig;
   starRating?: StarRatingRendererConfig;
+  sparklineHistogram?: SparklineHistogramRendererConfig;
 }
 
 /**
@@ -224,4 +226,16 @@ export interface DecimalRendererConfig {
 export interface StarRatingRendererConfig extends BaseRendererConfig {
   maxRating?: number;          // Maximum rating value (default: 5)
   color?: string;              // Color of the stars (default: '#facc15')
+}
+
+/**
+ * Configuration options for the sparkline histogram renderer.
+ * Controls how the histogram is displayed.
+ */
+export interface SparklineHistogramRendererConfig extends BaseRendererConfig {
+  numBins?: number;            // Number of bins for the histogram (default: 10)
+  height?: string;             // Height of the chart (default: "h-[50px]")
+  width?: string;              // Width of the chart (default: "w-full")
+  barColor?: string;           // Color of the bars (default: "hsl(var(--primary))")
+  formatTooltipValue?: (value: number) => string; // Optional formatter for bin range values
 } 

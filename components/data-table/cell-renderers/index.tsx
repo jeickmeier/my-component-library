@@ -8,17 +8,18 @@
 import * as React from 'react';
 import { createContext, useContext, useState } from 'react';
 
-// Import types and renderers
+// Import types and raw renderer functions for registry
 import type { CellRendererProps, CellRendererFunction, BaseRendererConfig } from './types';
 import { 
-  textRenderer,
-  statusRenderer,
-  currencyRenderer, 
-  dateRenderer,
-  booleanRenderer,
-  nullRenderer,
-  decimalRenderer,
-  starRatingRenderer
+  textRendererFn,
+  statusRendererFn,
+  currencyRendererFn, 
+  dateRendererFn,
+  booleanRendererFn,
+  nullRendererFn,
+  decimalRendererFn,
+  starRatingRendererFn,
+  sparklineHistogramRendererFn
 } from './renderers';
 
 // Export for external use
@@ -35,14 +36,16 @@ const CellRendererContext = createContext<CellRendererContextType | undefined>(u
 
 // Global registry (singleton) for backward compatibility
 let globalRegistry: Record<string, CellRendererFunction> = {
-  text: textRenderer,
-  status: statusRenderer,
-  currency: currencyRenderer,
-  date: dateRenderer,
-  boolean: booleanRenderer,
-  null: nullRenderer,
-  decimal: decimalRenderer,
-  starRating: starRatingRenderer
+  // Use the raw function renderers (not wrapped with React.memo)
+  text: textRendererFn,
+  status: statusRendererFn,
+  currency: currencyRendererFn,
+  date: dateRendererFn,
+  boolean: booleanRendererFn,
+  null: nullRendererFn,
+  decimal: decimalRendererFn,
+  starRating: starRatingRendererFn,
+  sparklineHistogram: sparklineHistogramRendererFn
 };
 
 /**
@@ -57,14 +60,15 @@ export function getGlobalCellRendererRegistry() {
     },
     clear: () => {
       globalRegistry = {
-        text: textRenderer,
-        status: statusRenderer,
-        currency: currencyRenderer,
-        date: dateRenderer,
-        boolean: booleanRenderer,
-        null: nullRenderer,
-        decimal: decimalRenderer,
-        starRating: starRatingRenderer
+        text: textRendererFn,
+        status: statusRendererFn,
+        currency: currencyRendererFn,
+        date: dateRendererFn,
+        boolean: booleanRendererFn,
+        null: nullRendererFn,
+        decimal: decimalRendererFn,
+        starRating: starRatingRendererFn,
+        sparklineHistogram: sparklineHistogramRendererFn
       };
     }
   };
@@ -135,14 +139,15 @@ export function createDefaultCellRendererProvider(children: React.ReactNode) {
   return (
     <CellRendererProvider 
       initialRenderers={{
-        text: textRenderer,
-        status: statusRenderer,
-        currency: currencyRenderer,
-        date: dateRenderer,
-        boolean: booleanRenderer,
-        null: nullRenderer,
-        decimal: decimalRenderer,
-        starRating: starRatingRenderer
+        text: textRendererFn,
+        status: statusRendererFn,
+        currency: currencyRendererFn,
+        date: dateRendererFn,
+        boolean: booleanRendererFn,
+        null: nullRendererFn,
+        decimal: decimalRendererFn,
+        starRating: starRatingRendererFn,
+        sparklineHistogram: sparklineHistogramRendererFn
       }}
     >
       {children}

@@ -19,13 +19,22 @@
 import * as React from "react"
 import { Column } from "@tanstack/react-table"
 import { X } from "lucide-react"
-import { ColumnFilter, isSelectFilter, isMultiSelectFilter, isRangeFilter, isDateRangeFilter, isBooleanFilter } from "../types"
+import { 
+  ColumnFilter, 
+  TextFilter, 
+  isSelectFilter, 
+  isMultiSelectFilter, 
+  isRangeFilter, 
+  isDateRangeFilter, 
+  isBooleanFilter 
+} from "../types"
 import {
   SelectFilterComponent,
   MultiSelectFilterComponent,
   RangeFilterComponent,
   DateRangeFilterComponent,
-  BooleanFilterComponent
+  BooleanFilterComponent,
+  TextFilterComponent
 } from "./components"
 
 /**
@@ -106,6 +115,10 @@ export function FilterFactory<TData>({
 
   // Create the appropriate filter component based on filter type
   const renderFilterComponent = () => {
+    if (isTextFilter(filter)) {
+      return <TextFilterComponent column={column} filter={filter} />
+    }
+    
     if (isSelectFilter(filter)) {
       return <SelectFilterComponent column={column} filter={filter} />
     }
@@ -144,4 +157,9 @@ export function FilterFactory<TData>({
       )}
     </>
   )
+}
+
+// Add the text filter type check function to the existing type guards
+export function isTextFilter(filter: ColumnFilter): filter is TextFilter {
+  return filter.type === 'text'
 } 

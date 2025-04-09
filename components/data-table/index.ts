@@ -15,6 +15,7 @@
  * - Pagination controls
  * - Cell rendering system
  * - Aggregation functions
+ * - Virtualization for large datasets
  * 
  * Features:
  * - Type-safe table configuration
@@ -26,6 +27,7 @@
  * - Custom cell rendering
  * - Data aggregation
  * - Backward compatibility support
+ * - Virtualized rendering for performance
  * 
  * @module data-table
  */
@@ -65,3 +67,6 @@ export * from "./schema/schema-utils"
 
 // Export serialization utils
 export * from "./schema/serialization"
+
+// Export hooks
+export * from "./hooks"

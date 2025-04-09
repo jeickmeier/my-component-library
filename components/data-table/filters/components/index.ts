@@ -12,6 +12,7 @@
  * - RangeFilterComponent: Numeric range filter
  * - DateRangeFilterComponent: Date range filter
  * - BooleanFilterComponent: True/False filter
+ * - TextFilterComponent: Text search filter with debouncing
  * 
  * Each component is designed to work with TanStack Table's column filtering system
  * and provides a consistent interface for filter state management and user interaction.
@@ -23,4 +24,5 @@ export { SelectFilterComponent } from "./SelectFilter"
 export { MultiSelectFilterComponent } from "./MultiSelectFilter"
 export { RangeFilterComponent } from "./RangeFilter"
 export { DateRangeFilterComponent } from "./DateRangeFilter"
-export { BooleanFilterComponent } from "./BooleanFilter" 
+export { BooleanFilterComponent } from "./BooleanFilter"
+export { TextFilterComponent } from "./TextFilter" 

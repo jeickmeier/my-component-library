@@ -62,35 +62,40 @@ import { TableHead, TableHeader, TableRow } from "@/components/ui/table"
  * ]
  * ```
  */
-export function TableHeaderComponent() {
-  const { table } = useDataTable<unknown>()
-  const typedTable = table as Table<unknown>
-
-  return (
-    <TableHeader>
-      {typedTable.getHeaderGroups().map((headerGroup: HeaderGroup<unknown>) => (
-        <TableRow key={headerGroup.id}>
-          {headerGroup.headers.map((header: Header<unknown, unknown>) => {
-            const columnDef = header.column.columnDef as DataTableColumnDef<unknown>
-            const alignmentClass = columnDef.alignment ? `text-${columnDef.alignment}` : 'text-left';
-            
-            return (
-              <TableHead 
-                key={header.id} 
-                className={`p-2 align-middle ${alignmentClass}`}
-                style={{ width: header.getSize() !== 150 ? header.getSize() : undefined }}
-              >
-                {header.isPlaceholder ? null : (
-                  flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
-                  )
-                )}
-              </TableHead>
-            )
-          })}
-        </TableRow>
-      ))}
-    </TableHeader>
-  )
-} 
+export const TableHeaderComponent = React.memo(
+  function TableHeaderComponentInner() {
+    const { table } = useDataTable<unknown>()
+    const typedTable = table as Table<unknown>
+  
+    return (
+      <TableHeader>
+        {typedTable.getHeaderGroups().map((headerGroup: HeaderGroup<unknown>) => (
+          <TableRow key={headerGroup.id}>
+            {headerGroup.headers.map((header: Header<unknown, unknown>) => {
+              const columnDef = header.column.columnDef as DataTableColumnDef<unknown>
+              const alignmentClass = columnDef.alignment ? `text-${columnDef.alignment}` : 'text-left';
+              
+              return (
+                <TableHead 
+                  key={header.id} 
+                  className={`p-2 align-middle ${alignmentClass}`}
+                  style={{ width: header.getSize() !== 150 ? header.getSize() : undefined }}
+                >
+                  {header.isPlaceholder ? null : (
+                    flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )
+                  )}
+                </TableHead>
+              )
+            })}
+          </TableRow>
+        ))}
+      </TableHeader>
+    )
+  },
+  // We don't need to provide a custom comparison function since the component 
+  // should re-render whenever any of the header-related states change, which is
+  // handled through the context
+) 

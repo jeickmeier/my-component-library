@@ -17,7 +17,8 @@ import {
     booleanRenderer,
     nullRenderer,
     decimalRenderer,
-    starRatingRenderer
+    starRatingRenderer,
+    sparklineHistogramRenderer
   } from "./renderers";
   
   // Define the structure expected by deserializeSchema
@@ -34,7 +35,8 @@ import {
     boolean: booleanRenderer,
     null: nullRenderer,
     decimal: decimalRenderer,
-    starRating: starRatingRenderer
+    starRating: starRatingRenderer,
+    sparklineHistogram: sparklineHistogramRenderer
     // Add other standard renderers if necessary
   };
   

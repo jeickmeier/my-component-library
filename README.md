@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Code Concatenator
 
-## Getting Started
+A simple utility to concatenate all code files in a directory (including nested subdirectories) into a single text file. This is particularly useful for preparing code to be input into Large Language Models (LLMs) for code analysis or question answering.
 
-First, run the development server:
+## Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Clone or download this repository
+git clone https://github.com/yourusername/code-concatenator.git
+cd code-concatenator
+
+# Make the script executable
+chmod +x concat-codebase.js
+
+# Optional: Install globally
+npm install -g .
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Usage
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Basic usage
+node concat-codebase.js ./path/to/your/codebase
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Or if installed globally
+concat-codebase ./path/to/your/codebase
 
-## Learn More
+# With options
+node concat-codebase.js ./path/to/your/codebase --output output.txt --max-size 2
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Options
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `--output, -o`: Specify output file path (default: code-concatenated.txt)
+- `--ignore-dirs`: Comma-separated list of directories to ignore (default: .git,node_modules,dist,build,.next,.cache)
+- `--ignore-exts`: Comma-separated list of file extensions to ignore (default: .lock,.log,.map,.md,.svg,.png,.jpg,.jpeg,.gif,.ico)
+- `--max-size`: Maximum file size in MB to include (default: 1)
+- `--with-line-numbers`: Include line numbers in the output
+- `--help, -h`: Show help message
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Example
 
-## Deploy on Vercel
+```bash
+# Concatenate all files in a React project but exclude test files
+node concat-codebase.js ./my-react-app --ignore-dirs "node_modules,.git,__tests__" --output react-code.txt
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Concatenate only TypeScript files in a project
+node concat-codebase.js ./my-project --ignore-exts ".js,.jsx,.css,.html" --output typescript-only.txt
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Output Format
+
+The output file contains:
+- A header with generation timestamp
+- Each file separated by dividers
+- File paths clearly labeled
+- Optional line numbers
+
+## Why use this tool?
+
+When working with LLMs for code analysis, providing the full context of a codebase can help the model understand the project structure and give more accurate answers. This utility makes it easy to prepare your code for such scenarios by:
+
+1. Including all relevant files in a single document
+2. Maintaining file structure information
+3. Excluding binary files and other non-relevant content
+4. Providing clear file boundaries for better context

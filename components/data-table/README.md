@@ -209,4 +209,217 @@ interface DataTableColumnDef<TData, TValue = unknown> {
   aggregationType?: AggregationFunctionType // Aggregation function type
   aggregationConfig?: AggregationFunctionConfig // Aggregation function config
 }
-``` 
+```
+
+## Web Worker For Large Datasets
+
+For tables with a large number of rows (10,000+), the data table includes a web worker implementation that offloads computationally expensive operations like sorting and filtering to a separate thread, keeping the UI responsive.
+
+### Using Web Workers
+
+```tsx
+import { DataTable, WorkerDataProvider, useDataTable } from "@/components/data-table";
+import { useState } from "react";
+
+// Example component that uses web workers for data processing
+function LargeDataTable() {
+  // Your data (10,000+ rows)
+  const [data, setData] = useState(generateLargeDataset());
+  
+  // Create your schema
+  const schema = {
+    columns: [
+      // Your column definitions
+    ],
+    enableVirtualization: true, // Enable virtualization for better performance
+  };
+  
+  // The WorkerTable handles the worker integration
+  return (
+    <WorkerTable 
+      schema={schema} 
+      data={data} 
+    />
+  );
+}
+
+// Component that integrates the worker with the data table
+function WorkerTable({ schema, data }) {
+  // Create a local state to store the processed data
+  const [processedData, setProcessedData] = useState(data);
+  
+  // Render the data table
+  return (
+    <DataTable schema={schema} data={processedData}>
+      <DataTableContent>
+        {(table) => (
+          <WorkerDataProvider
+            data={data}
+            table={table}
+            sorting={table.getState().sorting}
+            columnFilters={table.getState().columnFilters}
+            globalFilter={table.getState().globalFilter}
+            onDataProcessed={setProcessedData}
+          >
+            {/* Optional: Show processing indicator */}
+            <WorkerStatusIndicator />
+            
+            {/* Render the table content */}
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader />
+                <TableBody />
+              </Table>
+            </div>
+            <Pagination />
+          </WorkerDataProvider>
+        )}
+      </DataTableContent>
+    </DataTable>
+  );
+}
+
+// Optional component to show processing status
+function WorkerStatusIndicator() {
+  const { isProcessing, processingTime, recordCount } = useWorkerStatus();
+  
+  if (!isProcessing && !processingTime) return null;
+  
+  return (
+    <div className="text-xs text-muted-foreground flex items-center gap-2 mb-2">
+      {isProcessing ? (
+        <div className="flex items-center">
+          <span className="mr-2">Processing...</span>
+          <Spinner size="sm" />
+        </div>
+      ) : (
+        <div>
+          Processed {recordCount} records in {processingTime?.toFixed(2)}ms
+        </div>
+      )}
+    </div>
+  );
+}
+
+### Performance Benefits
+
+Using web workers provides several performance benefits:
+
+1. **Responsive UI**: The main thread remains responsive during heavy operations
+2. **Parallel Processing**: Data operations run in parallel with UI rendering
+3. **Improved User Experience**: No freezing or janky scrolling with large datasets
+4. **Better Resource Utilization**: Takes advantage of multi-core processors
+
+### When to Use Web Workers
+
+Consider using web workers when:
+
+- You have datasets with 10,000+ rows
+- Users need to sort or filter data frequently
+- Table operations are causing noticeable UI lag
+- Your table includes complex custom cell renderers 
+
+## Performance Optimizations
+
+The `DataTable` component includes several performance optimizations to ensure smooth performance even with large datasets:
+
+### 1. Virtualization
+
+For large datasets, the table uses virtualization to render only the visible rows:
+
+```tsx
+<DataTable
+  schema={{
+    columns: [...],
+    enableVirtualization: true,      // Enable virtualization (enabled by default)
+    virtualizationThreshold: 100,    // Number of rows before virtualization kicks in
+    rowHeight: 35,                   // Height of each row in pixels
+    virtualOverscan: 10,             // Number of extra rows to render outside viewport
+    tableHeight: '400px',            // Height of the virtualized table container
+  }}
+  data={largeDataset}
+/>
+```
+
+### 2. Memoization
+
+Critical components are wrapped with `React.memo` to prevent unnecessary re-renders, with custom comparison functions where needed:
+
+- `DataTablePartCell`
+- `DataTableCell`
+- `DataTableAggregatedCell`
+
+### 3. Web Workers
+
+Computationally intensive operations are offloaded to web workers to keep the main thread responsive:
+
+```tsx
+<WorkerDataProvider>
+  <DataTable schema={schema} data={largeDataset} />
+</WorkerDataProvider>
+```
+
+The worker handles:
+- Sorting
+- Filtering
+- Data processing
+
+### 4. Debounced Inputs
+
+User input handlers (particularly for filters) are debounced to prevent excessive re-renders while typing:
+
+```tsx
+// Using the debounce utility
+const debouncedHandler = debounce((value) => {
+  // Handle input
+}, 300);
+
+// Or with the React hook
+const handleFilterChange = useDebounce((value) => {
+  column.setFilterValue(value);
+}, 300, [column]);
+```
+
+### 5. Adaptive Sizing with ResizeObserver
+
+The table automatically adapts to container size changes using ResizeObserver, providing better performance and user experience:
+
+```tsx
+<DataTable
+  schema={{
+    columns: [...],
+    enableAdaptiveSizing: true,       // Enable adaptive sizing (enabled by default)
+    enableAdaptiveColumns: true,      // Enable adaptive column widths (disabled by default)
+    minColumnWidth: 50,               // Minimum column width in pixels
+    resizeThrottleMs: 200,            // Throttle resize calculations (ms)
+  }}
+  data={data}
+/>
+```
+
+This optimization:
+- Dynamically adjusts to container size changes
+- Recalculates virtualization parameters when dimensions change
+- Optimizes column widths to make best use of available space
+- Improves user experience on different screen sizes
+- Prevents layout shifts and visual disruptions
+
+The ResizeObserver implementation provides these benefits with minimal overhead by:
+- Using debounced resize handlers to limit recalculations
+- Only updating dimensions when actual changes occur
+- Calculating optimal column widths based on available space
+- Respecting column-specific sizing constraints
+
+### Performance Impact
+
+These optimizations have the following impact (ranked from highest to lowest):
+
+1. **Virtualization**: Most effective for tables with many rows (1000+)
+2. **Web Workers**: Critical for expensive operations on large datasets
+3. **Adaptive Sizing**: Improves responsiveness and prevents layout thrashing
+4. **Memoization**: Reduces unnecessary component re-renders
+5. **Debounced Inputs**: Prevents filter input performance issues
+
+## Usage Examples
+
+// ... rest of existing content ... 

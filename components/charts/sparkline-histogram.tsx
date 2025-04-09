@@ -1,5 +1,6 @@
 "use client"
 
+import React, { useMemo } from "react"
 import { Bar, BarChart } from "recharts"
 
 import {
@@ -16,6 +17,7 @@ interface SparklineHistogramProps {
   width?: string; // e.g., "w-full" or "w-[100px]"
   barColor?: string; // CSS color value, e.g., "hsl(var(--primary))" or "#3b82f6"
   formatTooltipValue?: (value: number) => string; // Optional formatter for bin range values
+  showTooltip?: boolean; // Optional flag to disable tooltips
 }
 
 // Define the shape of the data returned by the histogram function
@@ -64,24 +66,27 @@ function createHistogramData(data: number[], numBins: number): HistogramBin[] {
 }
 
 
-export function SparklineHistogram({
+export const SparklineHistogram = React.memo(({
   data,
   numBins = 10,
   height = "h-[50px]",
   width = "w-full",
   barColor = "hsl(var(--primary))",
   formatTooltipValue = (value) => value.toFixed(1), // Default formatting
-}: SparklineHistogramProps) {
+  showTooltip = true,
+}: SparklineHistogramProps) => {
 
-  const chartData = createHistogramData(data, numBins);
+  const chartData = useMemo(() => 
+    createHistogramData(data, numBins),
+    [data, numBins]
+  );
 
-  const chartConfig = {
+  const chartConfig = useMemo(() => ({
     value: { // 'value' represents the count
       label: "Count",
       color: barColor,
     },
-    // We don't need start/end in chartConfig as tooltip content is custom
-  } satisfies ChartConfig
+  }), [barColor]) as ChartConfig;
 
   if (chartData.length === 0) {
       return <div className={`${height} ${width} flex items-center justify-center text-xs text-muted-foreground`}>No data</div>;
@@ -95,33 +100,35 @@ export function SparklineHistogram({
         margin={{ top: 5, right: 5, left: 5, bottom: 5 }} // Increased margin slightly for tooltip visibility
         barGap={1}
       >
-        {/* Add the Tooltip component */}
-        <ChartTooltip
-          cursor={false} // Hide the default cursor line
-          content={
-            <ChartTooltipContent
-              hideLabel // Hide the default label (bin name)
-              formatter={(value, name, props) => {
-                // Access the full payload for the bin range
-                const binData = props.payload as HistogramBin | undefined;
-                if (binData) {
-                  const formattedStart = formatTooltipValue(binData.start);
-                  const formattedEnd = formatTooltipValue(binData.end);
-                  // Display Range and Count
-                  return (
-                    <div className="flex flex-col text-xs">
-                      <span>Range: {formattedStart} - {formattedEnd}</span>
-                      <span>Count: {value}</span>
-                    </div>
-                  );
-                }
-                return value; // Fallback
-              }}
-              // Style the tooltip box
-              className="min-w-[120px] rounded-md border bg-background p-2 text-foreground shadow-sm"
-            />
-          }
-        />
+        {/* Add the Tooltip component only if showTooltip is true */}
+        {showTooltip && (
+          <ChartTooltip
+            cursor={false} // Hide the default cursor line
+            content={
+              <ChartTooltipContent
+                hideLabel // Hide the default label (bin name)
+                formatter={(value, name, props) => {
+                  // Access the full payload for the bin range
+                  const binData = props.payload as HistogramBin | undefined;
+                  if (binData) {
+                    const formattedStart = formatTooltipValue(binData.start);
+                    const formattedEnd = formatTooltipValue(binData.end);
+                    // Display Range and Count
+                    return (
+                      <div className="flex flex-col text-xs">
+                        <span>Range: {formattedStart} - {formattedEnd}</span>
+                        <span>Count: {value}</span>
+                      </div>
+                    );
+                  }
+                  return value; // Fallback
+                }}
+                // Style the tooltip box
+                className="min-w-[120px] rounded-md border bg-background p-2 text-foreground shadow-sm"
+              />
+            }
+          />
+        )}
         <Bar
           dataKey="value"
           fill={`var(--color-value)`}
@@ -130,4 +137,6 @@ export function SparklineHistogram({
       </BarChart>
     </ChartContainer>
   )
-}
+});
+
+SparklineHistogram.displayName = "SparklineHistogram";

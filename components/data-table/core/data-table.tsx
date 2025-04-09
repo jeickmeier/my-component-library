@@ -17,15 +17,19 @@
  * - Composable structure
  * - Built-in toolbar and pagination
  * - Responsive design
+ * - Virtualization for large datasets
+ * - Adaptive sizing with ResizeObserver
  * 
  * @module data-table/core/data-table
  */
 
 import * as React from "react"
-import { DataTableProvider } from "./context"
+import { DataTableProvider, useDataTable } from "./context"
 import { DataTableProps } from "../types"
 import { Table } from "@/components/ui/table"
 import { TableHeader, TableBody, Toolbar, Pagination } from "../parts"
+import { TableBodyComponent } from "../parts/table-body"
+import { useAdaptiveColumns } from "../hooks/useAdaptiveColumns"
 
 /**
  * Main DataTable component
@@ -42,6 +46,7 @@ import { TableHeader, TableBody, Toolbar, Pagination } from "../parts"
  * - Column visibility and ordering
  * - Grouping and aggregation support
  * - Responsive design and accessibility
+ * - Virtualization for large datasets
  * 
  * The component uses a provider pattern to manage state, making it easy to
  * extend and customize while maintaining a clean separation of concerns.
@@ -85,7 +90,8 @@ import { TableHeader, TableBody, Toolbar, Pagination } from "../parts"
  *   ],
  *   enablePagination: true,
  *   enableGrouping: true,
- *   defaultPageSize: 25
+ *   defaultPageSize: 25,
+ *   enableVirtualization: true  // Enable virtualization for large datasets
  * };
  * 
  * return <DataTable schema={advancedSchema} data={data} />;
@@ -118,6 +124,8 @@ export function DataTable<TData>({
  *    - Responsive border and rounded corners
  *    - Header with sort and filter controls
  *    - Body with data rows and formatting
+ *    - Virtualization for large datasets when enabled
+ *    - Adaptive sizing based on container dimensions
  * 
  * 3. Pagination - Controls for navigating through data pages
  *    - Page size selection
@@ -130,14 +138,42 @@ export function DataTable<TData>({
  * @private
  */
 function DataTableContent() {
+  const { table, schema } = useDataTable<unknown>()
+  
+  // Reference to the table container for size measurements
+  const tableContainerRef = React.useRef<HTMLDivElement>(null)
+  
+  // Determine if we should use virtualization
+  const rows = table.getRowModel().rows
+  const shouldVirtualize = schema.enableVirtualization !== false && 
+                          rows.length > (schema.virtualizationThreshold || 100) &&
+                          !schema.enableGrouping; // Don't virtualize when grouping is enabled
+                          
+  // Setup adaptive columns if enabled
+  useAdaptiveColumns(
+    table,
+    tableContainerRef,
+    {
+      enabled: schema.enableAdaptiveColumns === true,
+      minColumnWidth: schema.minColumnWidth,
+      resizeThrottleMs: schema.resizeThrottleMs,
+    }
+  )
+  
   return (
     <div className="space-y-2">
       <Toolbar />
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader />
-          <TableBody />
-        </Table>
+      <div ref={tableContainerRef} className="rounded-md border">
+        {shouldVirtualize ? (
+          // Use virtualized table body component directly
+          <TableBodyComponent />
+        ) : (
+          // Use standard table with header and body
+          <Table>
+            <TableHeader />
+            <TableBody />
+          </Table>
+        )}
       </div>
       <Pagination />
     </div>

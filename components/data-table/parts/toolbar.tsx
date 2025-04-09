@@ -51,6 +51,26 @@ export function Toolbar<TData>() {
 
   const [isGroupingDialogOpen, setIsGroupingDialogOpen] = React.useState(false)
 
+  // Local state for debounced filter input
+  const [filterValue, setFilterValue] = React.useState(globalFilter || "")
+  
+  // Reference for debouncing timeout
+  const filterTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
+  
+  // Update local state when global filter changes externally
+  React.useEffect(() => {
+    setFilterValue(globalFilter || "")
+  }, [globalFilter])
+  
+  // Clean up timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (filterTimeoutRef.current) {
+        clearTimeout(filterTimeoutRef.current)
+      }
+    }
+  }, [])
+
   // --- Memoized Calculations ---
   // Get groupable column IDs (still needed for checking below)
   const groupableColumns = React.useMemo(() => getGroupableColumns(schema), [schema])
@@ -86,9 +106,35 @@ export function Toolbar<TData>() {
     exportToCSV(data, schema.columns, 'table-export') 
   }, [data, schema.columns]) // Dependencies for export
 
-  const handleGlobalFilterChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setGlobalFilter(event.target.value)
-  }, [setGlobalFilter])
+  // Handle input change with debouncing
+  const handleGlobalFilterChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value
+    setFilterValue(newValue)
+    
+    // Clear any existing timeout
+    if (filterTimeoutRef.current) {
+      clearTimeout(filterTimeoutRef.current)
+    }
+    
+    // Set new timeout for the filter update
+    const debounceMs = schema.filterDebounceMs || 300
+    filterTimeoutRef.current = setTimeout(() => {
+      setGlobalFilter(newValue || "")
+    }, debounceMs)
+  }, [setGlobalFilter, schema.filterDebounceMs])
+  
+  // Apply filter immediately on key press
+  const handleFilterKeyDown = React.useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      // Clear any pending timeout
+      if (filterTimeoutRef.current) {
+        clearTimeout(filterTimeoutRef.current)
+      }
+      
+      // Apply filter immediately
+      setGlobalFilter(filterValue || "")
+    }
+  }, [setGlobalFilter, filterValue])
 
   // --- Render Logic ---
   const showGlobalFilter = schema.enableGlobalFilter !== false;
@@ -102,9 +148,10 @@ export function Toolbar<TData>() {
         {showGlobalFilter && (
           <Input
             placeholder="Search all columns..."
-            value={globalFilter ?? ""}
+            value={filterValue}
             onChange={handleGlobalFilterChange}
-            className="h-8 w-48 sm:w-64 text-sm" // Use h-8 text-sm
+            onKeyDown={handleFilterKeyDown}
+            className="h-8 w-48 sm:w-64 text-sm"
           />
         )}
       </div>
@@ -116,7 +163,7 @@ export function Toolbar<TData>() {
           <Button
             variant="outline"
             size="sm"
-            className="h-8 gap-1 text-sm" // Use h-8 text-sm
+            className="h-8 gap-1 text-sm"
             onClick={handleExportCSV}
           >
             <Download className="h-3.5 w-3.5" />
@@ -131,7 +178,7 @@ export function Toolbar<TData>() {
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="h-8 gap-1 text-sm" // Use h-8 text-sm
+                className="h-8 gap-1 text-sm"
               >
                 <Settings className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Configure</span>

@@ -165,6 +165,29 @@ export interface BooleanFilter extends BaseFilter {
 }
 
 /**
+ * Text filter configuration
+ * 
+ * Defines a text input filter that performs case-insensitive searches.
+ * 
+ * @example
+ * ```typescript
+ * const textFilter: TextFilter = {
+ *   type: 'text',
+ *   placeholder: 'Search name...',
+ *   debounceMs: 300
+ * };
+ * ```
+ */
+export interface TextFilter {
+  /** The filter type */
+  type: 'text'
+  /** Placeholder text for the input */
+  placeholder?: string
+  /** Debounce time in milliseconds */
+  debounceMs?: number
+}
+
+/**
  * Union type for all column filters
  * 
  * Represents any valid filter type that can be applied to a column.
@@ -185,6 +208,7 @@ export type ColumnFilter =
   | RangeFilter 
   | DateRangeFilter
   | BooleanFilter
+  | TextFilter
 
 /**
  * Type guard for SelectFilter
@@ -327,6 +351,64 @@ export interface DataTableSchema<TData> {
   enableExport?: boolean
   defaultColumnOrder?: string[]
   defaultPageSize?: number
+  /**
+   * Enable virtualization for improved performance with large datasets
+   * When true, the table will only render visible rows
+   * @default true
+   */
+  enableVirtualization?: boolean
+  /**
+   * Threshold of rows before virtualization is automatically enabled
+   * @default 100
+   */
+  virtualizationThreshold?: number
+  /**
+   * Height of each row in pixels for virtualization calculations
+   * @default 35
+   */
+  rowHeight?: number
+  /**
+   * Number of additional rows to render outside the visible area
+   * Higher values reduce blank space during scrolling but impact performance
+   * @default 10
+   */
+  virtualOverscan?: number
+  /**
+   * Height of the table container when virtualization is enabled
+   * Can be any valid CSS height value
+   * @default '400px'
+   */
+  tableHeight?: string
+  /**
+   * Enable adaptive sizing for the table using ResizeObserver
+   * When true, the table will automatically adjust to container size changes
+   * @default true
+   */
+  enableAdaptiveSizing?: boolean
+  /**
+   * Enable automatic column width adjustments based on content and container width
+   * When true, columns will resize to fit their content while respecting available space
+   * @default false
+   */
+  enableAdaptiveColumns?: boolean
+  /**
+   * Minimum column width in pixels when adaptive columns are enabled
+   * @default 50
+   */
+  minColumnWidth?: number
+  /**
+   * Frequency of resize checks in milliseconds
+   * Lower values are more responsive but impact performance
+   * Only applies when enableAdaptiveSizing is true
+   * @default 200
+   */
+  resizeThrottleMs?: number
+  /**
+   * Debounce time in milliseconds for filter inputs
+   * Controls how long to wait after typing before applying the filter
+   * @default 300
+   */
+  filterDebounceMs?: number
 }
 
 /**

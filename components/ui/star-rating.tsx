@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Tooltip,
   TooltipContent,
@@ -15,87 +15,112 @@ interface StarRatingProps {
   className?: string;
   /** Style object for the container */
   style?: React.CSSProperties;
+  /** Whether to show tooltip (default: true) */
+  showTooltip?: boolean;
+  /** Whether to use external TooltipProvider (default: false) */
+  externalProvider?: boolean;
 }
 
 /**
  * Displays a visual star rating based on a numeric value, using shadcn/ui Tooltip.
  */
-export const StarRating: React.FC<StarRatingProps> = ({
+export const StarRating: React.FC<StarRatingProps> = React.memo(({
   rating,
   maxRating = 5,
   className = '',
   style,
+  showTooltip = true,
+  externalProvider = false,
 }) => {
-  const fullStars = Math.floor(rating);
-  // Use a small epsilon for floating point comparison
-  const hasHalfStar = rating % 1 >= 0.49; // Check if remainder is close to 0.5 or more
-  const emptyStars = maxRating - fullStars - (hasHalfStar ? 1 : 0);
-
-  // Ensure values are non-negative
-  const validFullStars = Math.max(0, fullStars);
-  const validEmptyStars = Math.max(0, emptyStars);
-  // Only show half star if rating is actually between 0 and max
-  const validHasHalfStar = hasHalfStar && rating > 0 && rating < maxRating;
-
-  const stars = [];
   const starColor = style?.color || '#facc15'; // Use provided color or default
+  
+  const { stars, tooltipText } = useMemo(() => {
+    const fullStars = Math.floor(rating);
+    // Use a small epsilon for floating point comparison
+    const hasHalfStar = rating % 1 >= 0.49; // Check if remainder is close to 0.5 or more
+    const emptyStars = maxRating - fullStars - (hasHalfStar ? 1 : 0);
 
-  // Add full stars
-  for (let i = 0; i < validFullStars; i++) {
-    stars.push(<span key={`full-${i}`} style={{ color: starColor }}>★</span>);
-  }
+    // Ensure values are non-negative
+    const validFullStars = Math.max(0, fullStars);
+    const validEmptyStars = Math.max(0, emptyStars);
+    // Only show half star if rating is actually between 0 and max
+    const validHasHalfStar = hasHalfStar && rating > 0 && rating < maxRating;
 
-  // Add half star using CSS gradient technique
-  if (validHasHalfStar) {
-     const halfStarStyle: React.CSSProperties = {
+    const starsArray = [];
+
+    // Add full stars
+    for (let i = 0; i < validFullStars; i++) {
+      starsArray.push(<span key={`full-${i}`} style={{ color: starColor }}>★</span>);
+    }
+
+    // Add half star using CSS gradient technique
+    if (validHasHalfStar) {
+      const halfStarStyle: React.CSSProperties = {
         display: 'inline-block', // Needed for background clip
-        position: 'relative', // Needed for positioning if using pseudo-elements (not used here but good practice)
+        position: 'relative',
         color: 'transparent', // Make the text character transparent
-        background: `linear-gradient(to right, ${starColor} 50%, #ccc 50%)`, // Gradient: half colored, half gray
-        WebkitBackgroundClip: 'text', // Clip the background to the text shape (Chrome, Safari)
-        backgroundClip: 'text', // Standard syntax
-        lineHeight: '1em', // Ensure proper alignment
-     };
-    stars.push(<span key="half" style={halfStarStyle}>★</span>); // Use a full star character but clip its background
+        background: `linear-gradient(to right, ${starColor} 50%, #ccc 50%)`,
+        WebkitBackgroundClip: 'text',
+        backgroundClip: 'text',
+        lineHeight: '1em',
+      };
+      starsArray.push(<span key="half" style={halfStarStyle}>★</span>);
+    }
+
+    // Add empty stars
+    for (let i = 0; i < validEmptyStars; i++) {
+      starsArray.push(<span key={`empty-${i}`} style={{ color: '#ccc' }}>☆</span>);
+    }
+
+    // Handle edge case: rating is 0
+    if (rating <= 0 && maxRating > 0) {
+      starsArray.length = 0; // Clear any potentially added stars
+      for (let i = 0; i < maxRating; i++) {
+        starsArray.push(<span key={`zero-empty-${i}`} style={{ color: '#ccc' }}>☆</span>);
+      }
+    }
+
+    return {
+      stars: starsArray,
+      tooltipText: `Rating: ${rating.toFixed(1)} / ${maxRating}`
+    };
+  }, [rating, maxRating, starColor]);
+
+  const starsContent = (
+    <div
+      className={`star-rating ${className}`}
+      style={{ display: 'inline-flex', alignItems: 'center', cursor: 'default', ...style }}
+    >
+      {stars}
+    </div>
+  );
+
+  if (!showTooltip) {
+    return starsContent;
   }
 
-  // Add empty stars
-  for (let i = 0; i < validEmptyStars; i++) {
-     // Use a lighter color for empty stars, like gray
-    stars.push(<span key={`empty-${i}`} style={{ color: '#ccc' }}>☆</span>);
+  const tooltipElement = (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        {starsContent}
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>{tooltipText}</p>
+      </TooltipContent>
+    </Tooltip>
+  );
+
+  if (externalProvider) {
+    return tooltipElement;
   }
 
-  // Handle edge case: rating is 0
-  if (rating <= 0 && maxRating > 0) {
-     stars.length = 0; // Clear any potentially added stars
-     for (let i = 0; i < maxRating; i++) {
-        stars.push(<span key={`zero-empty-${i}`} style={{ color: '#ccc' }}>☆</span>);
-     }
-  }
-
-  const tooltipText = `Rating: ${rating.toFixed(1)} / ${maxRating}`;
-
-  // Important: TooltipProvider should ideally wrap your application or a larger
-  // section where tooltips are used. Placing it here works for an isolated component
-  // but might be redundant if already present higher up the component tree.
   return (
     <TooltipProvider delayDuration={100}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-           {/* The trigger is the element that shows the tooltip on hover */}
-          <div
-             className={`star-rating ${className}`}
-             style={{ display: 'inline-flex', alignItems: 'center', cursor: 'default', ...style }} // Added cursor
-          >
-            {stars}
-          </div>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{tooltipText}</p>
-        </TooltipContent>
-      </Tooltip>
+      {tooltipElement}
     </TooltipProvider>
   );
-};
+});
+
+StarRating.displayName = 'StarRating';
 
 export default StarRating;

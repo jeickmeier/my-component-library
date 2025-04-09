@@ -68,8 +68,8 @@
         "config": {
           "currency": "USD",
           "locale": "en-US",
-          "positiveColor": "#00ff00",
-          "negativeColor": "#ff0000",
+          "positiveColor": "#4d7c0f",
+          "negativeColor": "#b91c1c",
           "options": {
             "minimumFractionDigits": 2,
             "maximumFractionDigits": 2
@@ -82,8 +82,8 @@
         "config": {
           "currency": "USD",
           "locale": "en-US",
-          "positiveColor": "#00ff00",
-          "negativeColor": "#ff0000",
+          "positiveColor": "#4d7c0f",
+          "negativeColor": "#b91c1c",
           "options": {
             "minimumFractionDigits": 0,
             "maximumFractionDigits": 0
@@ -196,13 +196,6 @@
         "type": "range",
         "min": 0,
         "max": 20
-      },
-      "aggregationType": "sum",
-      "aggregationRenderer": {
-        "type": "decimal",
-        "config": {
-          "decimals": 2
-        }
       }
     }
   ],

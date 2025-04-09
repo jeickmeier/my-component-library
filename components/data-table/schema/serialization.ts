@@ -18,6 +18,7 @@
 import { DataTableSchema, SerializableDataTableSchema, DataTableColumnDef, SerializableColumnDef } from "../types"
 import { CellRendererFunction } from "../cell-renderers"
 import { getGlobalAggregationFunctionRegistry } from "../aggregation"
+import { Row } from "@tanstack/react-table"
 
 // Define a minimal type for the registry based on usage
 interface CellRendererRegistry {
@@ -118,7 +119,7 @@ export function deserializeSchema<TData>(
       // Convert cell renderer type back to function
       if (col.cellRenderer) {
         const renderer = registry.get(col.cellRenderer.type)
-        if (renderer) {
+        if (renderer && typeof renderer === 'function') {
           // Pass the cell context to the renderer after casting
           column.cell = (props) => {
             // Cast the props to a compatible format for our renderers
@@ -132,6 +133,11 @@ export function deserializeSchema<TData>(
               }
             }, col.cellRenderer?.config as Record<string, unknown>)
           }
+        } else {
+          // Fallback cell renderer if the specified type is not found
+          column.cell = (props) => {
+            return String(props.getValue() ?? '');
+          }
         }
       }
       
@@ -140,7 +146,20 @@ export function deserializeSchema<TData>(
         const aggregationFn = aggregationRegistry.get(col.aggregationType)
         if (aggregationFn) {
           column.aggregationFn = (columnId, leafRows, childRows) => 
-            aggregationFn(columnId, leafRows, childRows, col.aggregationRenderer?.config)
+            aggregationFn(
+              columnId, 
+              leafRows as Row<unknown>[], 
+              childRows as Row<unknown>[], 
+              col.aggregationRenderer?.config
+            )
+            
+          // Handle aggregation renderer if specified
+          if (col.aggregationRenderer?.type) {
+            const aggRenderer = registry.get(col.aggregationRenderer.type)
+            if (!aggRenderer) {
+              // If the specified renderer doesn't exist, use a basic fallback
+            }
+          }
         }
       }
       

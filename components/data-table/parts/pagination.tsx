@@ -29,6 +29,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { PreviousPageIcon, NextPageIcon } from "./icons"
+
+// Memoized pagination button component to reduce re-renders
+interface PaginationButtonProps {
+  onClick: () => void;
+  disabled: boolean;
+  label: string;
+  icon: React.ReactNode;
+}
+
+const PaginationButton = React.memo(({ onClick, disabled, label, icon }: PaginationButtonProps) => (
+  <button
+    className={`h-6 px-1.5 flex items-center ${disabled ? "opacity-50 cursor-not-allowed" : "hover:bg-accent"} rounded-sm`}
+    onClick={onClick}
+    disabled={disabled}
+    aria-label={label}
+  >
+    <span className="sr-only">{label}</span>
+    {icon}
+  </button>
+));
+PaginationButton.displayName = 'PaginationButton';
 
 /**
  * Pagination Component
@@ -81,6 +103,23 @@ export function Pagination() {
   // Cast table to the correct type
   const typedTable = table as Table<unknown>
 
+  // Memoize callback functions to prevent recreating on each render
+  const handlePreviousPage = React.useCallback(() => {
+    if (typedTable.getCanPreviousPage()) {
+      typedTable.previousPage()
+    }
+  }, [typedTable]);
+
+  const handleNextPage = React.useCallback(() => {
+    if (typedTable.getCanNextPage()) {
+      typedTable.nextPage()
+    }
+  }, [typedTable]);
+
+  const handlePageSizeChange = React.useCallback((value: string) => {
+    typedTable.setPageSize(Number(value))
+  }, [typedTable]);
+
   // If pagination is not enabled, don't render anything
   if (schema.enablePagination !== true) {
     return null
@@ -101,10 +140,19 @@ export function Pagination() {
       : columnId.charAt(0).toUpperCase() + columnId.slice(1)
   }
 
+  // Memoize derived state to prevent recalculations
+  const filteredRowCount = typedTable.getFilteredRowModel().rows.length;
+  const totalRowCount = typedTable.options.data.length;
+  const currentPage = typedTable.getState().pagination.pageIndex + 1;
+  const totalPages = typedTable.getPageCount();
+  const canPreviousPage = typedTable.getCanPreviousPage();
+  const canNextPage = typedTable.getCanNextPage();
+  const pageSize = typedTable.getState().pagination.pageSize.toString();
+
   return (
     <div className="flex items-center justify-between text-xs">
       <div className="flex-1 text-muted-foreground">
-        Showing {typedTable.getFilteredRowModel().rows.length} of {typedTable.options.data.length} entries
+        Showing {filteredRowCount} of {totalRowCount} entries
         {grouping.length > 0 && (
           <span className="ml-2">
             (Grouped by{" "}
@@ -124,13 +172,11 @@ export function Pagination() {
       </div>
       <div className="flex items-center gap-1 border rounded-md p-0.5">
         <Select
-          value={typedTable.getState().pagination.pageSize.toString()}
-          onValueChange={(value) => {
-            typedTable.setPageSize(Number(value))
-          }}
+          value={pageSize}
+          onValueChange={handlePageSizeChange}
         >
           <SelectTrigger className="h-6 w-[80px] border-0 text-xs">
-            <SelectValue placeholder={typedTable.getState().pagination.pageSize} />
+            <SelectValue placeholder={pageSize} />
           </SelectTrigger>
           <SelectContent>
             {[25, 50, 100, 250, 500, 1000].map((pageSize) => (
@@ -142,40 +188,25 @@ export function Pagination() {
         </Select>
         <span className="text-xs font-medium px-1">per page</span>
         <div className="border-l h-6 mx-1"></div>
-        <button
-          className={`h-6 px-1.5 flex items-center ${!typedTable.getCanPreviousPage() ? "opacity-50 cursor-not-allowed" : "hover:bg-accent"} rounded-sm`}
-          onClick={() => {
-            if (typedTable.getCanPreviousPage()) {
-              typedTable.previousPage()
-            }
-          }}
-          disabled={!typedTable.getCanPreviousPage()}
-          aria-label="Previous page"
-        >
-          <span className="sr-only">Previous page</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
-            <path d="m15 18-6-6 6-6"></path>
-          </svg>
-        </button>
+        
+        <PaginationButton
+          onClick={handlePreviousPage}
+          disabled={!canPreviousPage}
+          label="Previous page"
+          icon={<PreviousPageIcon />}
+        />
+        
         <span className="text-xs font-medium">
-          Page {typedTable.getState().pagination.pageIndex + 1} of{" "}
-          {typedTable.getPageCount()}
+          Page {currentPage} of{" "}
+          {totalPages}
         </span>
-        <button
-          className={`h-6 px-1.5 flex items-center ${!typedTable.getCanNextPage() ? "opacity-50 cursor-not-allowed" : "hover:bg-accent"} rounded-sm`}
-          onClick={() => {
-            if (typedTable.getCanNextPage()) {
-              typedTable.nextPage()
-            }
-          }}
-          disabled={!typedTable.getCanNextPage()}
-          aria-label="Next page"
-        >
-          <span className="sr-only">Next page</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
-            <path d="m9 18 6-6-6-6"></path>
-          </svg>
-        </button>
+        
+        <PaginationButton
+          onClick={handleNextPage}
+          disabled={!canNextPage}
+          label="Next page"
+          icon={<NextPageIcon />}
+        />
       </div>
     </div>
   )

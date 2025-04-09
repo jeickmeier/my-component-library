@@ -13,6 +13,7 @@ import { Cell, flexRender } from "@tanstack/react-table"
 // Internal Imports
 import { DataTableColumnDef, SerializableCellRenderer } from "../types"
 import { DataTableCell, DataTableAggregatedCell } from "../core"
+import { ExpandIcon, CollapseIcon } from "./icons"
 
 /**
  * Props for the DataTablePartCell component
@@ -28,83 +29,113 @@ interface DataTablePartCellProps<TData> {
 /**
  * Renders a single table cell content based on its type.
  * Handles grouped cells, aggregated cells with optional renderers, and normal cells.
+ * Optimized to use React.Fragment where possible to reduce DOM nodes.
  */
-export function DataTablePartCell<TData>({
-  cell,
-}: DataTablePartCellProps<TData>) {
-  // Get the column definition using the centralized type
-  const columnDef = cell.column.columnDef as DataTableColumnDef<TData> & {
-    // Explicitly type meta for easier access
-    meta?: {
-      aggregationRenderer?: SerializableCellRenderer;
-      // other meta properties...
+export const DataTablePartCell = React.memo(
+  function DataTablePartCellInner<TData>({
+    cell,
+  }: DataTablePartCellProps<TData>) {
+    // Get the column definition using the centralized type
+    const columnDef = cell.column.columnDef as DataTableColumnDef<TData> & {
+      // Explicitly type meta for easier access
+      meta?: {
+        aggregationRenderer?: SerializableCellRenderer;
+        // other meta properties...
+      };
     };
-  };
 
-  // Handle grouped cells (with expand/collapse buttons, etc.)
-  if (cell.getIsGrouped()) {
-    // Get the row from context
-    const row = cell.getContext().row;
-    return (
-      <div className="flex items-center">
-        {/* Add expand/collapse button next to grouped cells */}
-        {row.subRows?.length > 0 && (
-          <button
-            className="mr-0.5 h-3 w-3 p-0 flex-shrink-0 align-middle"
-            onClick={() => row.toggleExpanded()}
-          >
-            {row.getIsExpanded() ? (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-3 w-3">
-                <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-3 w-3">
-                <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
-              </svg>
-            )}
-          </button>
-        )}
-        {flexRender(
-          cell.column.columnDef.cell,
-          cell.getContext()
-        )}
-        <span className="ml-1 text-xs text-muted-foreground">
-          ({row.subRows.length})
-        </span>
-      </div>
-    );
-  }
-
-  // Handle aggregated cells with aggregationRenderer
-  if (cell.getIsAggregated()) {
-    const aggRenderer = columnDef.meta?.aggregationRenderer;
-
-    // Use the DataTableAggregatedCell component if there's a custom renderer
-    if (aggRenderer) {
-      return <DataTableAggregatedCell cell={cell} />;
+    // Handle grouped cells (with expand/collapse buttons, etc.)
+    if (cell.getIsGrouped()) {
+      // Get the row from context
+      const row = cell.getContext().row;
+      
+      // Return grouped cell with button in a fragment to minimize nodes
+      return (
+        <React.Fragment>
+          {/* Add expand/collapse button next to grouped cells */}
+          {row.subRows?.length > 0 && (
+            <button
+              className="mr-0.5 h-3 w-3 p-0 flex-shrink-0 align-middle"
+              onClick={(e) => {
+                e.stopPropagation()
+                row.toggleExpanded()
+              }}
+              aria-label={row.getIsExpanded() ? "Collapse row" : "Expand row"}
+            >
+              {row.getIsExpanded() ? <CollapseIcon /> : <ExpandIcon />}
+            </button>
+          )}
+          
+          {/* Cell value */}
+          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          
+          {/* Show aggregation count */}
+          <span className="ml-1 text-muted-foreground text-xs">
+            {row.subRows.length > 0 && `(${row.subRows.length})`}
+          </span>
+        </React.Fragment>
+      );
     }
 
-    // Otherwise fall back to default rendering
+    // Handle aggregated cells
+    if (cell.getIsAggregated()) {
+      const aggregationRenderer = columnDef.meta?.aggregationRenderer;
+      
+      // If column has a specified aggregation renderer, use that
+      if (aggregationRenderer) {
+        return (
+          <DataTableAggregatedCell cell={cell as Cell<unknown, unknown>} />
+        );
+      }
+
+      // Default rendering for aggregated value
+      return (
+        <React.Fragment>
+          {flexRender(
+            cell.column.columnDef.aggregatedCell || cell.column.columnDef.cell,
+            cell.getContext()
+          )}
+        </React.Fragment>
+      );
+    }
+
+    // Handle placeholder cells (part of a grouped row)
+    if (cell.getIsPlaceholder()) {
+      return <React.Fragment></React.Fragment>;
+    }
+
+    // Standard cell rendering
     return (
-      <span className="font-semibold">
-        {flexRender(cell.column.columnDef.aggregatedCell ?? cell.column.columnDef.cell, cell.getContext())}
-      </span>
+      <DataTableCell cell={cell as Cell<unknown, unknown>} />
     );
+  },
+  // Custom comparison function to prevent unnecessary re-renders
+  (prevProps, nextProps) => {
+    // Compare the cell values
+    const prevValue = prevProps.cell.getValue();
+    const nextValue = nextProps.cell.getValue();
+    const valuesEqual = prevValue === nextValue;
+    
+    // Compare grouped state
+    const prevIsGrouped = prevProps.cell.getIsGrouped();
+    const nextIsGrouped = nextProps.cell.getIsGrouped();
+    
+    // Compare aggregated state
+    const prevIsAggregated = prevProps.cell.getIsAggregated();
+    const nextIsAggregated = nextProps.cell.getIsAggregated();
+    
+    // Compare expanded state if grouped
+    let expandedEqual = true;
+    if (prevIsGrouped && nextIsGrouped) {
+      const prevRow = prevProps.cell.getContext().row;
+      const nextRow = nextProps.cell.getContext().row;
+      expandedEqual = prevRow.getIsExpanded() === nextRow.getIsExpanded();
+    }
+    
+    // Return true if all relevant properties are equal (preventing re-render)
+    return valuesEqual && 
+           prevIsGrouped === nextIsGrouped && 
+           prevIsAggregated === nextIsAggregated &&
+           expandedEqual;
   }
-
-  // Handle placeholder cells
-  if (cell.getIsPlaceholder()) {
-    return null;
-  }
-
-  // Handle regular cells
-  if (columnDef.cellRenderer) {
-    return <DataTableCell cell={cell} />;
-  }
-
-  // Fall back to default rendering for normal cells
-  return flexRender(
-    cell.column.columnDef.cell,
-    cell.getContext()
-  );
-} 
+) 
