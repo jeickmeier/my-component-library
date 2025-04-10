@@ -83,6 +83,7 @@ export function GroupingPanel({
   grouping, 
   onGroupingChange 
 }: GroupingPanelProps) {
+  const [selectValue, setSelectValue] = React.useState("")
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -108,6 +109,7 @@ export function GroupingPanel({
   const handleAddGroup = (columnId: string) => {
     if (columnId && !grouping.includes(columnId)) {
       onGroupingChange([...grouping, columnId])
+      setSelectValue("") // Reset select value after adding
     }
   }
 
@@ -147,7 +149,7 @@ export function GroupingPanel({
         <div className="flex items-center gap-2">
           <span className="text-sm">Add group:</span>
           <Select
-            value=""
+            value={selectValue}
             onValueChange={handleAddGroup}
           >
             <SelectTrigger className="h-8 w-[180px]">

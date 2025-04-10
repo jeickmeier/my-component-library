@@ -1,12 +1,6 @@
 import * as React from "react";
 import { ColumnDef, CellContext } from "@tanstack/react-table";
 
-/**
- * Helper function to create column definitions with improved header functionality
- * 
- * @param options Column configuration options
- * @returns A column definition with sorting and visibility enabled by default
- */
 export function createColumn<T>(options: {
   id: string;
   header: string;
@@ -28,31 +22,3 @@ export function createColumn<T>(options: {
     meta: options.meta || {},
   };
 }
-
-/**
- * Example usage:
- * 
- * import { createColumn } from "@/app/components/column-helper";
- * 
- * const columns = [
- *   createColumn<User>({
- *     id: "name",
- *     header: "Name",
- *     accessorKey: "name",
- *   }),
- *   createColumn<User>({
- *     id: "email",
- *     header: "Email",
- *     accessorKey: "email",
- *   }),
- *   // Custom cell rendering
- *   createColumn<User>({
- *     id: "actions",
- *     header: "Actions",
- *     cell: ({ row }) => (
- *       <button onClick={() => handleEdit(row.original)}>Edit</button>
- *     ),
- *     enableSorting: false, // Disable sorting for this column
- *   }),
- * ];
- */ 
