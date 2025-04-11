@@ -1,10 +1,10 @@
-import * as React from "react"
+import * as React from "react";
 
 export function useTableStyles() {
   React.useEffect(() => {
-    if (!document.getElementById('sticky-group-header-styles')) {
-      const styleSheet = document.createElement('style');
-      styleSheet.id = 'sticky-group-header-styles';
+    if (!document.getElementById("sticky-group-header-styles")) {
+      const styleSheet = document.createElement("style");
+      styleSheet.id = "sticky-group-header-styles";
       styleSheet.innerHTML = `
         /* Sticky header styling */
         .sticky-table-header {
@@ -59,11 +59,11 @@ export function useTableStyles() {
         }
       `;
       document.head.appendChild(styleSheet);
-      
+
       return () => {
-        const style = document.getElementById('sticky-group-header-styles');
+        const style = document.getElementById("sticky-group-header-styles");
         if (style) document.head.removeChild(style);
       };
     }
   }, []);
-} 
+}

@@ -1,21 +1,21 @@
-import * as React from "react"
-import { Column } from "@tanstack/react-table"
-import { ArrowDown, ArrowUp, ArrowUpDown, Filter } from "lucide-react"
+import * as React from "react";
+import { Column } from "@tanstack/react-table";
+import { ArrowDown, ArrowUp, ArrowUpDown, Filter } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { SelectColumnFilter, RangeColumnFilter } from "../../types"
-import { ColumnActions } from "./ColumnActions"
+} from "@/components/ui/dropdown-menu";
+import { SelectColumnFilter, RangeColumnFilter } from "../../types";
+import { ColumnActions } from "./ColumnActions";
 
 interface DataTableColumnHeaderProps<TData, TValue> {
-  column: Column<TData, TValue>
-  title: React.ReactNode
-  filterConfig?: SelectColumnFilter | RangeColumnFilter
-  onAggregationChange?: (columnId: string, aggregationFn: string) => void
+  column: Column<TData, TValue>;
+  title: React.ReactNode;
+  filterConfig?: SelectColumnFilter | RangeColumnFilter;
+  onAggregationChange?: (columnId: string, aggregationFn: string) => void;
 }
 
 export function DataTableColumnHeader<TData, TValue>({
@@ -25,7 +25,7 @@ export function DataTableColumnHeader<TData, TValue>({
   onAggregationChange,
 }: DataTableColumnHeaderProps<TData, TValue>) {
   const isSortable = column.getCanSort();
-  
+
   if (!isSortable) {
     return (
       <div className="h-full flex items-center px-2 p-0 m-0 cursor-default">
@@ -33,7 +33,7 @@ export function DataTableColumnHeader<TData, TValue>({
       </div>
     );
   }
-  
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -59,13 +59,14 @@ export function DataTableColumnHeader<TData, TValue>({
           <span className="sr-only">Sort by {column.id}</span>
         </Button>
       </DropdownMenuTrigger>
+
       <DropdownMenuContent align="start">
-        <ColumnActions 
-          column={column} 
-          filterConfig={filterConfig} 
-          onAggregationChange={onAggregationChange} 
+        <ColumnActions
+          column={column}
+          filterConfig={filterConfig}
+          onAggregationChange={onAggregationChange}
         />
       </DropdownMenuContent>
     </DropdownMenu>
   );
-} 
+}

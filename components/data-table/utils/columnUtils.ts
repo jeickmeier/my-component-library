@@ -10,17 +10,33 @@ interface ColumnDef<T> {
   enableColumnFilter?: boolean;
   enableSorting?: boolean;
   enableHiding?: boolean;
-  aggregationFn?: string | ((columnId: string, leafRows: unknown[], childRows: unknown[]) => unknown);
+  aggregationFn?:
+    | string
+    | ((
+        columnId: string,
+        leafRows: unknown[],
+        childRows: unknown[],
+      ) => unknown);
   meta?: Record<string, unknown>;
   [key: string]: unknown;
 }
 
 // Define a more specific interface for our column with optional properties
-interface TableColumn<T> extends Omit<ColumnDef<T>, 'accessorKey' | 'accessorFn' | 'enableColumnFilter'> {
+interface TableColumn<T>
+  extends Omit<
+    ColumnDef<T>,
+    "accessorKey" | "accessorFn" | "enableColumnFilter"
+  > {
   accessorKey?: string;
   accessorFn?: (row: T) => unknown;
   enableColumnFilter?: boolean;
-  aggregationFn?: string | ((columnId: string, leafRows: unknown[], childRows: unknown[]) => unknown);
+  aggregationFn?:
+    | string
+    | ((
+        columnId: string,
+        leafRows: unknown[],
+        childRows: unknown[],
+      ) => unknown);
 }
 
 export function createColumn<T>(options: {
@@ -32,7 +48,13 @@ export function createColumn<T>(options: {
   enableSorting?: boolean;
   enableHiding?: boolean;
   enableFiltering?: boolean;
-  aggregationFn?: string | ((columnId: string, leafRows: unknown[], childRows: unknown[]) => unknown);
+  aggregationFn?:
+    | string
+    | ((
+        columnId: string,
+        leafRows: unknown[],
+        childRows: unknown[],
+      ) => unknown);
   meta?: Record<string, unknown>;
 }): ColumnDef<T> {
   // Start with common properties that are always defined
@@ -41,7 +63,7 @@ export function createColumn<T>(options: {
     header: options.header,
     cell: options.cell,
     enableSorting: options.enableSorting !== false, // Enabled by default
-    enableHiding: options.enableHiding !== false,   // Enabled by default
+    enableHiding: options.enableHiding !== false, // Enabled by default
     meta: options.meta || {},
   };
 

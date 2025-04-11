@@ -1,4 +1,4 @@
-import * as React from "react"
+import * as React from "react";
 import {
   SortingState,
   ColumnFiltersState,
@@ -13,12 +13,15 @@ import {
   getExpandedRowModel,
   Table as ReactTable,
   Row,
-  aggregationFns
-} from "@tanstack/react-table"
-import { DataTableProps } from "../types"
+  aggregationFns,
+} from "@tanstack/react-table";
+import { DataTableProps } from "../types";
 
-import { numberRangeFilterFn } from "../utils/filterFunctions"
-import { firstAggregation, AggregationFunction } from "../utils/aggregationFunctions"
+import { numberRangeFilterFn } from "../utils/filterFunctions";
+import {
+  firstAggregation,
+  AggregationFunction,
+} from "../utils/aggregationFunctions";
 
 // Define the explicit return type for the hook
 interface UseDataTableLogicReturn<TData> {
@@ -48,12 +51,17 @@ export function useDataTableLogic<TData, TValue>({
   // State
   const [isClient, setIsClient] = React.useState(false);
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFiltersState, setColumnFiltersState] = React.useState<ColumnFiltersState>([]);
+  const [columnFiltersState, setColumnFiltersState] =
+    React.useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = React.useState<string>("");
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [grouping, setGrouping] = React.useState<GroupingState>([]);
   const [expanded, setExpanded] = React.useState<ExpandedState>({});
-  const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 });
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
   const [isGroupingDialogOpen, setIsGroupingDialogOpen] = React.useState(false);
   const [forceRenderCount, setForceRenderCount] = React.useState(0);
 
@@ -62,7 +70,7 @@ export function useDataTableLogic<TData, TValue>({
   const tableContainerRef = React.useRef<HTMLDivElement>(null);
   const headerRef = React.useRef<HTMLTableSectionElement>(null);
   const rowRefsMap = React.useRef<Map<number, HTMLTableRowElement>>(new Map());
-  
+
   // Table reference
   const tableRef = React.useRef<ReactTable<TData> | null>(null);
 
@@ -77,13 +85,18 @@ export function useDataTableLogic<TData, TValue>({
 
   // Memos
   const groupableColumnObjects = React.useMemo(() => {
-    return groupableColumns.map(columnId => {
-      const col = columns.find(c => c.id === columnId || ('accessorKey' in c && c.accessorKey === columnId));
+    return groupableColumns.map((columnId) => {
+      const col = columns.find(
+        (c) =>
+          c.id === columnId ||
+          ("accessorKey" in c && c.accessorKey === columnId),
+      );
       return {
         id: columnId,
-        label: typeof col?.header === 'string'
-          ? col.header
-          : (columnId.charAt(0).toUpperCase() + columnId.slice(1)),
+        label:
+          typeof col?.header === "string"
+            ? col.header
+            : columnId.charAt(0).toUpperCase() + columnId.slice(1),
       };
     });
   }, [columns, groupableColumns]);
@@ -94,7 +107,7 @@ export function useDataTableLogic<TData, TValue>({
       forceRender: () => {
         if (isMountedRef.current) {
           // Increment a counter to force a rerender
-          setForceRenderCount(count => count + 1);
+          setForceRenderCount((count) => count + 1);
         }
       },
       recomputeAggregations: () => {
@@ -102,7 +115,7 @@ export function useDataTableLogic<TData, TValue>({
           // First, temporarily clear grouping
           const tempGrouping = [...grouping];
           tableRef.current.setGrouping([]);
-          
+
           // Then restore it to force recalculation
           setTimeout(() => {
             if (tableRef.current) {
@@ -110,7 +123,7 @@ export function useDataTableLogic<TData, TValue>({
             }
           }, 0);
         }
-      }
+      },
     };
   }, [grouping]);
 
@@ -118,8 +131,8 @@ export function useDataTableLogic<TData, TValue>({
   React.useEffect(() => {
     if (forceRenderCount > 0 && tableRef.current) {
       // Trigger table updates
-      tableRef.current.setColumnVisibility({...columnVisibility});
-      
+      tableRef.current.setColumnVisibility({ ...columnVisibility });
+
       // Also reset expanded state to force recalculation
       if (grouping.length > 0) {
         tableRef.current.resetExpanded();
@@ -142,8 +155,8 @@ export function useDataTableLogic<TData, TValue>({
       if (isMountedRef.current) {
         setGrouping(updater);
       } else {
-        if (typeof updater === 'function') {
-          setGrouping(prev => updater(prev));
+        if (typeof updater === "function") {
+          setGrouping((prev) => updater(prev));
         } else {
           setGrouping(updater);
         }
@@ -152,13 +165,13 @@ export function useDataTableLogic<TData, TValue>({
     getGroupedRowModel: enableGrouping ? getGroupedRowModel() : undefined,
     onExpandedChange: setExpanded,
     getExpandedRowModel: getExpandedRowModel(),
-    
+
     onPaginationChange: (updater) => {
       if (isMountedRef.current) {
         setPagination(updater);
       } else {
-        if (typeof updater === 'function') {
-          setPagination(prev => updater(prev));
+        if (typeof updater === "function") {
+          setPagination((prev) => updater(prev));
         } else {
           setPagination(updater);
         }
@@ -192,7 +205,7 @@ export function useDataTableLogic<TData, TValue>({
 
     enableGrouping,
     manualGrouping: !enableGrouping,
-    
+
     // These options help with aggregation recalculation
     autoResetExpanded: false,
 
@@ -205,7 +218,7 @@ export function useDataTableLogic<TData, TValue>({
     autoResetPageIndex: false,
     meta: tableMeta,
   });
-  
+
   // Store table reference for use in meta methods
   React.useEffect(() => {
     tableRef.current = table;
@@ -230,4 +243,4 @@ export function useDataTableLogic<TData, TValue>({
     isMountedRef,
     groupableColumnObjects,
   };
-} 
+}

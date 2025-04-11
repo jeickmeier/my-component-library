@@ -1,15 +1,18 @@
-import * as React from "react"
-import { Column } from "@tanstack/react-table"
-import { ArrowDown, ArrowUp, EyeOff } from "lucide-react"
-import { DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
-import { ColumnFilter } from "../filters/ColumnFilter"
-import { AggregationMenu } from "./AggregationMenu"
-import { SelectColumnFilter, RangeColumnFilter } from "../../types"
+import * as React from "react";
+import { Column } from "@tanstack/react-table";
+import { ArrowDown, ArrowUp, EyeOff } from "lucide-react";
+import {
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { ColumnFilter } from "../filters/ColumnFilter";
+import { AggregationMenu } from "./AggregationMenu";
+import { SelectColumnFilter, RangeColumnFilter } from "../../types";
 
 interface ColumnActionsProps<TData, TValue> {
-  column: Column<TData, TValue>
-  filterConfig?: SelectColumnFilter | RangeColumnFilter
-  onAggregationChange?: (columnId: string, aggregationFn: string) => void
+  column: Column<TData, TValue>;
+  filterConfig?: SelectColumnFilter | RangeColumnFilter;
+  onAggregationChange?: (columnId: string, aggregationFn: string) => void;
 }
 
 export function ColumnActions<TData, TValue>({
@@ -18,7 +21,7 @@ export function ColumnActions<TData, TValue>({
   onAggregationChange,
 }: ColumnActionsProps<TData, TValue>) {
   const isFilterable = column.getCanFilter();
-  
+
   return (
     <>
       <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
@@ -40,7 +43,10 @@ export function ColumnActions<TData, TValue>({
         </>
       )}
       <DropdownMenuSeparator />
-      <AggregationMenu column={column} onAggregationChange={onAggregationChange} />
+      <AggregationMenu
+        column={column}
+        onAggregationChange={onAggregationChange}
+      />
     </>
-  )
-} 
+  );
+}

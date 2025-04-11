@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   DndContext,
   closestCenter,
@@ -9,46 +9,47 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from "@dnd-kit/core"
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
-import { GroupingState } from "@tanstack/react-table"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { GripVertical, Plus, X } from "lucide-react"
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { GroupingState } from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { GripVertical, Plus, X } from "lucide-react";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
 interface GroupableColumn {
-  id: string
-  label: string
+  id: string;
+  label: string;
 }
 
 interface SortableItemProps {
-  id: string
-  label: string
-  onRemove: (id: string) => void
+  id: string;
+  label: string;
+  onRemove: (id: string) => void;
 }
 
 // Sortable Item component for group by
 const SortableItem = ({ id, label, onRemove }: SortableItemProps) => {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id })
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-  }
+  };
 
   return (
     <div
@@ -60,59 +61,59 @@ const SortableItem = ({ id, label, onRemove }: SortableItemProps) => {
         <GripVertical className="h-4 w-4" />
       </span>
       <span className="text-sm">{label}</span>
-      <Button 
-        variant="ghost" 
-        size="icon" 
+      <Button
+        variant="ghost"
+        size="icon"
         className="h-4 w-4 p-0 ml-1 hover:bg-muted"
         onClick={() => onRemove(id)}
       >
         <X className="h-3 w-3" />
       </Button>
     </div>
-  )
-}
+  );
+};
 
 interface GroupingPanelProps {
-  availableColumns: GroupableColumn[]
-  grouping: GroupingState
-  onGroupingChange: (grouping: GroupingState) => void
+  availableColumns: GroupableColumn[];
+  grouping: GroupingState;
+  onGroupingChange: (grouping: GroupingState) => void;
 }
 
 // Memoize GroupingPanel to prevent rerendering on aggregation changes
-export const GroupingPanel = React.memo(function GroupingPanel({ 
-  availableColumns, 
-  grouping, 
-  onGroupingChange 
+export const GroupingPanel = React.memo(function GroupingPanel({
+  availableColumns,
+  grouping,
+  onGroupingChange,
 }: GroupingPanelProps) {
-  const [selectValue, setSelectValue] = React.useState("")
+  const [selectValue, setSelectValue] = React.useState("");
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
-  )
+    }),
+  );
 
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-    
+    const { active, over } = event;
+
     if (over && active.id !== over.id) {
-      const oldIndex = grouping.indexOf(active.id as string)
-      const newIndex = grouping.indexOf(over.id as string)
-      
-      onGroupingChange(arrayMove(grouping, oldIndex, newIndex))
+      const oldIndex = grouping.indexOf(active.id as string);
+      const newIndex = grouping.indexOf(over.id as string);
+
+      onGroupingChange(arrayMove(grouping, oldIndex, newIndex));
     }
-  }
+  };
 
   const handleRemoveGroup = (columnId: string) => {
-    onGroupingChange(grouping.filter(g => g !== columnId))
-  }
+    onGroupingChange(grouping.filter((g) => g !== columnId));
+  };
 
   const handleAddGroup = (columnId: string) => {
     if (columnId && !grouping.includes(columnId)) {
-      onGroupingChange([...grouping, columnId])
-      setSelectValue("") // Reset select value after adding
+      onGroupingChange([...grouping, columnId]);
+      setSelectValue(""); // Reset select value after adding
     }
-  }
+  };
 
   return (
     <div className="space-y-4">
@@ -124,18 +125,23 @@ export const GroupingPanel = React.memo(function GroupingPanel({
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <SortableContext items={grouping} strategy={verticalListSortingStrategy}>
+            <SortableContext
+              items={grouping}
+              strategy={verticalListSortingStrategy}
+            >
               <div className="flex flex-wrap gap-2">
                 {grouping.map((columnId) => {
-                  const column = availableColumns.find(col => col.id === columnId)
+                  const column = availableColumns.find(
+                    (col) => col.id === columnId,
+                  );
                   return column ? (
-                    <SortableItem 
-                      key={columnId} 
-                      id={columnId} 
-                      label={column.label} 
-                      onRemove={handleRemoveGroup} 
+                    <SortableItem
+                      key={columnId}
+                      id={columnId}
+                      label={column.label}
+                      onRemove={handleRemoveGroup}
                     />
-                  ) : null
+                  ) : null;
                 })}
               </div>
             </SortableContext>
@@ -149,10 +155,7 @@ export const GroupingPanel = React.memo(function GroupingPanel({
       {availableColumns.length > grouping.length && (
         <div className="flex items-center gap-2">
           <span className="text-sm">Add group:</span>
-          <Select
-            value={selectValue}
-            onValueChange={handleAddGroup}
-          >
+          <Select value={selectValue} onValueChange={handleAddGroup}>
             <SelectTrigger className="h-8 w-[180px]">
               <div className="flex items-center gap-2">
                 <Plus className="h-3.5 w-3.5" />
@@ -161,8 +164,8 @@ export const GroupingPanel = React.memo(function GroupingPanel({
             </SelectTrigger>
             <SelectContent>
               {availableColumns
-                .filter(column => !grouping.includes(column.id))
-                .map(column => (
+                .filter((column) => !grouping.includes(column.id))
+                .map((column) => (
                   <SelectItem key={column.id} value={column.id}>
                     {column.label}
                   </SelectItem>
@@ -171,10 +174,10 @@ export const GroupingPanel = React.memo(function GroupingPanel({
           </Select>
         </div>
       )}
-      
+
       <div className="pt-4 text-xs text-muted-foreground">
         <p>Drag groups to reorder • Click X to remove a group</p>
       </div>
     </div>
-  )
-}); 
+  );
+});

@@ -1,9 +1,9 @@
-import * as React from "react"
-import { Input } from "@/components/ui/input"
+import * as React from "react";
+import { Input } from "@/components/ui/input";
 
 interface GlobalFilterProps {
-  globalFilter: string
-  setGlobalFilter: (value: string) => void
+  globalFilter: string;
+  setGlobalFilter: (value: string) => void;
 }
 
 // Memoize the global filter to prevent rerendering on aggregation changes
@@ -20,5 +20,5 @@ export const GlobalFilter = React.memo(function GlobalFilter({
         className="w-64"
       />
     </div>
-  )
-}); 
+  );
+});

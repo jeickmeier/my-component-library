@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 
 // Import types
-import { DataTableProps } from "../types"
-import { ColumnFilter } from "../types"
-import { Table as ReactTable, GroupingState } from "@tanstack/react-table"
+import { DataTableProps } from "../types";
+import { ColumnFilter } from "../types";
+import { Table as ReactTable, GroupingState } from "@tanstack/react-table";
 
 // Import sub-components
-import { DataTableToolbar } from "../ui/Toolbar"
-import { DataTableGroupingControl } from "../ui/GroupingControl"
-import { DataTableStructure } from "./Structure"
-import { DataTableFooter } from "../ui/Footer"
+import { DataTableToolbar } from "../ui/Toolbar";
+import { DataTableGroupingControl } from "../ui/GroupingControl";
+import { DataTableStructure } from "./Structure";
+import { DataTableFooter } from "../ui/Footer";
 
 // Import the custom hook
-import { useDataTableLogic } from "../hooks/useDataTableLogic"
+import { useDataTableLogic } from "../hooks/useDataTableLogic";
 
 // Create a wrapper component for the toolbar to prevent re-renders
 const TableToolbar = React.memo(function TableToolbar({
@@ -44,18 +44,18 @@ const TableToolbar = React.memo(function TableToolbar({
     <div className="flex items-center justify-between">
       {/* Filters Section */}
       <div className="flex-grow">
-        <DataTableToolbar 
+        <DataTableToolbar
           table={table}
           columnFilters={columnFilters}
           globalFilter={globalFilter}
           setGlobalFilter={setGlobalFilter}
         />
       </div>
-      
+
       {/* Grouping Section */}
       <div className="flex items-center pl-2">
         {enableGrouping && groupableColumnObjects.length > 0 && (
-          <DataTableGroupingControl 
+          <DataTableGroupingControl
             grouping={grouping}
             setGrouping={setGrouping}
             groupableColumnObjects={groupableColumnObjects}
@@ -89,7 +89,7 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
 
   // Destructure props needed here or pass `props` down
   const { columns, data, columnFilters = [], enableGrouping = false } = props;
-  
+
   return (
     <div className="space-y-4">
       {/* Toolbar Area (Memoized) */}
@@ -105,7 +105,7 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
         setIsGroupingDialogOpen={setIsGroupingDialogOpen}
         enableGrouping={enableGrouping}
       />
-      
+
       {/* Table Structure Area */}
       <DataTableStructure<TData, TValue>
         table={table}
@@ -119,9 +119,9 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
         headerRef={headerRef}
         columnFilters={columnFilters}
       />
-      
+
       {/* Footer Area */}
-      <DataTableFooter 
+      <DataTableFooter
         table={table as unknown as ReactTable<unknown>}
         dataLength={data.length}
         grouping={grouping}
@@ -129,4 +129,4 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
       />
     </div>
   );
-} 
+}

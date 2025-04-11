@@ -1,19 +1,19 @@
-import * as React from "react"
-import { Column } from "@tanstack/react-table"
-import { Calculator } from "lucide-react"
+import * as React from "react";
+import { Column } from "@tanstack/react-table";
+import { Calculator } from "lucide-react";
 import {
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuPortal,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
 // Available aggregation functions
 export const AGGREGATION_FUNCTIONS = [
@@ -26,11 +26,11 @@ export const AGGREGATION_FUNCTIONS = [
   { value: "unique", label: "Unique Values" },
   { value: "uniqueCount", label: "Unique Count" },
   { value: "first", label: "First Value" },
-]
+];
 
 interface AggregationMenuProps<TData, TValue> {
-  column: Column<TData, TValue>
-  onAggregationChange?: (columnId: string, aggregationFn: string) => void
+  column: Column<TData, TValue>;
+  onAggregationChange?: (columnId: string, aggregationFn: string) => void;
 }
 
 export function AggregationMenu<TData, TValue>({
@@ -41,13 +41,15 @@ export function AggregationMenu<TData, TValue>({
   const getCurrentAggregationFn = React.useCallback(() => {
     const aggFn = column.columnDef.aggregationFn;
     if (!aggFn) return "sum"; // Default
-    
+
     return typeof aggFn === "string" ? aggFn : "custom";
   }, [column.columnDef.aggregationFn]);
-  
+
   // For state tracking in the UI
-  const [selectedAggFn, setSelectedAggFn] = React.useState(() => getCurrentAggregationFn());
-  
+  const [selectedAggFn, setSelectedAggFn] = React.useState(() =>
+    getCurrentAggregationFn(),
+  );
+
   // Update selected aggregation function when column def changes
   // Use a ref to track previous value to avoid unnecessary updates
   const prevAggFnRef = React.useRef(selectedAggFn);
@@ -58,27 +60,30 @@ export function AggregationMenu<TData, TValue>({
       setSelectedAggFn(currentAggFn);
     }
   }, [getCurrentAggregationFn]);
-  
+
   // Handle aggregation function change with debouncing to prevent update loops
-  const handleAggregationChange = React.useCallback((value: string) => {
-    if (value === selectedAggFn) return; // Avoid redundant updates
-    
-    // Update the local state first
-    setSelectedAggFn(value);
-    prevAggFnRef.current = value; // Update ref to prevent useEffect from firing again
-    
-    // Notify parent about the change
-    if (onAggregationChange) {
-      onAggregationChange(column.id, value);
-    }
-    
-    // Update column definition without forcing a re-render
-    if (column.columnDef) {
-      // @ts-expect-error - Type system constraints
-      column.columnDef.aggregationFn = value;
-    }
-  }, [column, onAggregationChange, selectedAggFn]);
-  
+  const handleAggregationChange = React.useCallback(
+    (value: string) => {
+      if (value === selectedAggFn) return; // Avoid redundant updates
+
+      // Update the local state first
+      setSelectedAggFn(value);
+      prevAggFnRef.current = value; // Update ref to prevent useEffect from firing again
+
+      // Notify parent about the change
+      if (onAggregationChange) {
+        onAggregationChange(column.id, value);
+      }
+
+      // Update column definition without forcing a re-render
+      if (column.columnDef) {
+        // @ts-expect-error - Type system constraints
+        column.columnDef.aggregationFn = value;
+      }
+    },
+    [column, onAggregationChange, selectedAggFn],
+  );
+
   // No need for stableHandleAggregationChange since we already check value equality
 
   return (
@@ -108,14 +113,16 @@ export function AggregationMenu<TData, TValue>({
                 </SelectContent>
               </Select>
             </div>
-            
+
             {/* Display current aggregation function */}
             <div className="text-xs text-muted-foreground">
-              Current: {AGGREGATION_FUNCTIONS.find(af => af.value === selectedAggFn)?.label || selectedAggFn}
+              Current:{" "}
+              {AGGREGATION_FUNCTIONS.find((af) => af.value === selectedAggFn)
+                ?.label || selectedAggFn}
             </div>
           </div>
         </DropdownMenuSubContent>
       </DropdownMenuPortal>
     </DropdownMenuSub>
   );
-} 
+}

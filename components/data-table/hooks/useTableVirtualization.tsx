@@ -1,6 +1,6 @@
-import * as React from "react"
-import { Row } from "@tanstack/react-table"
-import { useVirtualizer } from "@tanstack/react-virtual"
+import * as React from "react";
+import { Row } from "@tanstack/react-table";
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 interface UseTableVirtualizationOptions<TData> {
   rows: Row<TData>[];
@@ -17,7 +17,7 @@ export function useTableVirtualization<TData>({
 }: UseTableVirtualizationOptions<TData>) {
   const getScrollElement = React.useCallback(
     () => tableContainerRef.current,
-    [tableContainerRef]
+    [tableContainerRef],
   );
 
   const virtualizer = useVirtualizer<HTMLDivElement, HTMLTableRowElement>({
@@ -29,24 +29,24 @@ export function useTableVirtualization<TData>({
     onChange: (instance) => {
       requestAnimationFrame(() => {
         if (!isMountedRef.current) return;
-        
-        instance.getVirtualItems().forEach(virtualRow => {
+
+        instance.getVirtualItems().forEach((virtualRow) => {
           const rowRef = rowRefsMap.current?.get(virtualRow.index);
           if (!rowRef) return;
-          
+
           // Only transform rows that aren't sticky
-          if (!rowRef.classList.contains('sticky-group-header')) {
+          if (!rowRef.classList.contains("sticky-group-header")) {
             rowRef.style.transform = `translateY(${virtualRow.start}px)`;
           }
         });
       });
-    }
+    },
   });
-  
+
   // Re-measure when layout changes
   React.useLayoutEffect(() => {
     virtualizer.measure();
   }, [virtualizer]);
 
   return virtualizer;
-} 
+}

@@ -1,20 +1,23 @@
-import * as React from "react"
-import { Column } from "@tanstack/react-table"
-import { Filter } from "lucide-react"
+import * as React from "react";
+import { Column } from "@tanstack/react-table";
+import { Filter } from "lucide-react";
 import {
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuPortal,
-} from "@/components/ui/dropdown-menu"
-import { SelectColumnFilter, RangeColumnFilter } from "@/components/data-table/types"
-import { SelectFilter } from "./SelectFilter"
-import { RangeFilter } from "./RangeFilter"
-import { TextFilter } from "./TextFilter"
+} from "@/components/ui/dropdown-menu";
+import {
+  SelectColumnFilter,
+  RangeColumnFilter,
+} from "@/components/data-table/types";
+import { SelectFilter } from "./SelectFilter";
+import { RangeFilter } from "./RangeFilter";
+import { TextFilter } from "./TextFilter";
 
 interface ColumnFilterProps<TData, TValue> {
-  column: Column<TData, TValue>
-  filterConfig?: SelectColumnFilter | RangeColumnFilter
+  column: Column<TData, TValue>;
+  filterConfig?: SelectColumnFilter | RangeColumnFilter;
 }
 
 export function ColumnFilter<TData, TValue>({
@@ -28,9 +31,9 @@ export function ColumnFilter<TData, TValue>({
     }
 
     switch (filterConfig.type) {
-      case 'select':
+      case "select":
         return <SelectFilter column={column} filter={filterConfig} />;
-      case 'range':
+      case "range":
         return <RangeFilter column={column} filter={filterConfig} />;
       default:
         // Default to a simple text filter
@@ -46,11 +49,9 @@ export function ColumnFilter<TData, TValue>({
       </DropdownMenuSubTrigger>
       <DropdownMenuPortal>
         <DropdownMenuSubContent className="p-2 min-w-[220px]">
-          <div className="space-y-2">
-            {renderFilter()}
-          </div>
+          <div className="space-y-2">{renderFilter()}</div>
         </DropdownMenuSubContent>
       </DropdownMenuPortal>
     </DropdownMenuSub>
-  )
-} 
+  );
+}

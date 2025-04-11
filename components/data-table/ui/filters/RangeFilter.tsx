@@ -1,11 +1,11 @@
-import * as React from "react"
-import { Column } from "@tanstack/react-table"
-import { Input } from "@/components/ui/input"
-import { RangeColumnFilter } from "@/components/data-table/types"
+import * as React from "react";
+import { Column } from "@tanstack/react-table";
+import { Input } from "@/components/ui/input";
+import { RangeColumnFilter } from "@/components/data-table/types";
 
 interface RangeFilterProps<TData> {
-  column: Column<TData, unknown>
-  filter: RangeColumnFilter
+  column: Column<TData, unknown>;
+  filter: RangeColumnFilter;
 }
 
 export function RangeFilter<TData>({
@@ -14,9 +14,11 @@ export function RangeFilter<TData>({
 }: RangeFilterProps<TData>) {
   const [minValue, setMinValue] = React.useState<string>("");
   const [maxValue, setMaxValue] = React.useState<string>("");
-  
+
   // Get the current filter value directly from the column
-  const currentFilterValue = column.getFilterValue() as [number, number] | undefined;
+  const currentFilterValue = column.getFilterValue() as
+    | [number, number]
+    | undefined;
 
   // Initialize local state from column filter value
   React.useEffect(() => {
@@ -34,21 +36,19 @@ export function RangeFilter<TData>({
     (min: string | undefined, max: string | undefined) => {
       const minNum = min ? Number(min) : undefined;
       const maxNum = max ? Number(max) : undefined;
-      
+
       column.setFilterValue(
-        minNum !== undefined || maxNum !== undefined 
-          ? [minNum, maxNum] 
-          : undefined
+        minNum !== undefined || maxNum !== undefined
+          ? [minNum, maxNum]
+          : undefined,
       );
     },
-    [column]
+    [column],
   );
 
   return (
     <div className="flex items-center space-x-2">
-      <p className="text-sm font-medium">
-        {filter.label}:
-      </p>
+      <p className="text-sm font-medium">{filter.label}:</p>
       <div className="flex items-center space-x-2">
         <Input
           type="number"
@@ -75,5 +75,5 @@ export function RangeFilter<TData>({
         />
       </div>
     </div>
-  )
-} 
+  );
+}

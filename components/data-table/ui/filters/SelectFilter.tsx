@@ -1,17 +1,17 @@
-import * as React from "react"
-import { Column } from "@tanstack/react-table"
+import * as React from "react";
+import { Column } from "@tanstack/react-table";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { SelectColumnFilter } from "@/components/data-table/types"
+} from "@/components/ui/select";
+import { SelectColumnFilter } from "@/components/data-table/types";
 
 interface SelectFilterProps<TData> {
-  column: Column<TData, unknown>
-  filter: SelectColumnFilter
+  column: Column<TData, unknown>;
+  filter: SelectColumnFilter;
 }
 
 export function SelectFilter<TData>({
@@ -20,13 +20,11 @@ export function SelectFilter<TData>({
 }: SelectFilterProps<TData>) {
   return (
     <div className="flex items-center space-x-2">
-      <p className="text-sm font-medium">
-        {filter.label}:
-      </p>
+      <p className="text-sm font-medium">{filter.label}:</p>
       <Select
-        value={column.getFilterValue() as string || "all"}
+        value={(column.getFilterValue() as string) || "all"}
         onValueChange={(value) => {
-          column.setFilterValue(value === "all" ? undefined : value)
+          column.setFilterValue(value === "all" ? undefined : value);
         }}
       >
         <SelectTrigger className="h-8 w-36">
@@ -42,5 +40,5 @@ export function SelectFilter<TData>({
         </SelectContent>
       </Select>
     </div>
-  )
-} 
+  );
+}

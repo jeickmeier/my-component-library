@@ -1,10 +1,10 @@
-import * as React from "react"
-import { Column } from "@tanstack/react-table"
-import { Input } from "@/components/ui/input"
+import * as React from "react";
+import { Column } from "@tanstack/react-table";
+import { Input } from "@/components/ui/input";
 
 interface TextFilterProps<TData> {
-  column: Column<TData, unknown>
-  label?: string
+  column: Column<TData, unknown>;
+  label?: string;
 }
 
 export function TextFilter<TData>({
@@ -12,7 +12,7 @@ export function TextFilter<TData>({
   label = "Filter value",
 }: TextFilterProps<TData>) {
   const [textValue, setTextValue] = React.useState<string>("");
-  
+
   // Get current filter value for the effect dependency
   const currentFilterValue = column.getFilterValue();
 
@@ -36,4 +36,4 @@ export function TextFilter<TData>({
       />
     </div>
   );
-} 
+}
