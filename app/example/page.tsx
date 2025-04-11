@@ -2,7 +2,7 @@
 
 import React from "react"
 import { Payment, columns } from "./columns"
-import { DataTable } from "../components/data-table"
+import { DataTable } from "@/components/data-table"
 import { paymentData } from "./payment-data"
 
 // Use imported payment data

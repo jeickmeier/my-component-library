@@ -78,7 +78,8 @@ interface GroupingPanelProps {
   onGroupingChange: (grouping: GroupingState) => void
 }
 
-export function GroupingPanel({ 
+// Memoize GroupingPanel to prevent rerendering on aggregation changes
+export const GroupingPanel = React.memo(function GroupingPanel({ 
   availableColumns, 
   grouping, 
   onGroupingChange 
@@ -176,4 +177,4 @@ export function GroupingPanel({
       </div>
     </div>
   )
-}
+}); 

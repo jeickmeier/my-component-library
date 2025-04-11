@@ -16,6 +16,7 @@ export const columns: ColumnDef<Payment>[] = [
     accessorKey: "status",
     header: "Status",
     enableGrouping: true,
+    aggregationFn: 'first',
     cell: ({ row }) => {
       const status = row.getValue("status") as string
       return (
@@ -27,6 +28,20 @@ export const columns: ColumnDef<Payment>[] = [
             "bg-red-500"
           }`} />
           <span className="capitalize">{status}</span>
+        </div>
+      )
+    },
+    aggregatedCell: ({ row }) => {
+      const status = row.getValue("status") as string
+      return (
+        <div className="flex items-center">
+          <span className={`mr-2 h-2 w-2 rounded-full ${
+            status === "pending" ? "bg-yellow-500" :
+            status === "processing" ? "bg-blue-500" :
+            status === "success" ? "bg-green-500" :
+            "bg-red-500"
+          }`} />
+          <span className="capitalize">{status} (First)</span>
         </div>
       )
     }
@@ -48,23 +63,20 @@ export const columns: ColumnDef<Payment>[] = [
  
       return <div className="text-right font-medium">{formatted}</div>
     },
-    filterFn: (row, id, value: [number, number]) => {
-      const amount = row.getValue(id) as number
-      const [min, max] = value
+    filterFn: 'numberRange',
+    aggregationFn: 'first',
+    aggregatedCell: ({ row }) => {
+      const value = row.getValue("amount")
       
-      if (min !== undefined && max !== undefined) {
-        return amount >= min && amount <= max
-      }
+      if (value == null) return null
       
-      if (min !== undefined) {
-        return amount >= min
-      }
+      // Format as currency
+      const formatted = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+      }).format(Number(value))
       
-      if (max !== undefined) {
-        return amount <= max
-      }
-      
-      return true
+      return <div className="text-right font-medium">{formatted}</div>
     },
   },
 ]
