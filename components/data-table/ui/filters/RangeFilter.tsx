@@ -12,6 +12,38 @@ export function RangeFilter<TData>({
   column,
   filter,
 }: RangeFilterProps<TData>) {
+  const [minValue, setMinValue] = React.useState<string>("");
+  const [maxValue, setMaxValue] = React.useState<string>("");
+  
+  // Get the current filter value directly from the column
+  const currentFilterValue = column.getFilterValue() as [number, number] | undefined;
+
+  // Initialize local state from column filter value
+  React.useEffect(() => {
+    if (currentFilterValue === undefined) {
+      setMinValue("");
+      setMaxValue("");
+    } else {
+      setMinValue(currentFilterValue[0]?.toString() || "");
+      setMaxValue(currentFilterValue[1]?.toString() || "");
+    }
+  }, [currentFilterValue]);
+
+  // Update the filter with debounce
+  const updateFilterValue = React.useCallback(
+    (min: string | undefined, max: string | undefined) => {
+      const minNum = min ? Number(min) : undefined;
+      const maxNum = max ? Number(max) : undefined;
+      
+      column.setFilterValue(
+        minNum !== undefined || maxNum !== undefined 
+          ? [minNum, maxNum] 
+          : undefined
+      );
+    },
+    [column]
+  );
+
   return (
     <div className="flex items-center space-x-2">
       <p className="text-sm font-medium">
@@ -22,16 +54,11 @@ export function RangeFilter<TData>({
           type="number"
           placeholder={`Min ${filter.label}`}
           className="h-8 w-24"
-          value={(column.getFilterValue() as [number, number])?.[0] ?? ""}
+          value={minValue}
           onChange={(event) => {
-            const value = event.target.value ? Number(event.target.value) : undefined;
-            const maxValue = (column.getFilterValue() as [number, number])?.[1];
-            
-            column.setFilterValue(
-              value !== undefined || maxValue !== undefined 
-                ? [value, maxValue] 
-                : undefined
-            );
+            const newMinValue = event.target.value;
+            setMinValue(newMinValue);
+            updateFilterValue(newMinValue, maxValue);
           }}
         />
         <span>-</span>
@@ -39,16 +66,11 @@ export function RangeFilter<TData>({
           type="number"
           placeholder={`Max ${filter.label}`}
           className="h-8 w-24"
-          value={(column.getFilterValue() as [number, number])?.[1] ?? ""}
+          value={maxValue}
           onChange={(event) => {
-            const value = event.target.value ? Number(event.target.value) : undefined;
-            const minValue = (column.getFilterValue() as [number, number])?.[0];
-            
-            column.setFilterValue(
-              minValue !== undefined || value !== undefined 
-                ? [minValue, value] 
-                : undefined
-            );
+            const newMaxValue = event.target.value;
+            setMaxValue(newMaxValue);
+            updateFilterValue(minValue, newMaxValue);
           }}
         />
       </div>

@@ -8,8 +8,8 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { SelectColumnFilter, RangeColumnFilter } from "../types"
-import { ColumnActions } from "./column-header/ColumnActions"
+import { SelectColumnFilter, RangeColumnFilter } from "../../types"
+import { ColumnActions } from "./ColumnActions"
 
 interface DataTableColumnHeaderProps<TData, TValue> {
   column: Column<TData, TValue>

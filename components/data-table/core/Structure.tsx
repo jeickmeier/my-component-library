@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { DataTableColumnHeader } from "../ui/ColumnHeader"
+import { DataTableColumnHeader } from "../ui/column-header/ColumnHeader"
 import { ColumnFilter } from "../types"
 
 // Define props for DataTableStructure
@@ -125,51 +125,44 @@ export function DataTableStructure<TData, TValue>({
   const handleAggregationChange = React.useCallback((columnId: string, aggregationFn: string) => {
     console.log(`Changing aggregation for column ${columnId} to ${aggregationFn}`);
     
-    // Update the body counter, not causing header re-render
+    // Single update for the body only
     setBodyUpdateCounter(prev => prev + 1);
     
     // Apply the aggregation change directly to the column definition
-    // This is needed in addition to what AggregationMenu does
-    const columnDef = table.getAllColumns().find(col => col.id === columnId)?.columnDef;
-    if (columnDef) {
+    const column = table.getAllColumns().find(col => col.id === columnId);
+    if (column?.columnDef) {
       // @ts-expect-error - Type system constraints
-      columnDef.aggregationFn = aggregationFn;
+      column.columnDef.aggregationFn = aggregationFn;
     }
     
-    // Force a table state update to recalculate
-    table.setColumnOrder([...table.getState().columnOrder]);
-    
-    // Schedule a delayed reset to ensure the column def is updated first
-    setTimeout(() => {
-      // Force table recalculation in different ways
-      if (grouping.length > 0) {
-        // Temporarily toggle grouping to force recalculation
+    // For grouped tables, gently recalculate without triggering multiple renders
+    if (grouping.length > 0) {
+      // Use a single timeout to batch updates
+      setTimeout(() => {
         const tempGrouping = [...grouping];
         table.setGrouping([]);
         
-        // Restore grouping without triggering header rerenders
-        setTimeout(() => {
+        // Use requestAnimationFrame to ensure DOM updates have settled
+        requestAnimationFrame(() => {
           table.setGrouping(tempGrouping);
-          
-          // Force expanded state reset to ensure grouped data is recalculated
-          setTimeout(() => {
-            table.resetExpanded(true);
-          }, 50);
-        }, 50);
-      } else {
-        // Even without grouping, force a table update
-        table.resetExpanded(true);
-      }
-    }, 50);
+        });
+      }, 0);
+    }
+    // No need for else branch - the body update will be sufficient
   }, [table, grouping]);
 
   // Effect to update rows only when bodyUpdateCounter changes
   React.useEffect(() => {
     if (bodyUpdateCounter > 0) {
-      // Only reset expansion state which affects rows, not headers
-      table.resetExpanded();
+      // Use requestAnimationFrame to ensure we're not in the middle of a render cycle
+      requestAnimationFrame(() => {
+        // Only reset if still mounted
+        if (isMountedRef.current) {
+          table.resetExpanded();
+        }
+      });
     }
-  }, [bodyUpdateCounter, table]);
+  }, [bodyUpdateCounter, table, isMountedRef]);
 
   return (
     <div className="rounded-md border">

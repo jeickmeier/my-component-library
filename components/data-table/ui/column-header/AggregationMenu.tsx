@@ -49,47 +49,37 @@ export function AggregationMenu<TData, TValue>({
   const [selectedAggFn, setSelectedAggFn] = React.useState(() => getCurrentAggregationFn());
   
   // Update selected aggregation function when column def changes
+  // Use a ref to track previous value to avoid unnecessary updates
+  const prevAggFnRef = React.useRef(selectedAggFn);
   React.useEffect(() => {
-    setSelectedAggFn(getCurrentAggregationFn());
-  }, [column.columnDef.aggregationFn, getCurrentAggregationFn]);
+    const currentAggFn = getCurrentAggregationFn();
+    if (prevAggFnRef.current !== currentAggFn) {
+      prevAggFnRef.current = currentAggFn;
+      setSelectedAggFn(currentAggFn);
+    }
+  }, [getCurrentAggregationFn]);
   
-  // Handle aggregation function change
+  // Handle aggregation function change with debouncing to prevent update loops
   const handleAggregationChange = React.useCallback((value: string) => {
+    if (value === selectedAggFn) return; // Avoid redundant updates
+    
     // Update the local state first
     setSelectedAggFn(value);
+    prevAggFnRef.current = value; // Update ref to prevent useEffect from firing again
     
-    // Store a reference to the column
-    const columnRef = column;
-    
-    // First, ensure the parent is notified BEFORE modifying the columnDef
-    // This ensures the parent has a chance to handle table-level updates
+    // Notify parent about the change
     if (onAggregationChange) {
-      onAggregationChange(columnRef.id, value);
+      onAggregationChange(column.id, value);
     }
     
-    // Now update the column definition to ensure changes are applied
-    if (columnRef.columnDef) {
-      // Need to type cast here because the TS definitions expect specific types
-      // but TanStack Table accepts string values for standard aggregation functions
-      // @ts-expect-error - The type system doesn't allow direct string assignment to aggregationFn
-      columnRef.columnDef.aggregationFn = value;
+    // Update column definition without forcing a re-render
+    if (column.columnDef) {
+      // @ts-expect-error - Type system constraints
+      column.columnDef.aggregationFn = value;
     }
-    
-    // Force a column rerender by toggling a state if needed
-    // This helps ensure the column recalculates with the new aggregation function
-    setTimeout(() => {
-      // This timeout helps ensure the update is processed in the next event loop
-      columnRef.toggleVisibility();
-      columnRef.toggleVisibility();
-    }, 0);
-  }, [column, onAggregationChange]);
+  }, [column, onAggregationChange, selectedAggFn]);
   
-  // Prevent re-renders unless necessary
-  const stableHandleAggregationChange = React.useCallback((value: string) => {
-    if (value !== selectedAggFn) {
-      handleAggregationChange(value);
-    }
-  }, [handleAggregationChange, selectedAggFn]);
+  // No need for stableHandleAggregationChange since we already check value equality
 
   return (
     <DropdownMenuSub>
@@ -104,7 +94,7 @@ export function AggregationMenu<TData, TValue>({
               <div className="text-xs font-medium">Aggregation Function</div>
               <Select
                 value={selectedAggFn}
-                onValueChange={stableHandleAggregationChange}
+                onValueChange={handleAggregationChange}
               >
                 <SelectTrigger className="h-8">
                   <SelectValue placeholder="Select function" />

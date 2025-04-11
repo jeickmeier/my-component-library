@@ -1,8 +1,6 @@
 import * as React from "react"
 import { Column } from "@tanstack/react-table"
 import { Filter } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
   DropdownMenuSub,
   DropdownMenuSubContent,
@@ -12,6 +10,7 @@ import {
 import { SelectColumnFilter, RangeColumnFilter } from "@/components/data-table/types"
 import { SelectFilter } from "./SelectFilter"
 import { RangeFilter } from "./RangeFilter"
+import { TextFilter } from "./TextFilter"
 
 interface ColumnFilterProps<TData, TValue> {
   column: Column<TData, TValue>
@@ -22,6 +21,23 @@ export function ColumnFilter<TData, TValue>({
   column,
   filterConfig,
 }: ColumnFilterProps<TData, TValue>) {
+  // Render the appropriate filter based on the filter type
+  const renderFilter = () => {
+    if (!filterConfig) {
+      return <TextFilter column={column} />;
+    }
+
+    switch (filterConfig.type) {
+      case 'select':
+        return <SelectFilter column={column} filter={filterConfig} />;
+      case 'range':
+        return <RangeFilter column={column} filter={filterConfig} />;
+      default:
+        // Default to a simple text filter
+        return <TextFilter column={column} />;
+    }
+  };
+
   return (
     <DropdownMenuSub>
       <DropdownMenuSubTrigger>
@@ -31,33 +47,7 @@ export function ColumnFilter<TData, TValue>({
       <DropdownMenuPortal>
         <DropdownMenuSubContent className="p-2 min-w-[220px]">
           <div className="space-y-2">
-            {filterConfig?.type === 'select' ? (
-              <SelectFilter column={column} filter={filterConfig} />
-            ) : filterConfig?.type === 'range' ? (
-              <RangeFilter column={column} filter={filterConfig} />
-            ) : (
-              /* Default text filter */
-              <div className="flex flex-col gap-1">
-                <div className="text-xs font-medium">Filter value</div>
-                <Input
-                  placeholder="Filter value..."
-                  value={(column.getFilterValue() as string) ?? ""}
-                  onChange={(e) => column.setFilterValue(e.target.value)}
-                  className="h-8"
-                />
-              </div>
-            )}
-            
-            <div className="flex gap-2 justify-end">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => column.setFilterValue(undefined)}
-                className="h-7 text-xs"
-              >
-                Clear
-              </Button>
-            </div>
+            {renderFilter()}
           </div>
         </DropdownMenuSubContent>
       </DropdownMenuPortal>
