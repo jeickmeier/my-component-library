@@ -11,7 +11,7 @@ export type { DataTableProps, ColumnFilter, FilterOption, SelectColumnFilter, Ra
 
 // Export all sub-components (for those who want direct access)
 export { DataTable, createColumn }
-export { DataTableFilters } from "./ui/Toolbar"
+export { DataTableToolbar } from "./ui/Toolbar"
 export { DataTableGroupingControl } from "./ui/GroupingControl"
 export { DataTableStructure } from "./core/Structure"
 export { DataTableFooter } from "./ui/Footer"

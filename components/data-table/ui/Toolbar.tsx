@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Table as ReactTable } from "@tanstack/react-table"
 import { ColumnFilter } from "@/components/data-table/types"
-import { GlobalFilter } from "./filter/GlobalFilter"
+import { GlobalFilter } from "./filters/GlobalFilter"
 
 // Define props for DataTableFilters
 interface DataTableToolbarProps<TData> {

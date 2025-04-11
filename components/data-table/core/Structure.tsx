@@ -125,24 +125,42 @@ export function DataTableStructure<TData, TValue>({
   const handleAggregationChange = React.useCallback((columnId: string, aggregationFn: string) => {
     console.log(`Changing aggregation for column ${columnId} to ${aggregationFn}`);
     
-    // Only update the body counter, not causing header re-render
+    // Update the body counter, not causing header re-render
     setBodyUpdateCounter(prev => prev + 1);
+    
+    // Apply the aggregation change directly to the column definition
+    // This is needed in addition to what AggregationMenu does
+    const columnDef = table.getAllColumns().find(col => col.id === columnId)?.columnDef;
+    if (columnDef) {
+      // @ts-expect-error - Type system constraints
+      columnDef.aggregationFn = aggregationFn;
+    }
+    
+    // Force a table state update to recalculate
+    table.setColumnOrder([...table.getState().columnOrder]);
     
     // Schedule a delayed reset to ensure the column def is updated first
     setTimeout(() => {
+      // Force table recalculation in different ways
       if (grouping.length > 0) {
-        // Only affect the data calculations, not the header UI
+        // Temporarily toggle grouping to force recalculation
         const tempGrouping = [...grouping];
-        
-        // Use a more targeted approach that won't affect headers
-        table.setGrouping([]);  // Temporarily clear
+        table.setGrouping([]);
         
         // Restore grouping without triggering header rerenders
         setTimeout(() => {
           table.setGrouping(tempGrouping);
-        }, 0);
+          
+          // Force expanded state reset to ensure grouped data is recalculated
+          setTimeout(() => {
+            table.resetExpanded(true);
+          }, 50);
+        }, 50);
+      } else {
+        // Even without grouping, force a table update
+        table.resetExpanded(true);
       }
-    }, 0);
+    }, 50);
   }, [table, grouping]);
 
   // Effect to update rows only when bodyUpdateCounter changes
