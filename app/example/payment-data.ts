@@ -12,6 +12,10 @@ export const paymentData = Array.from({ length: 50000 }, (_, i) => {
   const statuses = ["pending", "processing", "success", "failed"] as const;
   const status = statuses[Math.floor(Math.random() * statuses.length)];
 
+  // Random category
+  const categories = ["retail", "corporate", "investment", "treasury"];
+  const category = categories[Math.floor(Math.random() * categories.length)];
+
   // Email based on index
   const email = `user${i + 1}@example.com`;
 
@@ -23,5 +27,5 @@ export const paymentData = Array.from({ length: 50000 }, (_, i) => {
   const oneYearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
   const reviewDate = new Date(oneYearAgo.getTime() + Math.random() * (now.getTime() - oneYearAgo.getTime()));
 
-  return { id, amount, status, email, reviewRating, reviewDate };
+  return { id, amount, status, category, email, reviewRating, reviewDate };
 }) as Payment[];

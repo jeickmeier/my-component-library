@@ -11,6 +11,7 @@ export type Payment = {
   amount: number
   status: "pending" | "processing" | "success" | "failed"
   email: string
+  category: string
   reviewRating: number
   reviewDate: Date
 }
@@ -51,6 +52,9 @@ export const columns = [
   columnHelper.accessor('status', {
     header: "Status",
     enableGrouping: true,
+    enableSorting: true,
+    enableColumnFilter: true,
+    enableHiding: true,
     filterFn: 'equals',
     meta: {
       options: [
@@ -63,6 +67,20 @@ export const columns = [
     aggregationFn: 'first',
     cell: (props) => iconCategoryRenderer({ cell: props.cell, row: props.row, value: props.getValue() })
   }),
+  columnHelper.accessor('category', {
+    header: "Category",
+    enableGrouping: true,
+    filterFn: 'equals',
+    meta: {
+      options: [
+        { label: "Retail", value: "retail" },
+        { label: "Corporate", value: "corporate" },
+        { label: "Investment", value: "investment" },
+        { label: "Treasury", value: "treasury" },
+      ]
+    },
+    aggregationFn: 'first',
+  }),
   columnHelper.accessor('email', {
     header: "Email",
     enableGrouping: true,
@@ -71,6 +89,13 @@ export const columns = [
     header: "Amount",
     enableGrouping: false,
     filterFn: 'numberRange',
+    meta: {
+      filterConfig: {
+        type: 'rangeSlider',
+        column: 'amount', 
+        label: 'Amount Range'
+      }
+    },
     aggregationFn: 'first',
     cell: (props) => moneyRenderer({ cell: props.cell, row: props.row, value: props.getValue() }),
     aggregatedCell: (props) => moneyAggregatedRenderer({ cell: props.cell, row: props.row, value: props.getValue() })
@@ -81,7 +106,13 @@ export const columns = [
     aggregationFn: 'mean',
     filterFn: 'starRating',
     meta: {
-      maxStars: 5
+      maxStars: 5,
+      filterConfig: {
+        type: 'starRating',
+        column: 'reviewRating',
+        label: 'Rating',
+        maxStars: 5
+      }
     },
     cell: (props) => starRenderer({ cell: props.cell, row: props.row, value: props.getValue() }),
     aggregatedCell: (props) => starRenderer({ cell: props.cell, row: props.row, value: props.getValue() })
