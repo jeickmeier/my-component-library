@@ -8,18 +8,17 @@ import {
   DropdownMenuPortal,
 } from "@/components/ui/dropdown-menu";
 import {
-  SelectColumnFilter,
-  RangeColumnFilter,
-  StarRatingColumnFilter,
+  ColumnFilter as ColumnFilterType,
 } from "@/components/data-table/types";
 import { SelectFilter } from "./SelectFilter";
 import { RangeFilter } from "./RangeFilter";
 import { TextFilter } from "./TextFilter";
 import { StarRatingFilter } from "./StarRatingFilter";
+import { RangeSliderFilter } from "./RangeSliderFilter";
 
 interface ColumnFilterProps<TData, TValue> {
   column: Column<TData, TValue>;
-  filterConfig?: SelectColumnFilter | RangeColumnFilter | StarRatingColumnFilter;
+  filterConfig?: ColumnFilterType;
 }
 
 export function ColumnFilter<TData, TValue>({
@@ -37,6 +36,8 @@ export function ColumnFilter<TData, TValue>({
         return <SelectFilter column={column} filter={filterConfig} />;
       case "range":
         return <RangeFilter column={column} filter={filterConfig} />;
+      case "rangeSlider":
+        return <RangeSliderFilter column={column} filter={filterConfig} />;
       case "starRating":
         return <StarRatingFilter column={column} filter={filterConfig} />;
       default:

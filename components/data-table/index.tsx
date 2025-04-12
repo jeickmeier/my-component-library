@@ -16,6 +16,7 @@ export type {
   FilterOption,
   SelectColumnFilter,
   RangeColumnFilter,
+  RangeSliderColumnFilter,
   StarRatingColumnFilter,
 } from "./types";
 

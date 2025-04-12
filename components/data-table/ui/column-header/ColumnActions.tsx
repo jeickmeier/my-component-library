@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Column } from "@tanstack/react-table";
-import { ArrowDown, ArrowUp, EyeOff } from "lucide-react";
+import { ArrowDown, ArrowUp, EyeOff, X } from "lucide-react";
 import {
   DropdownMenuItem,
   DropdownMenuSeparator,
@@ -11,6 +11,7 @@ import { SelectFilter } from "./filters/SelectFilter";
 import { RangeFilter } from "./filters/RangeFilter";
 import { TextFilter } from "./filters/TextFilter";
 import { StarRatingFilter } from "./filters/StarRatingFilter";
+import { RangeSliderFilter } from "./filters/RangeSliderFilter";
 import { 
   Select,
   SelectContent,
@@ -18,12 +19,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SelectColumnFilter, RangeColumnFilter, StarRatingColumnFilter } from "../../types";
+import { ColumnFilter } from "../../types";
 import { AGGREGATION_FUNCTIONS } from "./AggregationMenu";
 
 interface ColumnActionsProps<TData, TValue> {
   column: Column<TData, TValue>;
-  filterConfig?: SelectColumnFilter | RangeColumnFilter | StarRatingColumnFilter;
+  filterConfig?: ColumnFilter;
   onAggregationChange?: (columnId: string, aggregationFn: string) => void;
 }
 
@@ -89,6 +90,8 @@ export function ColumnActions<TData, TValue>({
         return <SelectFilter column={column} filter={filterConfig} />;
       case "range":
         return <RangeFilter column={column} filter={filterConfig} />;
+      case "rangeSlider":
+        return <RangeSliderFilter column={column} filter={filterConfig} />;
       case "starRating":
         return <StarRatingFilter column={column} filter={filterConfig} />;
       default:
@@ -107,21 +110,29 @@ export function ColumnActions<TData, TValue>({
       {isSortable && (
         <DropdownMenuGroup className="mb-1">
           <DropdownMenuLabel className="text-xs font-medium text-muted-foreground py-1 px-2">Sort Order</DropdownMenuLabel>
-          <div className="grid grid-cols-2 gap-0.5">
+          <div className="flex gap-0.5 px-1">
             <DropdownMenuItem 
               onClick={() => column.toggleSorting(false)}
-              className="h-8 justify-start py-0.5 px-2"
+              className="h-8 justify-start py-0.5 px-2 flex-1"
             >
               <ArrowUp className="mr-1.5 h-3.5 w-3.5 text-muted-foreground/70" />
               <span>Asc</span>
             </DropdownMenuItem>
             <DropdownMenuItem 
               onClick={() => column.toggleSorting(true)}
-              className="h-8 justify-start py-0.5 px-2"
+              className="h-8 justify-start py-0.5 px-2 flex-1"
             >
               <ArrowDown className="mr-1.5 h-3.5 w-3.5 text-muted-foreground/70" />
               <span>Desc</span>
             </DropdownMenuItem>
+            {column.getIsSorted() && (
+              <DropdownMenuItem 
+                onClick={() => column.clearSorting()}
+                className="h-8 justify-center py-0.5 px-2 flex-1"
+              >
+                <X className="h-3.5 w-3.5 text-muted-foreground/70" />
+              </DropdownMenuItem>
+            )}
           </div>
         </DropdownMenuGroup>
       )}
@@ -130,7 +141,7 @@ export function ColumnActions<TData, TValue>({
         <>
           {isSortable && <DropdownMenuSeparator className="my-1" />}
           <DropdownMenuGroup className="mb-1">
-            <DropdownMenuLabel className="text-xs font-medium text-muted-foreground py-1 px-2">Status:</DropdownMenuLabel>
+            <DropdownMenuLabel className="text-xs font-medium text-muted-foreground py-1 px-2">Filter</DropdownMenuLabel>
             <DropdownMenuItem 
               onSelect={(e) => e.preventDefault()} 
               className="p-1 cursor-default focus:bg-transparent"

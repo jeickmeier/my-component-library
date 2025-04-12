@@ -33,6 +33,15 @@ export interface RangeColumnFilter {
   max?: number;
 }
 
+export interface RangeSliderColumnFilter {
+  type: "rangeSlider";
+  column: string;
+  label: string;
+  min?: number;
+  max?: number;
+  step?: number;
+}
+
 export interface StarRatingColumnFilter {
   type: "starRating";
   column: string;
@@ -40,7 +49,11 @@ export interface StarRatingColumnFilter {
   maxStars?: number;
 }
 
-export type ColumnFilter = SelectColumnFilter | RangeColumnFilter | StarRatingColumnFilter;
+export type ColumnFilter = 
+  | SelectColumnFilter 
+  | RangeColumnFilter 
+  | RangeSliderColumnFilter
+  | StarRatingColumnFilter;
 
 export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

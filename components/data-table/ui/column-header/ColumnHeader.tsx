@@ -9,13 +9,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { SelectColumnFilter, RangeColumnFilter, StarRatingColumnFilter } from "../../types";
+import { ColumnFilter } from "../../types";
 import { ColumnActions } from "./ColumnActions";
 
 interface DataTableColumnHeaderProps<TData, TValue> {
   column: Column<TData, TValue>;
   title: React.ReactNode;
-  filterConfig?: SelectColumnFilter | RangeColumnFilter | StarRatingColumnFilter;
+  filterConfig?: ColumnFilter;
   onAggregationChange?: (columnId: string, aggregationFn: string) => void;
 }
 

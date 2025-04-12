@@ -91,8 +91,14 @@ export function useDataTableLogic<TData, TValue>({
       if (hasFilterFn) {
         const columnId = col.id || (('accessorKey' in col) ? String(col.accessorKey) : undefined);
         if (columnId) {
-          // Determine filter type based on column definition
-          if (col.filterFn === 'numberRange' || 
+          // First check if there's a filterConfig in meta
+          const colMeta = col.meta as Record<string, unknown> | undefined;
+          if (colMeta && 'filterConfig' in colMeta && colMeta.filterConfig) {
+            // Use the filter config from meta
+            acc.push(colMeta.filterConfig as ColumnFilter);
+          }
+          // If no filterConfig in meta, determine filter type based on column definition
+          else if (col.filterFn === 'numberRange' || 
               (typeof col.filterFn === 'string' && col.filterFn.includes('range'))) {
             // Create a range filter
             acc.push({
@@ -111,7 +117,6 @@ export function useDataTableLogic<TData, TValue>({
           } else {
             // Try to determine if this could be a select filter by checking for enumerable values
             // Safe check for meta.options property
-            const colMeta = col.meta as { options?: FilterOption[] } | undefined;
             const hasOptions = colMeta && 'options' in colMeta && Array.isArray(colMeta.options);
             
             if (hasOptions && colMeta.options) {
@@ -120,7 +125,7 @@ export function useDataTableLogic<TData, TValue>({
                 type: 'select',
                 column: columnId,
                 label: typeof col.header === 'string' ? col.header : columnId,
-                options: colMeta.options
+                options: colMeta.options as FilterOption[]
               });
             }
             // You can add more filter type detection logic here if needed
