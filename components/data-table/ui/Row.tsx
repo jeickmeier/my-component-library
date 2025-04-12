@@ -50,13 +50,21 @@ export function TableRowComponent<TData>({
     ? 1000 - stickyPosition // High z-index but lower than header's 2000
     : undefined;
 
+  // Handle row click for parent rows
+  const handleRowClick = () => {
+    if (isParentRow) {
+      row.toggleExpanded();
+    }
+  };
+
   return (
     <TableRow
       data-index={virtualRow.index}
       data-state={row.getIsSelected() && "selected"}
       className={`flex items-center w-full ${
         isSticky ? "sticky backdrop-blur bg-background/95 border-b border-border z-5" : ""
-      } ${isParentRow ? "bg-gray-100" : ""}`}
+      } ${isParentRow ? "bg-gray-100 cursor-pointer" : ""}`}
+      onClick={handleRowClick}
       ref={(node: HTMLTableRowElement | null) => {
         if (node) {
           // Measure the element for dynamic height
@@ -92,7 +100,8 @@ export function TableRowComponent<TData>({
                 variant="ghost"
                 size="icon"
                 className="mr-1 h-4 w-4 p-0"
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   row.toggleExpanded();
                 }}
               >
