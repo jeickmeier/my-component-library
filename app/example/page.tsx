@@ -53,6 +53,8 @@ export default function DemoPage() {
         columnFilters={columnFilters}
         enableGrouping={true}
         groupableColumns={groupableColumns}
+        defaultPageSize={50}
+        containerHeight="65vh" 
       />
     </div>
   );

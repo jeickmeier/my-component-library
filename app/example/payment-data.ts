@@ -14,5 +14,13 @@ export const paymentData = Array.from({ length: 50000 }, (_, i) => {
   // Email based on index
   const email = `user${i + 1}@example.com`;
 
-  return { id, amount, status, email };
+  // Review rating between 1 and 5
+  const reviewRating = Math.floor(Math.random() * 5) + 1;
+
+  // Random review date within the last year
+  const now = new Date();
+  const oneYearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+  const reviewDate = new Date(oneYearAgo.getTime() + Math.random() * (now.getTime() - oneYearAgo.getTime()));
+
+  return { id, amount, status, email, reviewRating, reviewDate };
 }) as Payment[];

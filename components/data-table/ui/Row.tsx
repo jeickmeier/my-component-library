@@ -54,7 +54,9 @@ export function TableRowComponent<TData>({
     <TableRow
       data-index={virtualRow.index}
       data-state={row.getIsSelected() && "selected"}
-      className={isSticky ? "sticky-group-header" : ""}
+      className={`flex items-center w-full ${
+        isSticky ? "sticky-group-header bg-background shadow-sm border-b border-border" : ""
+      } ${isParentRow ? "bg-gray-100" : ""}`}
       ref={(node: HTMLTableRowElement | null) => {
         if (node) {
           // Measure the element for dynamic height
@@ -66,30 +68,22 @@ export function TableRowComponent<TData>({
       style={{
         position: isSticky ? "sticky" : "absolute",
         top: isSticky ? stickyTop : 0,
-        left: 0,
-        width: "100%",
         height: `${virtualRow.size}px`,
         transform: isSticky ? "none" : `translateY(${virtualRow.start}px)`,
-        display: "flex",
-        alignItems: "center",
         zIndex: stickyZIndex,
-        backgroundColor: isSticky ? "var(--background)" : undefined,
-        boxShadow: isSticky ? "0 1px 3px rgba(0,0,0,0.1)" : undefined,
-        borderBottom: isSticky ? "1px solid var(--border)" : undefined,
       }}
     >
       {row.getVisibleCells().map((cell) => (
         <TableCell
           key={cell.id}
-          className={grouping.includes(cell.column.id) ? "font-medium" : ""}
+          className={`overflow-hidden text-ellipsis whitespace-nowrap ${
+            grouping.includes(cell.column.id) ? "font-medium" : ""
+          }`}
           style={{
             flex: cell.column.getSize() ? `${cell.column.getSize()} 0 0` : 1,
             width: cell.column.getSize()
               ? `${cell.column.getSize()}px`
               : "auto",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
           }}
         >
           {grouping.includes(cell.column.id) && row.subRows?.length > 0 ? (
@@ -109,14 +103,17 @@ export function TableRowComponent<TData>({
                 )}
               </Button>
               <span
+                className="block overflow-hidden text-ellipsis"
                 style={{
                   paddingLeft: `${row.depth * 2}rem`,
-                  display: "block",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
                 }}
               >
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                {flexRender(
+                  cell.getIsAggregated() && cell.column.columnDef.aggregatedCell
+                    ? cell.column.columnDef.aggregatedCell
+                    : cell.column.columnDef.cell, 
+                  cell.getContext()
+                )}
               </span>
               <span className="ml-2 text-xs text-muted-foreground">
                 ({row.subRows.length})
@@ -124,14 +121,17 @@ export function TableRowComponent<TData>({
             </div>
           ) : (
             <span
+              className="block overflow-hidden text-ellipsis"
               style={{
-                paddingLeft: `${row.depth * 2}rem`,
-                display: "block",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
+                paddingLeft: grouping.includes(cell.column.id) ? `${row.depth * 2}rem` : 0,
               }}
             >
-              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              {flexRender(
+                cell.getIsAggregated() && cell.column.columnDef.aggregatedCell
+                  ? cell.column.columnDef.aggregatedCell
+                  : cell.column.columnDef.cell, 
+                cell.getContext()
+              )}
             </span>
           )}
         </TableCell>

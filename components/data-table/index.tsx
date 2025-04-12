@@ -17,8 +17,8 @@ export type {
 
 // Export all sub-components (for those who want direct access)
 export { DataTable, createColumn };
-export { DataTableToolbar } from "./ui/Toolbar";
-export { DataTableGroupingControl } from "./ui/GroupingControl";
+export { DataTableToolbar } from "./ui/toolbar/Toolbar";
+export { DataTableGroupingControl, TableCustomizationControl } from "./ui/toolbar/TableCustomizationControl";
 export { DataTableStructure } from "./core/Structure";
 export { DataTableFooter } from "./ui/Footer";
 export { useDataTableLogic } from "./hooks/useDataTableLogic";

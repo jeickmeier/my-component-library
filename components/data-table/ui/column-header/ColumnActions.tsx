@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { ColumnFilter } from "../filters/ColumnFilter";
+import { ColumnFilter } from "./filters/ColumnFilter";
 import { AggregationMenu } from "./AggregationMenu";
 import { SelectColumnFilter, RangeColumnFilter } from "../../types";
 

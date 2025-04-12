@@ -47,6 +47,7 @@ export function useDataTableLogic<TData, TValue>({
   columns,
   enableGrouping = false,
   groupableColumns = [],
+  defaultPageSize = 50,
 }: DataTableProps<TData, TValue>): UseDataTableLogicReturn<TData> {
   // State
   const [isClient, setIsClient] = React.useState(false);
@@ -60,7 +61,7 @@ export function useDataTableLogic<TData, TValue>({
   const [expanded, setExpanded] = React.useState<ExpandedState>({});
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: defaultPageSize,
   });
   const [isGroupingDialogOpen, setIsGroupingDialogOpen] = React.useState(false);
   const [forceRenderCount, setForceRenderCount] = React.useState(0);

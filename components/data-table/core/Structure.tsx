@@ -6,7 +6,6 @@ import {
   Row,
   GroupingState,
 } from "@tanstack/react-table";
-import { ClientTableBody } from "./ClientBody";
 import {
   Table,
   TableBody,
@@ -15,6 +14,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
+import { ClientTableBody } from "./ClientBody";
 import { DataTableColumnHeader } from "../ui/column-header/ColumnHeader";
 import { ColumnFilter } from "../types";
 
@@ -30,6 +31,7 @@ interface DataTableStructureProps<TData, TValue> {
   grouping: GroupingState;
   headerRef: React.RefObject<HTMLTableSectionElement | null>;
   columnFilters?: ColumnFilter[];
+  containerHeight?: string;
 }
 
 // Memoized table header component to prevent re-renders
@@ -38,12 +40,18 @@ const MemoizedTableHeader = React.memo(function TableHeaderComponent<TData>({
   headerRef,
   getFilterConfigForColumn,
   onAggregationChange,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  columnVisibility,
 }: {
   table: ReactTable<TData>;
   headerRef: React.RefObject<HTMLTableSectionElement | null>;
   getFilterConfigForColumn: (columnId: string) => ColumnFilter | undefined;
   onAggregationChange: (columnId: string, aggregationFn: string) => void;
+  columnVisibility: Record<string, boolean>; // Will force re-render when changed
 }) {
+  // We use columnVisibility as a dependency to force re-renders
+  // when visibility changes, even though we don't reference it directly
+  
   return (
     <Table
       style={{
@@ -70,32 +78,39 @@ const MemoizedTableHeader = React.memo(function TableHeaderComponent<TData>({
               display: "flex",
               width: "100%",
             }}
+            className="flex-auto"
           >
-            {headerGroup.headers.map((header) => (
-              <TableHead
-                key={header.id}
-                style={{
-                  flex: header.column.getSize()
-                    ? `${header.column.getSize()} 0 0`
-                    : 1,
-                  width: header.column.getSize()
-                    ? `${header.column.getSize()}px`
-                    : "auto",
-                }}
-              >
-                {header.isPlaceholder ? null : (
-                  <DataTableColumnHeader
-                    column={header.column}
-                    title={flexRender(
-                      header.column.columnDef.header,
-                      header.getContext(),
-                    )}
-                    filterConfig={getFilterConfigForColumn(header.column.id)}
-                    onAggregationChange={onAggregationChange}
-                  />
-                )}
-              </TableHead>
-            ))}
+            {headerGroup.headers
+              // Only include headers that have at least one visible leaf column
+              .filter(header => 
+                // Check if this header or any of its children are visible
+                header.column.getLeafColumns().some(column => column.getIsVisible())
+              )
+              .map((header) => (
+                <TableHead
+                  key={header.id}
+                  style={{
+                    flex: header.column.getSize()
+                      ? `${header.column.getSize()} 0 0`
+                      : 1,
+                    width: header.column.getSize()
+                      ? `${header.column.getSize()}px`
+                      : "auto",
+                  }}
+                >
+                  {header.isPlaceholder ? null : (
+                    <DataTableColumnHeader
+                      column={header.column}
+                      title={flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                      filterConfig={getFilterConfigForColumn(header.column.id)}
+                      onAggregationChange={onAggregationChange}
+                    />
+                  )}
+                </TableHead>
+              ))}
           </TableRow>
         ))}
       </TableHeader>
@@ -106,6 +121,7 @@ const MemoizedTableHeader = React.memo(function TableHeaderComponent<TData>({
   headerRef: React.RefObject<HTMLTableSectionElement | null>;
   getFilterConfigForColumn: (columnId: string) => ColumnFilter | undefined;
   onAggregationChange: (columnId: string, aggregationFn: string) => void;
+  columnVisibility: Record<string, boolean>;
 }) => React.ReactElement;
 
 // New DataTableStructure component
@@ -120,9 +136,13 @@ export function DataTableStructure<TData, TValue>({
   grouping,
   headerRef,
   columnFilters = [],
+  containerHeight = "400px", // Default height if none provided
 }: DataTableStructureProps<TData, TValue>) {
   // Separate state for body updates only
   const [bodyUpdateCounter, setBodyUpdateCounter] = React.useState(0);
+
+  // Get column visibility from table state to force re-renders when it changes
+  const columnVisibility = table.getState().columnVisibility;
 
   // Helper function to find filter config for a column
   const getFilterConfigForColumn = React.useCallback(
@@ -188,6 +208,7 @@ export function DataTableStructure<TData, TValue>({
         headerRef={headerRef}
         getFilterConfigForColumn={getFilterConfigForColumn}
         onAggregationChange={handleAggregationChange}
+        columnVisibility={columnVisibility}
       />
 
       {/* Scrollable table body that will re-render when needed */}
@@ -195,7 +216,7 @@ export function DataTableStructure<TData, TValue>({
         ref={tableContainerRef}
         className="virtualized-table-container"
         style={{
-          height: "400px",
+          height: containerHeight,
           position: "relative",
           willChange: "transform",
           overflowX: "auto",

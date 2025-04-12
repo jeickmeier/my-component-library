@@ -8,6 +8,7 @@ declare module "@tanstack/react-table" {
 
   interface AggregationFns {
     range: AggregationFn<unknown>;
+    first: true;
   }
 }
 
@@ -39,4 +40,6 @@ export interface DataTableProps<TData, TValue> {
   columnFilters?: ColumnFilter[];
   enableGrouping?: boolean;
   groupableColumns?: string[];
+  defaultPageSize?: number; // Number of rows to display per page
+  containerHeight?: string; // CSS height value (e.g., '500px', '70vh', 'calc(100vh - 200px)')
 }
