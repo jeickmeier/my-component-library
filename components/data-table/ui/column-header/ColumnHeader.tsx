@@ -9,13 +9,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { SelectColumnFilter, RangeColumnFilter } from "../../types";
+import { SelectColumnFilter, RangeColumnFilter, StarRatingColumnFilter } from "../../types";
 import { ColumnActions } from "./ColumnActions";
 
 interface DataTableColumnHeaderProps<TData, TValue> {
   column: Column<TData, TValue>;
   title: React.ReactNode;
-  filterConfig?: SelectColumnFilter | RangeColumnFilter;
+  filterConfig?: SelectColumnFilter | RangeColumnFilter | StarRatingColumnFilter;
   onAggregationChange?: (columnId: string, aggregationFn: string) => void;
 }
 
@@ -30,7 +30,7 @@ export function DataTableColumnHeader<TData, TValue>({
 
   if (!isSortable) {
     return (
-      <div className="h-full flex items-center px-2 p-0 m-0 cursor-default ">
+      <div className="h-full flex items-center px-2 p-0 m-0 cursor-default">
         <div className="flex-1 truncate">{title}</div>
       </div>
     );
@@ -45,16 +45,16 @@ export function DataTableColumnHeader<TData, TValue>({
         >
           <div className="flex items-center w-full h-full px-2">
             <div className="flex-1 truncate text-left">{title}</div>
-            <div className="ml-2 flex aspect-square items-center justify-center">
+            <div className="ml-1.5 flex items-center justify-center gap-0.5">
               {column.getIsSorted() === "desc" ? (
-                <ArrowDown className="h-3.5 w-3.5" />
+                <ArrowDown className="h-3.5 w-3.5 text-primary" />
               ) : column.getIsSorted() === "asc" ? (
-                <ArrowUp className="h-3.5 w-3.5" />
+                <ArrowUp className="h-3.5 w-3.5 text-primary" />
               ) : (
-                <ArrowUpDown className="h-3.5 w-3.5" />
+                <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground/70" />
               )}
               {column.getIsFiltered() && (
-                <Filter className="h-3.5 w-3.5 ml-1" />
+                <Filter className="h-3.5 w-3.5 ml-0.5 text-primary" />
               )}
             </div>
           </div>
@@ -62,7 +62,7 @@ export function DataTableColumnHeader<TData, TValue>({
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="start">
+      <DropdownMenuContent align="start" className="p-0">
         <ColumnActions
           column={column}
           filterConfig={filterConfig}

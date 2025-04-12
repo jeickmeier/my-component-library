@@ -4,6 +4,7 @@ import { ColumnDef, FilterFn, AggregationFn } from "@tanstack/react-table";
 declare module "@tanstack/react-table" {
   interface FilterFns {
     numberRange: FilterFn<unknown>;
+    starRating: FilterFn<unknown>;
   }
 
   interface AggregationFns {
@@ -32,7 +33,14 @@ export interface RangeColumnFilter {
   max?: number;
 }
 
-export type ColumnFilter = SelectColumnFilter | RangeColumnFilter;
+export interface StarRatingColumnFilter {
+  type: "starRating";
+  column: string;
+  label: string;
+  maxStars?: number;
+}
+
+export type ColumnFilter = SelectColumnFilter | RangeColumnFilter | StarRatingColumnFilter;
 
 export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

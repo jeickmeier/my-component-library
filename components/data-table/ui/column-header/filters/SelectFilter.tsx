@@ -8,6 +8,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SelectColumnFilter } from "@/components/data-table/types";
+import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface SelectFilterProps<TData> {
   column: Column<TData, unknown>;
@@ -18,17 +20,22 @@ export function SelectFilter<TData>({
   column,
   filter,
 }: SelectFilterProps<TData>) {
+  const currentValue = (column.getFilterValue() as string) || "all";
+  
+  const clearFilter = React.useCallback(() => {
+    column.setFilterValue(undefined);
+  }, [column]);
+
   return (
-    <div className="flex items-center space-x-2">
-      <p className="text-sm font-medium">{filter.label}:</p>
+    <div className="relative w-full">
       <Select
-        value={(column.getFilterValue() as string) || "all"}
+        value={currentValue}
         onValueChange={(value) => {
           column.setFilterValue(value === "all" ? undefined : value);
         }}
       >
-        <SelectTrigger className="h-8 w-36">
-          <SelectValue placeholder={`All ${filter.label}`} />
+        <SelectTrigger className="h-8 min-h-8 w-full text-sm pr-7">
+          <SelectValue placeholder={`All`} />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All</SelectItem>
@@ -39,6 +46,17 @@ export function SelectFilter<TData>({
           ))}
         </SelectContent>
       </Select>
+      {currentValue !== "all" && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-6 w-6 absolute right-7 top-1 p-0 opacity-70 hover:opacity-100"
+          onClick={clearFilter}
+        >
+          <X className="h-3.5 w-3.5" />
+          <span className="sr-only">Clear filter</span>
+        </Button>
+      )}
     </div>
   );
 }

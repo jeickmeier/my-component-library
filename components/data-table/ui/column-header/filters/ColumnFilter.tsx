@@ -10,14 +10,16 @@ import {
 import {
   SelectColumnFilter,
   RangeColumnFilter,
+  StarRatingColumnFilter,
 } from "@/components/data-table/types";
 import { SelectFilter } from "./SelectFilter";
 import { RangeFilter } from "./RangeFilter";
 import { TextFilter } from "./TextFilter";
+import { StarRatingFilter } from "./StarRatingFilter";
 
 interface ColumnFilterProps<TData, TValue> {
   column: Column<TData, TValue>;
-  filterConfig?: SelectColumnFilter | RangeColumnFilter;
+  filterConfig?: SelectColumnFilter | RangeColumnFilter | StarRatingColumnFilter;
 }
 
 export function ColumnFilter<TData, TValue>({
@@ -35,6 +37,8 @@ export function ColumnFilter<TData, TValue>({
         return <SelectFilter column={column} filter={filterConfig} />;
       case "range":
         return <RangeFilter column={column} filter={filterConfig} />;
+      case "starRating":
+        return <StarRatingFilter column={column} filter={filterConfig} />;
       default:
         // Default to a simple text filter
         return <TextFilter column={column} />;

@@ -16,6 +16,7 @@ export type {
   FilterOption,
   SelectColumnFilter,
   RangeColumnFilter,
+  StarRatingColumnFilter,
 } from "./types";
 
 // Export all sub-components (for those who want direct access)

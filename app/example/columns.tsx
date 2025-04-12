@@ -27,7 +27,6 @@ const iconCategoryRenderer = createCategoryRenderer<Payment, Payment['status']>(
     pending: { 
       type: 'icon',
       icon: <Clock className="h-4 w-4 text-yellow-500" />,
-      label: "Awaiting Payment"
     },
     processing: { 
       type: 'icon',
@@ -80,6 +79,10 @@ export const columns = [
     header: "Rating",
     enableGrouping: false,
     aggregationFn: 'mean',
+    filterFn: 'starRating',
+    meta: {
+      maxStars: 5
+    },
     cell: (props) => starRenderer({ cell: props.cell, row: props.row, value: props.getValue() }),
     aggregatedCell: (props) => starRenderer({ cell: props.cell, row: props.row, value: props.getValue() })
   }),

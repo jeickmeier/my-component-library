@@ -19,7 +19,8 @@ import {
 import { DataTableProps, ColumnFilter, FilterOption } from "../types";
 
 import { 
-  numberRangeFilterFn 
+  numberRangeFilterFn,
+  starRatingFilterFn
 } from "../utils/filterFunctions";
 
 import {
@@ -98,6 +99,14 @@ export function useDataTableLogic<TData, TValue>({
               type: 'range',
               column: columnId,
               label: typeof col.header === 'string' ? col.header : columnId
+            });
+          } else if (col.filterFn === 'starRating') {
+            // Create a star rating filter
+            acc.push({
+              type: 'starRating',
+              column: columnId,
+              label: typeof col.header === 'string' ? col.header : columnId,
+              maxStars: (col.meta as { maxStars?: number } | undefined)?.maxStars || 5
             });
           } else {
             // Try to determine if this could be a select filter by checking for enumerable values
@@ -280,7 +289,8 @@ export function useDataTableLogic<TData, TValue>({
     },
 
     filterFns: {
-      numberRange: numberRangeFilterFn, // Add additional filter functions here
+      numberRange: numberRangeFilterFn,
+      starRating: starRatingFilterFn,
     },
     aggregationFns: {
       first: firstAggregation,

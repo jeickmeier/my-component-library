@@ -26,6 +26,7 @@ export interface RatingOptions {
   showNumeric?: boolean;
   starClassName?: string;
   emptyStarClassName?: string;
+  digits?: number;
 }
 
 type CategoryStyle<T extends string> = {

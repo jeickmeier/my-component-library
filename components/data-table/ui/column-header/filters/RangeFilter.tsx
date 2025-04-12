@@ -2,6 +2,8 @@ import * as React from "react";
 import { Column } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import { RangeColumnFilter } from "@/components/data-table/types";
+import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface RangeFilterProps<TData> {
   column: Column<TData, unknown>;
@@ -10,6 +12,8 @@ interface RangeFilterProps<TData> {
 
 export function RangeFilter<TData>({
   column,
+  // We're not using the filter parameter anymore, but keep it in the interface for consistency
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   filter,
 }: RangeFilterProps<TData>) {
   const [minValue, setMinValue] = React.useState<string>("");
@@ -46,34 +50,55 @@ export function RangeFilter<TData>({
     [column],
   );
 
+  const clearFilter = React.useCallback(() => {
+    setMinValue("");
+    setMaxValue("");
+    column.setFilterValue(undefined);
+  }, [column]);
+
+  const hasValue = minValue !== "" || maxValue !== "";
+
   return (
-    <div className="flex items-center space-x-2">
-      <p className="text-sm font-medium">{filter.label}:</p>
-      <div className="flex items-center space-x-2">
-        <Input
-          type="number"
-          placeholder={`Min ${filter.label}`}
-          className="h-8 w-24"
-          value={minValue}
-          onChange={(event) => {
-            const newMinValue = event.target.value;
-            setMinValue(newMinValue);
-            updateFilterValue(newMinValue, maxValue);
-          }}
-        />
-        <span>-</span>
-        <Input
-          type="number"
-          placeholder={`Max ${filter.label}`}
-          className="h-8 w-24"
-          value={maxValue}
-          onChange={(event) => {
-            const newMaxValue = event.target.value;
-            setMaxValue(newMaxValue);
-            updateFilterValue(minValue, newMaxValue);
-          }}
-        />
+    <div className="w-full">
+      <div className="grid grid-cols-2 gap-1.5 w-full">
+        <div className="relative w-full">
+          <Input
+            type="number"
+            placeholder="Min"
+            className="h-8 min-h-8 text-sm w-full"
+            value={minValue}
+            onChange={(event) => {
+              const newMinValue = event.target.value;
+              setMinValue(newMinValue);
+              updateFilterValue(newMinValue, maxValue);
+            }}
+          />
+        </div>
+        <div className="relative w-full">
+          <Input
+            type="number"
+            placeholder="Max"
+            className="h-8 min-h-8 text-sm w-full"
+            value={maxValue}
+            onChange={(event) => {
+              const newMaxValue = event.target.value;
+              setMaxValue(newMaxValue);
+              updateFilterValue(minValue, newMaxValue);
+            }}
+          />
+        </div>
       </div>
+      {hasValue && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 w-full mt-1 text-xs p-0 opacity-70 hover:opacity-100"
+          onClick={clearFilter}
+        >
+          <X className="h-3 w-3 mr-1" />
+          Clear
+        </Button>
+      )}
     </div>
   );
 }

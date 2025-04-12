@@ -8,7 +8,8 @@ const StarRatingComponent = ({ value, options }: { value: number; options: Ratin
     emptyChar = "☆",
     showNumeric = true,
     starClassName = "text-yellow-500",
-    emptyStarClassName = "text-gray-300"
+    emptyStarClassName = "text-gray-300",
+    digits = 1
   } = options;
 
   const filledStars = Math.round(Math.min(Math.max(value, 0), maxStars));
@@ -18,7 +19,7 @@ const StarRatingComponent = ({ value, options }: { value: number; options: Ratin
     <div className="flex items-center">
       <span className={starClassName}>{starChar.repeat(filledStars)}</span>
       <span className={emptyStarClassName}>{emptyChar.repeat(emptyStars)}</span>
-      {showNumeric && <span className="ml-2">{value.toFixed(3)}/{maxStars}</span>}
+      {showNumeric && <span className="ml-2">{value.toFixed(digits)}/{maxStars}</span>}
     </div>
   );
 };
