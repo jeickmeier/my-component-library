@@ -5,7 +5,6 @@ import { TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { TableRowComponent } from "../ui/Row";
 import { useTableVirtualization } from "../hooks/useTableVirtualization";
 import { useStickyGroupHeaders } from "../hooks/useStickyGroupHeaders";
-import { useTableStyles } from "../utils/tableStyles";
 
 // Update ClientTableBody props to be generic
 interface ClientTableBodyProps<TData, TValue> {
@@ -28,9 +27,6 @@ export function ClientTableBody<TData, TValue>({
   columns,
   bodyUpdateCounter, // Add the prop here
 }: ClientTableBodyProps<TData, TValue>) {
-  // Apply table styles
-  useTableStyles();
-
   // Setup virtualization
   const virtualizer = useTableVirtualization({
     rows,
@@ -81,6 +77,7 @@ export function ClientTableBody<TData, TValue>({
         contain: "strict",
         zIndex: 1,
       }}
+      className="z-1 relative"
     >
       {virtualRows.map((virtualRow) => {
         const row = rows[virtualRow.index];

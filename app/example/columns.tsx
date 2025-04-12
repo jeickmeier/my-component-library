@@ -1,6 +1,8 @@
 "use client"
 
-import { ColumnDef } from "@tanstack/react-table"
+import { createColumnHelper } from "@tanstack/react-table"
+import { createMoneyRenderer, createCategoryRenderer, createStarRatingRenderer, createDateRenderer, createExtentRenderer } from "@/components/data-table/ui/cell-renderers"
+import { CheckCircle, Clock, RefreshCcw, XCircle } from "lucide-react"
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -13,133 +15,71 @@ export type Payment = {
   reviewDate: Date
 }
 
-export const columns: ColumnDef<Payment>[] = [
-  {
-    accessorKey: "status",
+const columnHelper = createColumnHelper<Payment>();
+
+// Create reusable renderers with proper typing
+const moneyRenderer = createMoneyRenderer<Payment>({ digits: 2, showCurrencySymbol: false });
+const moneyAggregatedRenderer = createMoneyRenderer<Payment>({ digits: 1, abbreviate: true, abbreviationDivider: 'B' });
+
+// Example using icons
+const iconCategoryRenderer = createCategoryRenderer<Payment, Payment['status']>({
+  categories: {
+    pending: { 
+      type: 'icon',
+      icon: <Clock className="h-4 w-4 text-yellow-500" />,
+      label: "Awaiting Payment"
+    },
+    processing: { 
+      type: 'icon',
+      icon: <RefreshCcw className="h-4 w-4 text-blue-500" />
+    },
+    success: { 
+      type: 'icon',
+      icon: <CheckCircle className="h-4 w-4 text-green-500" />
+    },
+    failed: { 
+      type: 'icon',
+      icon: <XCircle className="h-4 w-4 text-red-500" />
+    }
+  }
+});
+
+
+
+const starRenderer = createStarRatingRenderer<Payment>();
+const dateRenderer = createDateRenderer<Payment>();
+const extentRenderer = createExtentRenderer<Payment>();
+
+export const columns = [
+  columnHelper.accessor('status', {
     header: "Status",
     enableGrouping: true,
     aggregationFn: 'first',
-    cell: ({ row }) => {
-      const status = row.getValue("status") as string
-      return (
-        <div className="flex items-center">
-          <span className={`mr-2 h-2 w-2 rounded-full ${
-            status === "pending" ? "bg-yellow-500" :
-            status === "processing" ? "bg-blue-500" :
-            status === "success" ? "bg-green-500" :
-            "bg-red-500"
-          }`} />
-          <span className="capitalize">{status}</span>
-        </div>
-      )
-    },
-    aggregatedCell: ({ row }) => {
-      const status = row.getValue("status") as string
-      return (
-        <div className="flex items-center">
-          <span className={`mr-2 h-2 w-2 rounded-full ${
-            status === "pending" ? "bg-yellow-500" :
-            status === "processing" ? "bg-blue-500" :
-            status === "success" ? "bg-green-500" :
-            "bg-red-500"
-          }`} />
-          <span className="capitalize">{status} (First)</span>
-        </div>
-      )
-    }
-  },
-  {
-    accessorKey: "email",
+    cell: (props) => iconCategoryRenderer({ cell: props.cell, row: props.row, value: props.getValue() })
+  }),
+  columnHelper.accessor('email', {
     header: "Email",
     enableGrouping: true,
-  },
-  {
-    accessorKey: "amount",
+  }),
+  columnHelper.accessor('amount', {
     header: "Amount",
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"))
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount)
- 
-      return <div className="text-right font-medium">{formatted}</div>
-    },
     filterFn: 'numberRange',
     aggregationFn: 'first',
-    aggregatedCell: ({ row }) => {
-      const value = row.getValue("amount")
-      
-      if (value == null) return null
-      
-      // Format as currency
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(Number(value))
-      
-      return <div className="text-right font-medium">{formatted}</div>
-    },
-  },
-  {
-    accessorKey: "reviewRating",
+    cell: (props) => moneyRenderer({ cell: props.cell, row: props.row, value: props.getValue() }),
+    aggregatedCell: (props) => moneyAggregatedRenderer({ cell: props.cell, row: props.row, value: props.getValue() })
+  }),
+  columnHelper.accessor('reviewRating', {
     header: "Rating",
     enableGrouping: true,
-    cell: ({ row }) => {
-      const rating = row.getValue("reviewRating") as number
-      return (
-        <div className="flex items-center">
-          <div className="flex">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <span key={i} className={`text-lg ${i < rating ? "text-yellow-500" : "text-gray-300"}`}>
-                ★
-              </span>
-            ))}
-          </div>
-          <span className="ml-2">{rating.toFixed(3)}/5 (Avg)</span>
-        </div>
-      )
-    },
     aggregationFn: 'mean',
-    aggregatedCell: ({ row }) => {
-      const rating = row.getValue("reviewRating") as number
-
-      return (
-        <div className="flex items-center">
-          <div className="flex">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <span key={i} className={`text-lg ${i < rating ? "text-yellow-500" : "text-gray-300"}`}>
-                ★
-              </span>
-            ))}
-          </div>
-          <span className="ml-2">{rating.toFixed(3)}/5 (Avg)</span>
-        </div>
-      )
-    }
-  },
-  {
-    accessorKey: "reviewDate",
+    cell: (props) => starRenderer({ cell: props.cell, row: props.row, value: props.getValue() }),
+    aggregatedCell: (props) => starRenderer({ cell: props.cell, row: props.row, value: props.getValue() })
+  }),
+  columnHelper.accessor('reviewDate', {
     header: "Review Date",
     enableGrouping: true,
-    cell: ({ row }) => {
-      const date = row.getValue("reviewDate") as Date
-      return (
-        <div>
-          {date.toLocaleDateString()}
-        </div>
-      )
-    },
-    aggregationFn: 'max',
-    aggregatedCell: ({ row }) => {
-      const date = row.getValue("reviewDate") as Date
-      if (!date) return null
-      
-      return (
-        <div>
-          {date.toLocaleDateString()} (Latest)
-        </div>
-      )
-    }
-  },
-]
+    aggregationFn: 'extent',
+    cell: (props) => dateRenderer({ cell: props.cell, row: props.row, value: props.getValue() }),
+    aggregatedCell: (props) => extentRenderer({ cell: props.cell, row: props.row, value: props.getValue() })
+  })
+];

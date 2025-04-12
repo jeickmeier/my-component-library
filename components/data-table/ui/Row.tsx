@@ -55,7 +55,7 @@ export function TableRowComponent<TData>({
       data-index={virtualRow.index}
       data-state={row.getIsSelected() && "selected"}
       className={`flex items-center w-full ${
-        isSticky ? "sticky-group-header bg-background shadow-sm border-b border-border" : ""
+        isSticky ? "sticky backdrop-blur bg-background/95 border-b border-border z-5" : ""
       } ${isParentRow ? "bg-gray-100" : ""}`}
       ref={(node: HTMLTableRowElement | null) => {
         if (node) {

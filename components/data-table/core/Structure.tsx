@@ -63,7 +63,7 @@ const MemoizedTableHeader = React.memo(function TableHeaderComponent<TData>({
     >
       <TableHeader
         ref={headerRef}
-        className="sticky-table-header"
+        className="sticky top-0 z-10 bg-background shadow-sm w-full"
         style={{
           width: "100%",
           position: "sticky",
@@ -214,7 +214,7 @@ export function DataTableStructure<TData, TValue>({
       {/* Scrollable table body that will re-render when needed */}
       <div
         ref={tableContainerRef}
-        className="virtualized-table-container"
+        className="relative z-0 overflow-auto"
         style={{
           height: containerHeight,
           position: "relative",

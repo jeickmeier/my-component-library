@@ -1,5 +1,8 @@
 "use client";
 
+// Import CSS
+import "./ui/tooltips.css";
+
 // Import from core directory
 import { DataTable } from "./core/DataTable";
 
@@ -24,4 +27,3 @@ export { DataTableFooter } from "./ui/Footer";
 export { useDataTableLogic } from "./hooks/useDataTableLogic";
 export { useTableVirtualization } from "./hooks/useTableVirtualization";
 export { useStickyGroupHeaders } from "./hooks/useStickyGroupHeaders";
-export { useTableStyles } from "./utils/tableStyles";

@@ -17,7 +17,10 @@ import {
 } from "@tanstack/react-table";
 import { DataTableProps } from "../types";
 
-import { numberRangeFilterFn } from "../utils/filterFunctions";
+import { 
+  numberRangeFilterFn 
+} from "../utils/filterFunctions";
+
 import {
   firstAggregation,
   AggregationFunction,
@@ -202,6 +205,7 @@ export function useDataTableLogic<TData, TValue>({
       median: aggregationFns.median,
       unique: aggregationFns.unique,
       uniqueCount: aggregationFns.uniqueCount,
+      extent: aggregationFns.extent,
     } as Record<string, AggregationFunction>,
 
     enableGrouping,
@@ -210,7 +214,6 @@ export function useDataTableLogic<TData, TValue>({
     // These options help with aggregation recalculation
     autoResetExpanded: false,
 
-    debugTable: true,
     defaultColumn: {
       size: 150,
       minSize: 50,
@@ -218,6 +221,8 @@ export function useDataTableLogic<TData, TValue>({
     },
     autoResetPageIndex: false,
     meta: tableMeta,
+
+    debugTable: true,
   });
 
   // Store table reference for use in meta methods

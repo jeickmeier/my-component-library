@@ -1,0 +1,5 @@
+/* Custom CSS for dropdowns and tooltips that can't be handled with Tailwind classes */
+[data-state="open"],
+[data-state="delayed-open"] {
+  z-index: 9999 !important;
+}
