@@ -30,17 +30,18 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
     rowRefsMap,
     isMountedRef,
     groupableColumnObjects,
+    discoveredColumnFilters,
   } = useDataTableLogic(props); // Use the hook
 
   // Destructure props needed here or pass `props` down
-  const { columns, data, columnFilters = [], enableGrouping = false, containerHeight } = props;
+  const { columns, data, enableGrouping = false, containerHeight } = props;
 
   return (
     <div className="space-y-1">
       {/* Consolidated Toolbar */}
       <DataTableToolbar
         table={table as unknown as ReactTable<unknown>}
-        columnFilters={columnFilters}
+        columnFilters={discoveredColumnFilters}
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
         groupableColumnObjects={groupableColumnObjects}
@@ -60,7 +61,7 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
         isMountedRef={isMountedRef}
         grouping={grouping}
         headerRef={headerRef}
-        columnFilters={columnFilters}
+        columnFilters={discoveredColumnFilters}
         containerHeight={containerHeight}
       />
 

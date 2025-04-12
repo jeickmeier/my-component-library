@@ -71,8 +71,12 @@ export function ColumnOrderingPanel({
     })
   );
 
+  // Keep a local copy of orderedColumns that's derived from props but doesn't
+  // directly update the parent state until drag ends
+  const [localOrderedColumns, setLocalOrderedColumns] = React.useState<ColumnOrderItem[]>([]);
+  
   // Initialize the ordered columns based on columnOrder state and available columns
-  const orderedColumns = React.useMemo(() => {
+  React.useEffect(() => {
     // Create a map of all columns
     const columnsMap = new Map(columns.map(c => [c.id, c]));
     
@@ -89,7 +93,7 @@ export function ColumnOrderingPanel({
       }
     });
     
-    return ordered;
+    setLocalOrderedColumns(ordered);
   }, [columns, columnOrder]);
 
   // Handle drag end event
@@ -97,16 +101,25 @@ export function ColumnOrderingPanel({
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      const oldIndex = orderedColumns.findIndex(col => col.id === active.id);
-      const newIndex = orderedColumns.findIndex(col => col.id === over.id);
+      const oldIndex = localOrderedColumns.findIndex(col => col.id === active.id);
+      const newIndex = localOrderedColumns.findIndex(col => col.id === over.id);
 
-      const newOrderedColumns = arrayMove(orderedColumns, oldIndex, newIndex);
-      onColumnOrderChange(newOrderedColumns.map(col => col.id));
+      // First update local state for immediate visual feedback
+      const newLocalOrderedColumns = arrayMove(localOrderedColumns, oldIndex, newIndex);
+      setLocalOrderedColumns(newLocalOrderedColumns);
+      
+      // Then propagate the change to parent component
+      onColumnOrderChange(newLocalOrderedColumns.map(col => col.id));
     }
   };
 
   // Reset to default ordering
   const resetColumnOrder = () => {
+    // Clear local state
+    const defaultOrder = columns.map(col => ({ id: col.id, label: col.label }));
+    setLocalOrderedColumns(defaultOrder);
+    
+    // Propagate to parent
     onColumnOrderChange([]);
   };
 
@@ -132,11 +145,11 @@ export function ColumnOrderingPanel({
           onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={orderedColumns.map(col => col.id)}
+            items={localOrderedColumns.map(col => col.id)}
             strategy={verticalListSortingStrategy}
           >
             <div>
-              {orderedColumns.map(column => (
+              {localOrderedColumns.map(column => (
                 <SortableColumnItem key={column.id} column={column} />
               ))}
             </div>

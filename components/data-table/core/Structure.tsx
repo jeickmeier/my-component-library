@@ -42,15 +42,18 @@ const MemoizedTableHeader = React.memo(function TableHeaderComponent<TData>({
   onAggregationChange,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   columnVisibility,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  columnOrder,
 }: {
   table: ReactTable<TData>;
   headerRef: React.RefObject<HTMLTableSectionElement | null>;
   getFilterConfigForColumn: (columnId: string) => ColumnFilter | undefined;
   onAggregationChange: (columnId: string, aggregationFn: string) => void;
   columnVisibility: Record<string, boolean>; // Will force re-render when changed
+  columnOrder: string[]; // Will force re-render when order changes
 }) {
-  // We use columnVisibility as a dependency to force re-renders
-  // when visibility changes, even though we don't reference it directly
+  // We use columnVisibility and columnOrder as dependencies to force re-renders
+  // when visibility or ordering changes, even though we don't reference them directly
   
   return (
     <Table
@@ -122,6 +125,7 @@ const MemoizedTableHeader = React.memo(function TableHeaderComponent<TData>({
   getFilterConfigForColumn: (columnId: string) => ColumnFilter | undefined;
   onAggregationChange: (columnId: string, aggregationFn: string) => void;
   columnVisibility: Record<string, boolean>;
+  columnOrder: string[];
 }) => React.ReactElement;
 
 // New DataTableStructure component
@@ -143,6 +147,9 @@ export function DataTableStructure<TData, TValue>({
 
   // Get column visibility from table state to force re-renders when it changes
   const columnVisibility = table.getState().columnVisibility;
+  
+  // Get column order from table state to force re-renders when it changes
+  const columnOrder = table.getState().columnOrder;
 
   // Helper function to find filter config for a column
   const getFilterConfigForColumn = React.useCallback(
@@ -209,6 +216,7 @@ export function DataTableStructure<TData, TValue>({
         getFilterConfigForColumn={getFilterConfigForColumn}
         onAggregationChange={handleAggregationChange}
         columnVisibility={columnVisibility}
+        columnOrder={columnOrder}
       />
 
       {/* Scrollable table body that will re-render when needed */}

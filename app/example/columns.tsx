@@ -44,8 +44,6 @@ const iconCategoryRenderer = createCategoryRenderer<Payment, Payment['status']>(
   }
 });
 
-
-
 const starRenderer = createStarRatingRenderer<Payment>();
 const dateRenderer = createDateRenderer<Payment>();
 const extentRenderer = createExtentRenderer<Payment>();
@@ -54,6 +52,15 @@ export const columns = [
   columnHelper.accessor('status', {
     header: "Status",
     enableGrouping: true,
+    filterFn: 'equals',
+    meta: {
+      options: [
+        { label: "Pending", value: "pending" },
+        { label: "Processing", value: "processing" },
+        { label: "Success", value: "success" },
+        { label: "Failed", value: "failed" },
+      ]
+    },    
     aggregationFn: 'first',
     cell: (props) => iconCategoryRenderer({ cell: props.cell, row: props.row, value: props.getValue() })
   }),
@@ -63,6 +70,7 @@ export const columns = [
   }),
   columnHelper.accessor('amount', {
     header: "Amount",
+    enableGrouping: false,
     filterFn: 'numberRange',
     aggregationFn: 'first',
     cell: (props) => moneyRenderer({ cell: props.cell, row: props.row, value: props.getValue() }),
@@ -70,14 +78,14 @@ export const columns = [
   }),
   columnHelper.accessor('reviewRating', {
     header: "Rating",
-    enableGrouping: true,
+    enableGrouping: false,
     aggregationFn: 'mean',
     cell: (props) => starRenderer({ cell: props.cell, row: props.row, value: props.getValue() }),
     aggregatedCell: (props) => starRenderer({ cell: props.cell, row: props.row, value: props.getValue() })
   }),
   columnHelper.accessor('reviewDate', {
     header: "Review Date",
-    enableGrouping: true,
+    enableGrouping: false,
     aggregationFn: 'extent',
     cell: (props) => dateRenderer({ cell: props.cell, row: props.row, value: props.getValue() }),
     aggregatedCell: (props) => extentRenderer({ cell: props.cell, row: props.row, value: props.getValue() })

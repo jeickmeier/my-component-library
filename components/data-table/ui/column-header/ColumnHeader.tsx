@@ -8,6 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 import { SelectColumnFilter, RangeColumnFilter } from "../../types";
 import { ColumnActions } from "./ColumnActions";
 
@@ -24,11 +25,12 @@ export function DataTableColumnHeader<TData, TValue>({
   filterConfig,
   onAggregationChange,
 }: DataTableColumnHeaderProps<TData, TValue>) {
+
   const isSortable = column.getCanSort();
 
   if (!isSortable) {
     return (
-      <div className="h-full flex items-center px-2 p-0 m-0 cursor-default">
+      <div className="h-full flex items-center px-2 p-0 m-0 cursor-default ">
         <div className="flex-1 truncate">{title}</div>
       </div>
     );

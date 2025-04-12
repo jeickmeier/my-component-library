@@ -29,6 +29,7 @@ export function TableRowComponent<TData>({
   // Determine if this row should be sticky
   const isParentRow =
     row.subRows && row.subRows.length > 0 && grouping.length > 0;
+  const isLeafNode = !row.subRows || row.subRows.length === 0;
   const rowIndex = rows.findIndex((r: Row<TData>) => r.id === row.id);
   const isSticky = isParentRow && stickyGroupHeaders.includes(rowIndex);
 
@@ -81,40 +82,96 @@ export function TableRowComponent<TData>({
         zIndex: stickyZIndex,
       }}
     >
-      {row.getVisibleCells().map((cell) => (
-        <TableCell
-          key={cell.id}
-          className={`overflow-hidden text-ellipsis whitespace-nowrap ${
-            grouping.includes(cell.column.id) ? "font-medium" : ""
-          }`}
-          style={{
-            flex: cell.column.getSize() ? `${cell.column.getSize()} 0 0` : 1,
-            width: cell.column.getSize()
-              ? `${cell.column.getSize()}px`
-              : "auto",
-          }}
-        >
-          {grouping.includes(cell.column.id) && row.subRows?.length > 0 ? (
-            <div className="flex items-center">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="mr-1 h-4 w-4 p-0"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  row.toggleExpanded();
-                }}
-              >
-                {row.getIsExpanded() ? (
-                  <ChevronDown className="h-4 w-4" />
-                ) : (
-                  <ChevronRight className="h-4 w-4" />
-                )}
-              </Button>
+      {row.getVisibleCells().map((cell) => {
+        // Determine if this column is the active grouping level
+        const columnIndex = grouping.indexOf(cell.column.id);
+        const isActiveGroupingLevel = columnIndex === row.depth;
+        
+        // If this is a grouped column and not the active level, we may want to hide content
+        const isGroupedColumn = grouping.includes(cell.column.id);
+        const shouldHideInLeafNode = isLeafNode && isGroupedColumn;
+        const shouldShowContent = (!isGroupedColumn || isActiveGroupingLevel || row.depth === 0) && !shouldHideInLeafNode;
+        
+        // If this is a leaf node with a grouping column, return empty cell or minimal content
+        if (shouldHideInLeafNode) {
+          return (
+            <TableCell
+              key={cell.id}
+              style={{
+                flex: cell.column.getSize() ? `${cell.column.getSize()} 0 0` : 1,
+                width: cell.column.getSize()
+                  ? `${cell.column.getSize()}px`
+                  : "auto",
+              }}
+            >
+              {/* Empty space instead of grouped column content for leaf nodes */}
+            </TableCell>
+          );
+        }
+        
+        return (
+          <TableCell
+            key={cell.id}
+            className={`overflow-hidden text-ellipsis whitespace-nowrap ${
+              isGroupedColumn ? "font-medium" : ""
+            }`}
+            style={{
+              flex: cell.column.getSize() ? `${cell.column.getSize()} 0 0` : 1,
+              width: cell.column.getSize()
+                ? `${cell.column.getSize()}px`
+                : "auto",
+            }}
+          >
+            {isGroupedColumn && row.subRows?.length > 0 ? (
+              <div className="flex items-center">
+                <div
+                  style={{
+                    paddingLeft: `${row.depth * 2}rem`,
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  {isActiveGroupingLevel && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="mr-1 h-4 w-4 p-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        row.toggleExpanded();
+                      }}
+                    >
+                      {row.getIsExpanded() ? (
+                        <ChevronDown className="h-4 w-4" />
+                      ) : (
+                        <ChevronRight className="h-4 w-4" />
+                      )}
+                    </Button>
+                  )}
+                  {shouldShowContent && (
+                    <>
+                      <span className="block overflow-hidden text-ellipsis">
+                        {flexRender(
+                          cell.getIsAggregated() && cell.column.columnDef.aggregatedCell
+                            ? cell.column.columnDef.aggregatedCell
+                            : cell.column.columnDef.cell, 
+                          cell.getContext()
+                        )}
+                      </span>
+                      {isActiveGroupingLevel && (
+                        <span className="ml-2 text-xs text-muted-foreground">
+                          ({row.subRows.length})
+                        </span>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            ) : (
               <span
                 className="block overflow-hidden text-ellipsis"
                 style={{
-                  paddingLeft: `${row.depth * 2}rem`,
+                  paddingLeft: isGroupedColumn ? `${row.depth * 2}rem` : 0,
                 }}
               >
                 {flexRender(
@@ -124,27 +181,10 @@ export function TableRowComponent<TData>({
                   cell.getContext()
                 )}
               </span>
-              <span className="ml-2 text-xs text-muted-foreground">
-                ({row.subRows.length})
-              </span>
-            </div>
-          ) : (
-            <span
-              className="block overflow-hidden text-ellipsis"
-              style={{
-                paddingLeft: grouping.includes(cell.column.id) ? `${row.depth * 2}rem` : 0,
-              }}
-            >
-              {flexRender(
-                cell.getIsAggregated() && cell.column.columnDef.aggregatedCell
-                  ? cell.column.columnDef.aggregatedCell
-                  : cell.column.columnDef.cell, 
-                cell.getContext()
-              )}
-            </span>
-          )}
-        </TableCell>
-      ))}
+            )}
+          </TableCell>
+        );
+      })}
     </TableRow>
   );
 }

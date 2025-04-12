@@ -80,11 +80,13 @@ interface GroupingPanelProps {
 }
 
 // Memoize GroupingPanel to prevent rerendering on aggregation changes
-export const GroupingPanel = React.memo(function GroupingPanel({
+export const GroupingPanel = function GroupingPanel({
   availableColumns,
   grouping,
   onGroupingChange,
 }: GroupingPanelProps) {
+  // Local state to ensure immediate UI updates
+  const [localGrouping, setLocalGrouping] = React.useState<string[]>(grouping);
   const [selectValue, setSelectValue] = React.useState("");
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -93,24 +95,35 @@ export const GroupingPanel = React.memo(function GroupingPanel({
     }),
   );
 
+  // Keep local state in sync with props
+  React.useEffect(() => {
+    setLocalGrouping(grouping);
+  }, [grouping]);
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      const oldIndex = grouping.indexOf(active.id as string);
-      const newIndex = grouping.indexOf(over.id as string);
+      const oldIndex = localGrouping.indexOf(active.id as string);
+      const newIndex = localGrouping.indexOf(over.id as string);
 
-      onGroupingChange(arrayMove(grouping, oldIndex, newIndex));
+      const newGrouping = arrayMove(localGrouping, oldIndex, newIndex);
+      setLocalGrouping(newGrouping);
+      onGroupingChange(newGrouping);
     }
   };
 
   const handleRemoveGroup = (columnId: string) => {
-    onGroupingChange(grouping.filter((g) => g !== columnId));
+    const newGrouping = localGrouping.filter((g) => g !== columnId);
+    setLocalGrouping(newGrouping);
+    onGroupingChange(newGrouping);
   };
 
   const handleAddGroup = (columnId: string) => {
-    if (columnId && !grouping.includes(columnId)) {
-      onGroupingChange([...grouping, columnId]);
+    if (columnId && !localGrouping.includes(columnId)) {
+      const newGrouping = [...localGrouping, columnId];
+      setLocalGrouping(newGrouping);
+      onGroupingChange(newGrouping);
       setSelectValue(""); // Reset select value after adding
     }
   };
@@ -119,18 +132,18 @@ export const GroupingPanel = React.memo(function GroupingPanel({
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <span className="text-sm font-medium">Active groups:</span>
-        {grouping.length > 0 ? (
+        {localGrouping.length > 0 ? (
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
             <SortableContext
-              items={grouping}
+              items={localGrouping}
               strategy={verticalListSortingStrategy}
             >
               <div className="flex flex-wrap gap-2">
-                {grouping.map((columnId) => {
+                {localGrouping.map((columnId) => {
                   const column = availableColumns.find(
                     (col) => col.id === columnId,
                   );
@@ -152,7 +165,7 @@ export const GroupingPanel = React.memo(function GroupingPanel({
           </Badge>
         )}
       </div>
-      {availableColumns.length > grouping.length && (
+      {availableColumns.length > localGrouping.length && (
         <div className="flex items-center gap-2">
           <span className="text-sm">Add group:</span>
           <Select value={selectValue} onValueChange={handleAddGroup}>
@@ -164,7 +177,7 @@ export const GroupingPanel = React.memo(function GroupingPanel({
             </SelectTrigger>
             <SelectContent>
               {availableColumns
-                .filter((column) => !grouping.includes(column.id))
+                .filter((column) => !localGrouping.includes(column.id))
                 .map((column) => (
                   <SelectItem key={column.id} value={column.id}>
                     {column.label}
@@ -180,4 +193,4 @@ export const GroupingPanel = React.memo(function GroupingPanel({
       </div>
     </div>
   );
-});
+}

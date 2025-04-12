@@ -39,7 +39,7 @@ const CustomizationButton = React.memo(function CustomizationButton({
       type="button"
     >
       <Layers className="h-4 w-4" />
-      Customize Table
+      Customize Columns
     </Button>
   );
 });
@@ -102,11 +102,11 @@ export function TableCustomizationControl<T>({
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
       >
-        <DialogContent className="sm:max-w-[550px]">
+        <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Table Customization</DialogTitle>
+            <DialogTitle>Column Customization</DialogTitle>
             <DialogDescription>
-              Customize how your data is displayed by grouping, reordering, or hiding columns.
+              Customize how your column data is displayed by grouping, reordering, or hiding.
             </DialogDescription>
           </DialogHeader>
           
