@@ -1,0 +1,19 @@
+---
+description: This is useful to know what technologies and dependencies can be used for this project
+globs: 
+alwaysApply: false
+---
+## Tech Stack
+- Next.js 15.2 (App Router)
+- React 19
+- TypeScript 5
+- TailwindCSS 4
+- date-fns for date functionality
+- lucide-react for icons
+- shadcn/ui component system
+- shadcn/ui implementation 
+- Tanstack Table & Virtual
+- dnd-kit for drag and drop functionality
+- Recharts for simple dashboard widget charts
+- ECharts for more complicated graphs
+

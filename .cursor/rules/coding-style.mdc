@@ -1,0 +1,75 @@
+---
+description: Describes the coding style, documentation style, linter rules, compnent structure, project structure, imports and naming conventions
+globs: 
+alwaysApply: false
+---
+# Code Style
+
+### TypeScript/JavaScript
+- Use TypeScript for all new code
+- Use functional components with React hooks
+- Use named exports for utility functions
+- Use default exports for page components
+- Type all props and function parameters
+- Prefer explicit return types for functions
+- Use React.ComponentProps for HTML element type extensions
+
+### CSS/Styling
+- Use TailwindCSS for styling
+- Use shadcn/ui component system and its conventions
+- Use class-variance-authority (cva) for component variants
+- Use cn utility for conditional class names
+- Follow the existing component pattern using Radix UI primitives
+
+### Component Structure
+- Place UI components in components/ui/
+- Place feature-specific components in components/[feature-name]/
+- Pages go in app/ directory following Next.js App Router conventions
+
+### Imports
+- Use absolute imports with @ alias
+  - @/components for components
+  - @/lib for utility functions
+  - @/hooks for custom hooks
+  - @/app for app-specific code
+
+### Naming Conventions
+- Use PascalCase for components and component files
+- Use camelCase for variables, functions, and utility files
+- Use kebab-case for directories and non-component files
+- Prefix boolean props with is/has/should
+
+### Documentation
+- Add JSDoc comments for complex functions and interfaces
+- Keep component props well-typed with descriptive names
+- Document any non-obvious behavior or workarounds
+
+## Formatting
+- Use Prettier for code formatting
+- Run format script before committing
+- Follow ESLint rules from Next.js core-web-vitals preset
+
+## Project Structure
+- /app - Next.js App Router pages and layouts
+- /components - Reusable React components
+  - /ui - Base UI components
+  - /data-table - Table-specific components
+- /lib - Utility functions and shared code
+- /public - Static assets
+
+## Performance Considerations
+- Use React.memo for expensive components
+- Virtualize large lists and tables
+- Use Next.js Image component for images
+- Follow React best practices for state management
+
+## Accessibility
+- Use semantic HTML elements
+- Include proper ARIA attributes
+- Ensure keyboard navigation works
+- Test with screen readers
+
+## Git Workflow
+- Write descriptive commit messages
+- Keep pull requests focused on a single concern
+- Test changes locally before committing 
