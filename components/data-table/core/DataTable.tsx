@@ -1,18 +1,24 @@
+/**
+ * Main DataTable component that orchestrates all the table functionality.
+ * Integrates hooks, state management, and UI components to create a fully featured
+ * data table with sorting, filtering, grouping, and virtualization capabilities.
+ */
+
 "use client";
 
 import * as React from "react";
 
 // Import types
-import { DataTableProps } from "../types";
+import { DataTableProps } from "@/components/data-table/types";
 import { Table as ReactTable } from "@tanstack/react-table";
 
 // Import sub-components
-import { DataTableToolbar } from "../ui/toolbar/Toolbar";
-import { DataTableStructure } from "./Structure";
-import { DataTableFooter } from "../ui/Footer";
+import { DataTableToolbar } from "@/components/data-table/ui/toolbar/Toolbar";
+import { DataTableStructure } from "@/components/data-table/core/Structure";
+import { DataTableFooter } from "@/components/data-table/ui/footer/Footer";
 
 // Import the custom hook
-import { useDataTableLogic } from "../hooks/useDataTableLogic";
+import { useDataTableLogic } from "@/components/data-table/hooks/useDataTableLogic";
 
 // --- Main DataTable Component ---
 export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {

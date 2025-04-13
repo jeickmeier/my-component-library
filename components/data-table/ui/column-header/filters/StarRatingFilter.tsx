@@ -1,3 +1,9 @@
+/**
+ * Star rating filter component that enables filtering based on star ratings.
+ * Provides an interactive star rating interface for selecting minimum rating
+ * thresholds with customizable star appearance and behavior.
+ */
+
 import * as React from "react";
 import { Column } from "@tanstack/react-table";
 import { X } from "lucide-react";

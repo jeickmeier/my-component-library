@@ -1,3 +1,9 @@
+/**
+ * Defines the core table structure including header, body, and footer components.
+ * Handles the layout, styling, and structural composition of the table while
+ * maintaining accessibility and responsive design.
+ */
+
 import * as React from "react";
 import {
   Table as ReactTable,
@@ -15,9 +21,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { ClientTableBody } from "./ClientBody";
-import { DataTableColumnHeader } from "../ui/column-header/ColumnHeader";
-import { ColumnFilter } from "../types";
+import { ClientTableBody } from "@/components/data-table/core/ClientBody";
+import { DataTableColumnHeader } from "@/components/data-table/ui/column-header/ColumnHeader";
+import { ColumnFilter } from "@/components/data-table/types";
 
 // Define props for DataTableStructure
 interface DataTableStructureProps<TData, TValue> {

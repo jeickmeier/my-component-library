@@ -1,3 +1,9 @@
+/**
+ * Hook that implements sticky header functionality for grouped rows in the table.
+ * Handles scroll synchronization and positioning of group headers to ensure they
+ * remain visible while scrolling through grouped data.
+ */
+
 import * as React from "react";
 import { GroupingState, Row } from "@tanstack/react-table";
 import { Virtualizer } from "@tanstack/react-virtual";

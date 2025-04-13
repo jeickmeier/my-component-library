@@ -1,3 +1,9 @@
+/**
+ * Utilities for exporting table data to various formats.
+ * Implements export functionality for CSV, Excel, and other formats while
+ * handling data transformation and formatting requirements.
+ */
+
 import { Table } from "@tanstack/react-table";
 
 /**

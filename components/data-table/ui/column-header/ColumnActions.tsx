@@ -7,20 +7,63 @@ import {
   DropdownMenuGroup,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { SelectFilter } from "./filters/SelectFilter";
-import { RangeFilter } from "./filters/RangeFilter";
-import { TextFilter } from "./filters/TextFilter";
-import { StarRatingFilter } from "./filters/StarRatingFilter";
-import { RangeSliderFilter } from "./filters/RangeSliderFilter";
+import { SelectFilter } from "@/components/data-table/ui/column-header/filters/SelectFilter";
+import { RangeFilter } from "@/components/data-table/ui/column-header/filters/RangeFilter";
+import { TextFilter } from "@/components/data-table/ui/column-header/filters/TextFilter";
+import { StarRatingFilter } from "@/components/data-table/ui/column-header/filters/StarRatingFilter";
+import { RangeSliderFilter } from "@/components/data-table/ui/column-header/filters/RangeSliderFilter";
 import { 
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ColumnFilter } from "../../types";
-import { AGGREGATION_FUNCTIONS } from "./AggregationMenu";
+import { ColumnFilter } from "@/components/data-table/types";
+
+export const AGGREGATION_FUNCTIONS = [
+
+  { value: "sum", type: "sum", label: "Sum" },  
+
+  { value: "count", type: "numeric", label: "Count" },  
+  { value: "uniqueCount", type: "numeric", label: "Unique Count" },  
+
+
+  { value: "min", type: "standard", label: "Min" },
+  { value: "max", type: "standard", label: "Max" },
+  { value: "mean", type: "standard", label: "Average" },
+  { value: "median", type: "standard", label: "Median" },
+
+  { value: "first", type: "order", label: "First Value" },
+  { value: "last", type: "order", label: "Last Value" },
+  { value: "extent", type: "order", label: "Range" },
+
+  //{ value: "unique", type: " Numeric", label: "Unique Values" },  
+  { value: "sparkline", type: "chart", label: "Histogram" },
+];
+
+// Group aggregation functions by type for display
+const GROUPED_AGGREGATION_FUNCTIONS = {
+  numeric: AGGREGATION_FUNCTIONS.filter(fn => fn.type === "numeric"),
+  standard: AGGREGATION_FUNCTIONS.filter(fn => fn.type === "standard"),
+  order: AGGREGATION_FUNCTIONS.filter(fn => fn.type === "order"),
+  chart: AGGREGATION_FUNCTIONS.filter(fn => fn.type === "chart"),
+  sum: AGGREGATION_FUNCTIONS.filter(fn => fn.type === "sum"),
+};
+
+// Function to convert type names to display labels
+const getGroupLabel = (type: string): string => {
+  switch (type) {
+    case "numeric": return "Counting";
+    case "standard": return "Statistical";
+    case "order": return "Ordering";
+    case "chart": return "Visualization";
+    case "sum": return "Sums";
+    default: return type.charAt(0).toUpperCase() + type.slice(1);
+  }
+};
 
 interface ColumnActionsProps<TData, TValue> {
   column: Column<TData, TValue>;
@@ -172,10 +215,15 @@ export function ColumnActions<TData, TValue>({
                     <SelectValue placeholder="First Value" />
                   </SelectTrigger>
                   <SelectContent>
-                    {AGGREGATION_FUNCTIONS.map((aggFn) => (
-                      <SelectItem key={aggFn.value} value={aggFn.value}>
-                        {aggFn.label}
-                      </SelectItem>
+                    {Object.entries(GROUPED_AGGREGATION_FUNCTIONS).map(([type, functions]) => (
+                      <SelectGroup key={type}>
+                        <SelectLabel>{getGroupLabel(type)}</SelectLabel>
+                        {functions.map((aggFn) => (
+                          <SelectItem key={aggFn.value} value={aggFn.value}>
+                            {aggFn.label}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
                     ))}
                   </SelectContent>
                 </Select>

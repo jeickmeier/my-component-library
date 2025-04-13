@@ -1,10 +1,16 @@
+/**
+ * Client-side table body component that handles row rendering and virtualization.
+ * Implements efficient rendering strategies for large datasets while maintaining
+ * smooth scrolling and interaction capabilities.
+ */
+
 import * as React from "react";
 import { ColumnDef, GroupingState, Row } from "@tanstack/react-table";
 import { TableBody, TableCell, TableRow } from "@/components/ui/table";
 
-import { TableRowComponent } from "../ui/Row";
-import { useTableVirtualization } from "../hooks/useTableVirtualization";
-import { useStickyGroupHeaders } from "../hooks/useStickyGroupHeaders";
+import { TableRowComponent } from "@/components/data-table/ui/row/Row";
+import { useTableVirtualization } from "@/components/data-table/hooks/useTableVirtualization";
+import { useStickyGroupHeaders } from "@/components/data-table/hooks/useStickyGroupHeaders";
 
 // Update ClientTableBody props to be generic
 interface ClientTableBodyProps<TData, TValue> {
@@ -58,7 +64,7 @@ export function ClientTableBody<TData, TValue>({
     return (
       <TableBody>
         <TableRow>
-          <TableCell colSpan={columns.length} className="h-24 text-center">
+          <TableCell colSpan={columns.length} className="h-16 text-center">
             No results.
           </TableCell>
         </TableRow>

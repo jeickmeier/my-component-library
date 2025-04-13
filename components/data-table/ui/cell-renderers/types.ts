@@ -1,3 +1,9 @@
+/**
+ * Type definitions for cell renderer components and their configuration options.
+ * Defines interfaces for various cell renderers including money, date, category,
+ * star rating, and extent renderers with their respective formatting options.
+ */
+
 import { Cell, Row } from "@tanstack/react-table";
 
 // Type for cell renderer function

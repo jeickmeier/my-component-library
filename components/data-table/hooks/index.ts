@@ -5,14 +5,16 @@
  * These hooks provide reusable logic for data table operations and features.
  * 
  * Features:
- * - Data source hooks
- * - Virtualization hooks
- * - Web worker integration for offloading heavy computations
- * - Custom state management hooks
+ * - Filter management hooks
+ * - Grouping management hooks
+ * - Table state management hooks
+ * - Refs and client-side state management hooks
  * 
  * @module data-table/hooks
  */
 
-export * from "./useDataTableSource"
-export * from "./useVirtualization"
-export * from "./useTableWorker" 
+export * from "./useDataTableLogic";
+export * from "./useDataTableFilters";
+export * from "./useDataTableGrouping";
+export * from "./useDataTableState";
+export * from "./useDataTableRefs"; 

@@ -1,3 +1,9 @@
+/**
+ * Global search filter component for the data table toolbar.
+ * Provides a search input that filters across all columns with debounced input
+ * handling and clear functionality for improved performance.
+ */
+
 import * as React from "react";
 import { Input } from "@/components/ui/input";
 

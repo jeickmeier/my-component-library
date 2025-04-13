@@ -1,10 +1,11 @@
+/**
+ * Core hook that implements the main data table logic including sorting, pagination,
+ * column visibility, and row selection. Integrates with TanStack Table to provide
+ * the core table functionality and state management.
+ */
+
 import * as React from "react";
 import {
-  SortingState,
-  ColumnFiltersState,
-  VisibilityState,
-  GroupingState,
-  ExpandedState,
   useReactTable,
   getCoreRowModel,
   getSortedRowModel,
@@ -14,19 +15,17 @@ import {
   Table as ReactTable,
   Row,
   aggregationFns,
-  ColumnOrderState,
+  GroupingState,
 } from "@tanstack/react-table";
-import { DataTableProps, ColumnFilter, FilterOption } from "../types";
+import { DataTableProps, ColumnFilter } from "@/components/data-table/types";
+import { numberRangeFilterFn, starRatingFilterFn } from "@/components/data-table/utils/filterFunctions";
+import { firstAggregation, lastAggregation, sparklineAggregation, AggregationFunction } from "@/components/data-table/utils/aggregationFunctions";
 
-import { 
-  numberRangeFilterFn,
-  starRatingFilterFn
-} from "../utils/filterFunctions";
-
-import {
-  firstAggregation,
-  AggregationFunction,
-} from "../utils/aggregationFunctions";
+// Import custom hooks
+import { useDataTableFilters } from "./useDataTableFilters";
+import { useDataTableGrouping } from "./useDataTableGrouping";
+import { useDataTableState } from "./useDataTableState";
+import { useDataTableRefs } from "./useDataTableRefs";
 
 // Define the explicit return type for the hook
 interface UseDataTableLogicReturn<TData> {
@@ -44,8 +43,8 @@ interface UseDataTableLogicReturn<TData> {
   rowRefsMap: React.RefObject<Map<number, HTMLTableRowElement>>;
   isMountedRef: React.RefObject<boolean>;
   groupableColumnObjects: { id: string; label: string }[];
-  columnOrder: ColumnOrderState;
-  setColumnOrder: React.Dispatch<React.SetStateAction<ColumnOrderState>>;
+  columnOrder: string[];
+  setColumnOrder: React.Dispatch<React.SetStateAction<string[]>>;
   discoveredColumnFilters: ColumnFilter[];
 }
 
@@ -58,185 +57,50 @@ export function useDataTableLogic<TData, TValue>({
   columnFilters = [],
   defaultPageSize = 50,
 }: DataTableProps<TData, TValue>): UseDataTableLogicReturn<TData> {
-  // State
-  const [isClient, setIsClient] = React.useState(false);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFiltersState, setColumnFiltersState] =
-    React.useState<ColumnFiltersState>([]);
-  const [globalFilter, setGlobalFilter] = React.useState<string>("");
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [grouping, setGrouping] = React.useState<GroupingState>([]);
-  const [expanded, setExpanded] = React.useState<ExpandedState>({});
-  const [columnOrder, setColumnOrder] = React.useState<ColumnOrderState>([]);
-  const [pagination, setPagination] = React.useState({
-    pageIndex: 0,
-    pageSize: defaultPageSize,
-  });
-  const [isGroupingDialogOpen, setIsGroupingDialogOpen] = React.useState(false);
-  const [forceRenderCount, setForceRenderCount] = React.useState(0);
+  // Use the custom hooks
+  const {
+    columnFiltersState,
+    setColumnFiltersState,
+    globalFilter,
+    setGlobalFilter,
+    discoveredColumnFilters,
+  } = useDataTableFilters({ columns, columnFilters });
 
-  // Auto-discovered column filters
-  const discoveredColumnFilters = React.useMemo(() => {
-    // Only auto-discover if no columnFilters were provided
-    if (columnFilters.length > 0) {
-      return columnFilters;
-    }
+  const {
+    grouping,
+    setGrouping,
+    expanded,
+    setExpanded,
+    isGroupingDialogOpen,
+    setIsGroupingDialogOpen,
+    groupableColumnObjects,
+  } = useDataTableGrouping({ columns, enableGrouping, groupableColumns });
 
-    // Find columns with filterFn defined
-    return columns.reduce<ColumnFilter[]>((acc, col) => {
-      // Check if column has filterFn defined
-      const hasFilterFn = 'filterFn' in col && col.filterFn;
-      
-      if (hasFilterFn) {
-        const columnId = col.id || (('accessorKey' in col) ? String(col.accessorKey) : undefined);
-        if (columnId) {
-          // First check if there's a filterConfig in meta
-          const colMeta = col.meta as Record<string, unknown> | undefined;
-          if (colMeta && 'filterConfig' in colMeta && colMeta.filterConfig) {
-            // Use the filter config from meta
-            acc.push(colMeta.filterConfig as ColumnFilter);
-          }
-          // If no filterConfig in meta, determine filter type based on column definition
-          else if (col.filterFn === 'numberRange' || 
-              (typeof col.filterFn === 'string' && col.filterFn.includes('range'))) {
-            // Create a range filter
-            acc.push({
-              type: 'range',
-              column: columnId,
-              label: typeof col.header === 'string' ? col.header : columnId
-            });
-          } else if (col.filterFn === 'starRating') {
-            // Create a star rating filter
-            acc.push({
-              type: 'starRating',
-              column: columnId,
-              label: typeof col.header === 'string' ? col.header : columnId,
-              maxStars: (col.meta as { maxStars?: number } | undefined)?.maxStars || 5
-            });
-          } else {
-            // Try to determine if this could be a select filter by checking for enumerable values
-            // Safe check for meta.options property
-            const hasOptions = colMeta && 'options' in colMeta && Array.isArray(colMeta.options);
-            
-            if (hasOptions && colMeta.options) {
-              // Create a select filter with options from meta
-              acc.push({
-                type: 'select',
-                column: columnId,
-                label: typeof col.header === 'string' ? col.header : columnId,
-                options: colMeta.options as FilterOption[]
-              });
-            }
-            // You can add more filter type detection logic here if needed
-          }
-        }
-      }
-      return acc;
-    }, []);
-  }, [columns, columnFilters]);
+  const {
+    sorting,
+    setSorting,
+    columnVisibility,
+    setColumnVisibility,
+    columnOrder,
+    setColumnOrder,
+    pagination,
+    setPagination,
+    createTableMeta,
+  } = useDataTableState({ defaultPageSize, isMountedRef: React.useRef(false) });
 
-  // Refs
-  const isMountedRef = React.useRef(false);
-  const tableContainerRef = React.useRef<HTMLDivElement>(null);
-  const headerRef = React.useRef<HTMLTableSectionElement>(null);
-  const rowRefsMap = React.useRef<Map<number, HTMLTableRowElement>>(new Map());
-
-  // Table reference
-  const tableRef = React.useRef<ReactTable<TData> | null>(null);
-
-  // Effects
-  React.useEffect(() => {
-    isMountedRef.current = true;
-    setIsClient(true);
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
-
-  // Memos
-  const groupableColumnObjects = React.useMemo(() => {
-    // Auto-discover groupable columns from column definitions if no explicit list provided
-    const autoDiscoveredGroupableColumns = columns.reduce((acc: string[], col) => {
-      // Check if column is explicitly marked as groupable
-      if ('enableGrouping' in col && col.enableGrouping === true) {
-        const columnId = col.id || (('accessorKey' in col) ? String(col.accessorKey) : undefined);
-        if (columnId) {
-          acc.push(columnId);
-        }
-      }
-      return acc;
-    }, []);
-
-    // Use provided groupableColumns if defined, otherwise use auto-discovered columns
-    const columnsToUse = groupableColumns.length > 0 
-      ? groupableColumns 
-      : autoDiscoveredGroupableColumns;
-
-    return columnsToUse.map((columnId) => {
-      const col = columns.find(
-        (c) =>
-          c.id === columnId ||
-          ("accessorKey" in c && c.accessorKey === columnId),
-      );
-      return {
-        id: columnId,
-        label:
-          typeof col?.header === "string"
-            ? col.header
-            : columnId.charAt(0).toUpperCase() + columnId.slice(1),
-      };
-    });
-  }, [columns, groupableColumns]);
-
-  // Create a meta object for the table that includes several ways to force a rerender
-  const tableMeta = React.useMemo(() => {
-    return {
-      forceRender: () => {
-        if (isMountedRef.current) {
-          // Increment a counter to force a rerender
-          setForceRenderCount((count) => count + 1);
-        }
-      },
-      recomputeAggregations: () => {
-        if (isMountedRef.current && tableRef.current && grouping.length > 0) {
-          // First, temporarily clear grouping
-          const tempGrouping = [...grouping];
-          tableRef.current.setGrouping([]);
-
-          // Then restore it to force recalculation
-          setTimeout(() => {
-            if (tableRef.current) {
-              tableRef.current.setGrouping(tempGrouping);
-            }
-          }, 0);
-        }
-      },
-    };
-  }, [grouping]);
-
-  // Force table to recompute when forceRenderCount changes
-  React.useEffect(() => {
-    if (forceRenderCount > 0 && tableRef.current) {
-      // Trigger table updates
-      tableRef.current.setColumnVisibility({ ...columnVisibility });
-      
-      // Apply column order updates
-      if (columnOrder.length > 0) {
-        tableRef.current.setColumnOrder([...columnOrder]);
-      }
-
-      // Also reset expanded state to force recalculation
-      if (grouping.length > 0) {
-        tableRef.current.resetExpanded();
-      }
-    }
-  }, [forceRenderCount, columnVisibility, grouping, columnOrder]);
+  const {
+    isClient,
+    isMountedRef,
+    tableContainerRef,
+    headerRef,
+    rowRefsMap,
+    tableRef,
+  } = useDataTableRefs<TData>();
 
   // Table Instance
   const table = useReactTable<TData>({
     data,
-    columns: columns,
+    columns,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
@@ -244,43 +108,12 @@ export function useDataTableLogic<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     onGlobalFilterChange: setGlobalFilter,
     onColumnVisibilityChange: setColumnVisibility,
-    onColumnOrderChange: (updater) => {
-      if (isMountedRef.current) {
-        setColumnOrder(updater);
-      } else {
-        if (typeof updater === "function") {
-          setColumnOrder((prev) => updater(prev));
-        } else {
-          setColumnOrder(updater);
-        }
-      }
-    },
-    onGroupingChange: (updater) => {
-      if (isMountedRef.current) {
-        setGrouping(updater);
-      } else {
-        if (typeof updater === "function") {
-          setGrouping((prev) => updater(prev));
-        } else {
-          setGrouping(updater);
-        }
-      }
-    },
+    onColumnOrderChange: setColumnOrder,
+    onGroupingChange: setGrouping,
     getGroupedRowModel: enableGrouping ? getGroupedRowModel() : undefined,
     onExpandedChange: setExpanded,
     getExpandedRowModel: getExpandedRowModel(),
-
-    onPaginationChange: (updater) => {
-      if (isMountedRef.current) {
-        setPagination(updater);
-      } else {
-        if (typeof updater === "function") {
-          setPagination((prev) => updater(prev));
-        } else {
-          setPagination(updater);
-        }
-      }
-    },
+    onPaginationChange: setPagination,
 
     state: {
       sorting,
@@ -299,6 +132,9 @@ export function useDataTableLogic<TData, TValue>({
     },
     aggregationFns: {
       first: firstAggregation,
+      last: lastAggregation,
+      sparkline: sparklineAggregation,
+      
       sum: aggregationFns.sum,
       count: aggregationFns.count,
       min: aggregationFns.min,
@@ -312,29 +148,26 @@ export function useDataTableLogic<TData, TValue>({
 
     enableGrouping,
     manualGrouping: !enableGrouping,
-
-    // These options help with aggregation recalculation
     autoResetExpanded: false,
-
     defaultColumn: {
       size: 150,
       minSize: 50,
       maxSize: 500,
     },
     autoResetPageIndex: false,
-    meta: tableMeta,
-
+    meta: createTableMeta<TData>(tableRef, grouping),
     debugTable: true,
   });
 
-  // Store table reference for use in meta methods
+  // Store table reference
   React.useEffect(() => {
-    tableRef.current = table;
-  }, [table]);
+    if (tableRef.current !== table) {
+      tableRef.current = table;
+    }
+  }, [table, tableRef]);
 
   const { rows } = table.getRowModel();
 
-  // Ensure the returned object matches the interface
   return {
     table,
     rows,

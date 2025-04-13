@@ -1,3 +1,9 @@
+/**
+ * Range filter component that allows filtering numeric values within a specified range.
+ * Provides min/max input fields with validation and proper numeric handling,
+ * supporting both inclusive minimum and maximum value filtering.
+ */
+
 import * as React from "react";
 import { Column } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";

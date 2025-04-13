@@ -1,3 +1,9 @@
+/**
+ * Base column filter component that manages the filter popover UI and state.
+ * Provides the foundation for all specific filter types while handling common
+ * functionality like popover positioning and filter application.
+ */
+
 import * as React from "react";
 import { Column } from "@tanstack/react-table";
 import { Filter } from "lucide-react";

@@ -1,3 +1,9 @@
+/**
+ * Date cell renderer that formats and displays date values in the table.
+ * Supports various date formats, localization options, and custom styling
+ * while handling different date input formats consistently.
+ */
+
 import * as React from "react";
 import { CellRenderer, DateOptions } from "../types";
 

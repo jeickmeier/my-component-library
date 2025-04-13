@@ -1,6 +1,12 @@
 import { Row, RowData } from "@tanstack/react-table";
 
 /**
+ * Collection of filter functions for different data types and filtering scenarios.
+ * Implements various filtering strategies including text search, range filtering,
+ * categorical filtering, and custom filter functions.
+ */
+
+/**
  * A custom number range filter function that can be registered with TanStack Table
  * Will be used like: filterFn: 'numberRange'
  */

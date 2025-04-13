@@ -1,3 +1,9 @@
+/**
+ * Category cell renderer that displays categorical data with optional styling.
+ * Supports color coding, icons, and custom labels for different category values,
+ * with configurable appearance and formatting options.
+ */
+
 import * as React from "react";
 import { CellRenderer, CategoryOptions } from "../types";
 

@@ -1,3 +1,9 @@
+/**
+ * Footer component for the data table that displays pagination controls,
+ * row count information, and summary statistics. Adapts its display based
+ * on grouping state and available data.
+ */
+
 import * as React from "react";
 import { Table as ReactTable, GroupingState } from "@tanstack/react-table";
 

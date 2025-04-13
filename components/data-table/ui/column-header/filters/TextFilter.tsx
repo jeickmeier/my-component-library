@@ -1,3 +1,9 @@
+/**
+ * Text filter component that provides free-form text filtering capabilities.
+ * Implements debounced text input with case-sensitive/insensitive options
+ * and support for different text matching strategies.
+ */
+
 import * as React from "react";
 import { Column } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";

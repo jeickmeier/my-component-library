@@ -1,11 +1,17 @@
+/**
+ * Main toolbar component that provides access to all table customization features.
+ * Combines global search, column visibility, ordering, and grouping controls
+ * in a unified interface with responsive design and keyboard accessibility.
+ */
+
 import * as React from "react";
 import { Table as ReactTable } from "@tanstack/react-table";
 import { ColumnFilter } from "@/components/data-table/types";
-import { GlobalFilter } from "./GlobalFilter";
+import { GlobalFilter } from "@/components/data-table/ui/toolbar/GlobalFilter";
 import { Button } from "@/components/ui/button";
 import { Download, ChevronDown } from "lucide-react";
-import { tableToCSV, downloadCSV } from "../../utils/exportUtils";
-import { TableCustomizationControl } from "./TableCustomizationControl"
+import { tableToCSV, downloadCSV } from "@/components/data-table/utils/exportUtils";
+import { TableCustomizationControl } from "@/components/data-table/ui/toolbar/TableCustomizationControl"
 import {
   DropdownMenu,
   DropdownMenuContent,

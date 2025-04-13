@@ -1,4 +1,11 @@
-import { ColumnDef, FilterFn, AggregationFn } from "@tanstack/react-table";
+/**
+ * Type definitions for the data table component library. Includes interfaces for various
+ * filter types (select, range, star rating), table props, and extends @tanstack/react-table
+ * with custom filter and aggregation functions. These types provide type safety and 
+ * documentation for the component's configuration options.
+ */
+
+import { ColumnDef, FilterFn } from "@tanstack/react-table";
 
 // Extend @tanstack/react-table module with our custom functions
 declare module "@tanstack/react-table" {
@@ -8,8 +15,8 @@ declare module "@tanstack/react-table" {
   }
 
   interface AggregationFns {
-    range: AggregationFn<unknown>;
     first: true;
+    sparkline: true;
   }
 }
 

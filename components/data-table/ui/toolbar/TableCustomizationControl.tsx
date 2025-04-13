@@ -1,12 +1,7 @@
 /**
- * Table Customization Control
- * 
- * This component provides a comprehensive interface for customizing table display:
- * - Grouping: Add/remove/reorder grouping columns
- * - Visibility: Show/hide specific columns
- * - Ordering: Change the display order of columns
- * 
- * All functionality uses drag and drop and maintains the state in the table instance.
+ * Table customization control component that provides a unified interface for
+ * managing table features like column visibility, ordering, and grouping.
+ * Implements a popover menu with tabs for different customization options.
  */
 import * as React from "react";
 import { Table } from "@tanstack/react-table";
@@ -39,7 +34,7 @@ const CustomizationButton = React.memo(function CustomizationButton({
       type="button"
     >
       <Layers className="h-4 w-4" />
-      Customize Columns
+      Customize
     </Button>
   );
 });

@@ -1,3 +1,9 @@
+/**
+ * Utility functions for column configuration and management.
+ * Provides helpers for creating column definitions, handling column types,
+ * and configuring column-specific features like sorting and filtering.
+ */
+
 import * as React from "react";
 
 // Define our interfaces with generic types

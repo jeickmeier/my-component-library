@@ -1,3 +1,9 @@
+/**
+ * Table row component that handles rendering of individual rows in the data table.
+ * Supports virtualization, grouping, sticky headers, and custom cell rendering
+ * while maintaining proper styling and accessibility features.
+ */
+
 import * as React from "react";
 import { Row, flexRender, GroupingState } from "@tanstack/react-table";
 import { VirtualItem, Virtualizer } from "@tanstack/react-virtual";
@@ -5,7 +11,16 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
-// Update the TableRowProps interface to include all rows
+/**
+ * Interface defining the properties required for rendering a table row.
+ * @param row - The current row being rendered
+ * @param rows - All rows in the table, needed for determining row indices
+ * @param virtualRow - Virtual row information from react-virtual for virtualization
+ * @param rowRefsMap - Map of row references to manage sticky header positioning
+ * @param virtualizer - Virtualizer instance for dynamic height management
+ * @param grouping - Current grouping state that affects row rendering and hierarchy
+ * @param stickyGroupHeaders - Array of row indices that should be sticky (parent group headers)
+ */
 interface TableRowProps<TData> {
   row: Row<TData>;
   rows: Row<TData>[];
@@ -16,7 +31,22 @@ interface TableRowProps<TData> {
   stickyGroupHeaders?: number[];
 }
 
-// Update the TableRowComponent function
+/**
+ * Renders a table row with support for grouping, virtualization, and sticky headers.
+ * 
+ * Rendering logic flow:
+ * 1. Determines if row is a parent row (has subRows and grouping is active)
+ * 2. Calculates sticky positioning for parent rows if needed
+ * 3. Renders each cell with appropriate content based on grouping context
+ * 
+ * Cell content rendering rules:
+ * - Parent rows with subRows show expand/collapse controls for the active grouping level
+ * - Group header cells include the count of subrows in parentheses
+ * - Leaf nodes (rows without children) don't display content for grouped columns 
+ * - Cells are indented based on their depth in the grouping hierarchy
+ * 
+ * @returns A table row with properly styled and positioned cells
+ */
 export function TableRowComponent<TData>({
   row,
   rows,
@@ -33,25 +63,30 @@ export function TableRowComponent<TData>({
   const rowIndex = rows.findIndex((r: Row<TData>) => r.id === row.id);
   const isSticky = isParentRow && stickyGroupHeaders.includes(rowIndex);
 
-  // Find the position in the sticky stack (0 = top, 1 = second from top, etc.)
+  /**
+   * Calculate sticky positioning properties:
+   * - stickyPosition: Position in the stack of sticky headers (0 = top, 1 = second from top, etc.)
+   * - stickyTop: Calculated top position based on heights of headers above this one
+   * - stickyZIndex: Z-index value to ensure proper stacking of sticky headers
+   */
   const stickyPosition = isSticky
     ? stickyGroupHeaders.findIndex((index) => index === rowIndex)
     : -1;
 
-  // Calculate the top position based on stack position
   const stickyTop = isSticky
     ? stickyGroupHeaders.slice(0, stickyPosition).reduce((total, idx) => {
         const el = rowRefsMap.current?.get(idx);
-        return total + (el?.offsetHeight || 35); // Use 35 as fallback height
+        return total + (el?.offsetHeight || 24); // Further reduce fallback height
       }, 0)
     : undefined;
 
-  // Z-index needs to be lower than the table header but still stacking properly
   const stickyZIndex = isSticky
     ? 1000 - stickyPosition // High z-index but lower than header's 2000
     : undefined;
 
-  // Handle row click for parent rows
+  /**
+   * Handles row click events - toggles expansion for parent rows
+   */
   const handleRowClick = () => {
     if (isParentRow) {
       row.toggleExpanded();
@@ -64,7 +99,7 @@ export function TableRowComponent<TData>({
       data-state={row.getIsSelected() && "selected"}
       className={`flex items-center w-full ${
         isSticky ? "sticky backdrop-blur bg-background/95 border-b border-border z-5" : ""
-      } ${isParentRow ? "bg-gray-100 cursor-pointer" : ""}`}
+      } ${isParentRow ? "bg-gray-100 cursor-pointer" : ""} py-0`}
       onClick={handleRowClick}
       ref={(node: HTMLTableRowElement | null) => {
         if (node) {
@@ -83,16 +118,21 @@ export function TableRowComponent<TData>({
       }}
     >
       {row.getVisibleCells().map((cell) => {
-        // Determine if this column is the active grouping level
+        /**
+         * Cell content visibility logic:
+         * 1. Determine if this column is used for grouping
+         * 2. Check if this column is the "active" grouping level for this row
+         * 3. For leaf nodes, hide content in grouped columns
+         * 4. Show content only if the column is not grouped OR it's the active grouping level
+         */
         const columnIndex = grouping.indexOf(cell.column.id);
         const isActiveGroupingLevel = columnIndex === row.depth;
         
-        // If this is a grouped column and not the active level, we may want to hide content
         const isGroupedColumn = grouping.includes(cell.column.id);
         const shouldHideInLeafNode = isLeafNode && isGroupedColumn;
-        const shouldShowContent = (!isGroupedColumn || isActiveGroupingLevel || row.depth === 0) && !shouldHideInLeafNode;
+        const shouldShowContent = (!isGroupedColumn || isActiveGroupingLevel) && !shouldHideInLeafNode;
         
-        // If this is a leaf node with a grouping column, return empty cell or minimal content
+        // For leaf nodes with grouped columns, render empty cells to maintain structure
         if (shouldHideInLeafNode) {
           return (
             <TableCell
@@ -126,11 +166,16 @@ export function TableRowComponent<TData>({
               <div className="flex items-center">
                 <div
                   style={{
-                    paddingLeft: `${row.depth * 2}rem`,
+                    paddingLeft: `${row.depth * 1.5}rem`,
                     display: 'flex',
                     alignItems: 'center'
                   }}
                 >
+                  {/* 
+                   * For parent rows at their active grouping level:
+                   * 1. Show expand/collapse button
+                   * 2. When expanded, show chevron down; when collapsed, show chevron right
+                   */}
                   {isActiveGroupingLevel && (
                     <Button
                       variant="ghost"
@@ -142,12 +187,18 @@ export function TableRowComponent<TData>({
                       }}
                     >
                       {row.getIsExpanded() ? (
-                        <ChevronDown className="h-4 w-4" />
+                        <ChevronDown className="h-3.5 w-3.5" />
                       ) : (
-                        <ChevronRight className="h-4 w-4" />
+                        <ChevronRight className="h-3.5 w-3.5" />
                       )}
                     </Button>
                   )}
+                  {/* 
+                   * Cell content rendering:
+                   * 1. For grouped columns, show cell content only at the active level
+                   * 2. For active grouping levels, show number of children in parentheses
+                   * 3. For aggregated cells, use special aggregatedCell renderer if provided
+                   */}
                   {shouldShowContent && (
                     <>
                       <span className="block overflow-hidden text-ellipsis">
@@ -159,7 +210,7 @@ export function TableRowComponent<TData>({
                         )}
                       </span>
                       {isActiveGroupingLevel && (
-                        <span className="ml-2 text-xs text-muted-foreground">
+                        <span className="ml-2 text-muted-foreground">
                           ({row.subRows.length})
                         </span>
                       )}
@@ -171,9 +222,14 @@ export function TableRowComponent<TData>({
               <span
                 className="block overflow-hidden text-ellipsis"
                 style={{
-                  paddingLeft: isGroupedColumn ? `${row.depth * 2}rem` : 0,
+                  paddingLeft: isGroupedColumn ? `${row.depth * 1.5}rem` : 0,
                 }}
               >
+                {/* 
+                 * For non-group cells or leaf nodes:
+                 * 1. Render cell content with appropriate indentation
+                 * 2. Use aggregatedCell renderer for aggregated cells if available
+                 */}
                 {flexRender(
                   cell.getIsAggregated() && cell.column.columnDef.aggregatedCell
                     ? cell.column.columnDef.aggregatedCell

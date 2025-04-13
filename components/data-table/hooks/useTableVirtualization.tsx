@@ -1,3 +1,9 @@
+/**
+ * Hook that implements virtual scrolling for the data table to efficiently render
+ * large datasets. Handles viewport calculations, row virtualization, and scroll
+ * position management for optimal performance.
+ */
+
 import * as React from "react";
 import { Row } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -23,9 +29,9 @@ export function useTableVirtualization<TData>({
   const virtualizer = useVirtualizer<HTMLDivElement, HTMLTableRowElement>({
     count: rows.length,
     getScrollElement,
-    estimateSize: () => 35,
+    estimateSize: () => 26,
     overscan: 20,
-    measureElement: (el) => el?.getBoundingClientRect().height || 35,
+    measureElement: (el) => el?.getBoundingClientRect().height || 26,
     onChange: (instance) => {
       requestAnimationFrame(() => {
         if (!isMountedRef.current) return;

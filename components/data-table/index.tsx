@@ -1,13 +1,13 @@
+/**
+ * Main entry point for the data table component library. Exports the core DataTable component,
+ * utility functions, types, cell renderers, and toolbar components for building customizable
+ * and interactive data tables with filtering, grouping, and custom rendering capabilities.
+ */
+
 "use client";
 
 // Import CSS
-import "./ui/tooltips.css";
-
-// Import from core directory
-import { DataTable } from "./core/DataTable";
-
-// Import utility functions
-import { createColumn } from "./utils/columnUtils";
+import "@/components/data-table/ui/tooltips.css";
 
 // Export types
 export type {
@@ -18,14 +18,21 @@ export type {
   RangeColumnFilter,
   RangeSliderColumnFilter,
   StarRatingColumnFilter,
-} from "./types";
+} from "@/components/data-table/types";
 
-// Export all sub-components (for those who want direct access)
-export { DataTable, createColumn };
-export { DataTableToolbar } from "./ui/toolbar/Toolbar";
-export { DataTableGroupingControl, TableCustomizationControl } from "./ui/toolbar/TableCustomizationControl";
-export { DataTableStructure } from "./core/Structure";
-export { DataTableFooter } from "./ui/Footer";
-export { useDataTableLogic } from "./hooks/useDataTableLogic";
-export { useTableVirtualization } from "./hooks/useTableVirtualization";
-export { useStickyGroupHeaders } from "./hooks/useStickyGroupHeaders";
+// Export main component and essential utilities
+export { DataTable } from "@/components/data-table/core/DataTable";
+export { createColumn } from "@/components/data-table/utils/columnUtils";
+
+// Export cell renderers
+export {
+  createMoneyRenderer,
+  createCategoryRenderer,
+  createStarRatingRenderer,
+  createDateRenderer,
+  createExtentRenderer,
+} from "@/components/data-table/ui/cell-renderers";
+
+// Export essential toolbar components
+export { DataTableToolbar } from "@/components/data-table/ui/toolbar/Toolbar";
+export { DataTableGroupingControl } from "@/components/data-table/ui/toolbar/TableCustomizationControl";

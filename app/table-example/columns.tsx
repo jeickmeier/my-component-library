@@ -1,7 +1,7 @@
 "use client"
 
 import { createColumnHelper } from "@tanstack/react-table"
-import { createMoneyRenderer, createCategoryRenderer, createStarRatingRenderer, createDateRenderer, createExtentRenderer } from "@/components/data-table/ui/cell-renderers"
+import { createMoneyRenderer, createCategoryRenderer, createStarRatingRenderer, createDateRenderer, createExtentRenderer, createMultiAggregationRenderer } from "@/components/data-table/ui/cell-renderers"
 import { CheckCircle, Clock, RefreshCcw, XCircle } from "lucide-react"
 
 // This type is used to define the shape of our data.
@@ -20,7 +20,8 @@ const columnHelper = createColumnHelper<Payment>();
 
 // Create reusable renderers with proper typing
 const moneyRenderer = createMoneyRenderer<Payment>({ digits: 2, showCurrencySymbol: false });
-const moneyAggregatedRenderer = createMoneyRenderer<Payment>({ digits: 1, abbreviate: true, abbreviationDivider: 'B' });
+const moneyRendererAggregated = createMoneyRenderer<Payment>({ digits: 0, showCurrencySymbol: true, abbreviate: true });
+const moneyRendererCount = createMoneyRenderer<Payment>({ digits: 0, showCurrencySymbol: false });
 
 // Example using icons
 const iconCategoryRenderer = createCategoryRenderer<Payment, Payment['status']>({
@@ -48,6 +49,18 @@ const starRenderer = createStarRatingRenderer<Payment>();
 const dateRenderer = createDateRenderer<Payment>();
 const extentRenderer = createExtentRenderer<Payment>();
 
+const getNull = () => null;
+
+// Create a multi-aggregation renderer for the amount column
+const amountAggregatedRenderer = createMultiAggregationRenderer<Payment>({
+  numBins: 10,
+  height: "h-[40px]",
+  formatTooltipValue: (value) => value.toLocaleString('en-US'),
+  barColor: "hsl(var(--primary))",
+  countRenderer: moneyRendererCount,
+  aggregatedRenderer: moneyRendererAggregated
+});
+
 export const columns = [
   columnHelper.accessor('status', {
     header: "Status",
@@ -56,6 +69,8 @@ export const columns = [
     enableColumnFilter: true,
     enableHiding: true,
     filterFn: 'equals',
+    aggregationFn: getNull,
+    aggregatedCell: () => getNull(),
     meta: {
       options: [
         { label: "Pending", value: "pending" },
@@ -64,12 +79,17 @@ export const columns = [
         { label: "Failed", value: "failed" },
       ]
     },    
-    aggregationFn: 'first',
     cell: (props) => iconCategoryRenderer({ cell: props.cell, row: props.row, value: props.getValue() })
   }),
   columnHelper.accessor('category', {
     header: "Category",
     enableGrouping: true,
+    enableSorting: true,
+    enableColumnFilter: true,
+    enableHiding: true,
+    aggregationFn: getNull,
+    aggregatedCell: () => getNull(),
+
     filterFn: 'equals',
     meta: {
       options: [
@@ -79,15 +99,16 @@ export const columns = [
         { label: "Treasury", value: "treasury" },
       ]
     },
-    aggregationFn: 'first',
   }),
+
   columnHelper.accessor('email', {
     header: "Email",
     enableGrouping: true,
   }),
+
   columnHelper.accessor('amount', {
     header: "Amount",
-    enableGrouping: false,
+    enableGrouping: true,
     filterFn: 'numberRange',
     meta: {
       filterConfig: {
@@ -96,9 +117,9 @@ export const columns = [
         label: 'Amount Range'
       }
     },
-    aggregationFn: 'first',
+    aggregationFn: 'sparkline',
     cell: (props) => moneyRenderer({ cell: props.cell, row: props.row, value: props.getValue() }),
-    aggregatedCell: (props) => moneyAggregatedRenderer({ cell: props.cell, row: props.row, value: props.getValue() })
+    aggregatedCell: amountAggregatedRenderer
   }),
   columnHelper.accessor('reviewRating', {
     header: "Rating",

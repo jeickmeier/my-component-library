@@ -113,12 +113,26 @@ export const SparklineHistogram = React.memo(({
                   if (binData) {
                     const formattedStart = formatTooltipValue(binData.start);
                     const formattedEnd = formatTooltipValue(binData.end);
+
+                    const formatLargeNumber = (num: string) => {
+                      // Remove commas from input before parsing
+                      const cleanNum = num.replace(/,/g, '');
+                      const numValue = parseFloat(cleanNum);
+                      if (numValue >= 1_000_000_000) {
+                        return `${(numValue / 1_000_000_000).toFixed(2)}B`;
+                      } else if (numValue >= 1_000_000) {
+                        return `${(numValue / 1_000_000).toFixed(2)}M`;
+                      } else if (numValue >= 1_000) {
+                        return `${(numValue / 1_000).toFixed(2)}K`;
+                      }
+                      return num;
+                    };
+                    
+                    const displayStart = formatLargeNumber(formattedStart);
+                    const displayEnd = formatLargeNumber(formattedEnd);
                     // Display Range and Count
                     return (
-                      <div className="flex flex-col text-xs">
-                        <span>Range: {formattedStart} - {formattedEnd}</span>
-                        <span>Count: {value}</span>
-                      </div>
+                      <div className="flex flex-col text-xs"><span>{displayStart} to {displayEnd} | Count: {value}</span></div>
                     );
                   }
                   return value; // Fallback

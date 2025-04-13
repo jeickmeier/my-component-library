@@ -1,3 +1,9 @@
+/**
+ * Column ordering panel component that enables drag-and-drop reordering of table columns.
+ * Provides a visual interface for changing column order with real-time preview
+ * and persistent state management for column positioning.
+ */
+
 import * as React from "react";
 import {
   DndContext,

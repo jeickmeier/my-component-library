@@ -1,3 +1,9 @@
+/**
+ * Select filter component that provides a dropdown menu for selecting categorical values.
+ * Supports single and multiple selection with customizable options and labels,
+ * ideal for filtering enumerated or categorical data.
+ */
+
 import * as React from "react";
 import { Column } from "@tanstack/react-table";
 import {

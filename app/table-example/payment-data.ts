@@ -1,11 +1,30 @@
-import { Payment } from "./columns";
+import { Payment } from "@/app/table-example/columns"
+
+/**
+ * Generates a random number from a normal distribution
+ * @param mean The mean of the distribution
+ * @param stdDev The standard deviation of the distribution
+ * @returns A random number from the normal distribution
+ */
+function generateNormalRandom(mean: number, stdDev: number): number {
+  // Box-Muller transform to generate normally distributed random numbers
+  let u1 = 0, u2 = 0;
+  // Ensure we don't get 0 from Math.random() which would cause -Infinity in log
+  while (u1 === 0) u1 = Math.random();
+  while (u2 === 0) u2 = Math.random();
+  
+  const z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+  
+  // Return both values to get a more accurate normal distribution
+  return z0 * stdDev + mean;
+}
 
 export const paymentData = Array.from({ length: 50000 }, (_, i) => {
   // Generate random hex ID (8 characters)
   const id = Math.random().toString(16).substring(2, 10);
 
-  // Random amount between 10 and 2 billion
-  const amount = Math.floor(Math.random() * (2_000_000_000 - 10 + 1)) + 10;
+  // Random amount between 0 and 2 billion
+  const amount = generateNormalRandom(1_000_000_000, 500_000_000);
 
 
   // Random status with proper typing

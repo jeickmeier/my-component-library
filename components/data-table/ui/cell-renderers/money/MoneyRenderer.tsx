@@ -1,3 +1,9 @@
+/**
+ * Money cell renderer that formats and displays monetary values in the table.
+ * Supports different currencies, localization, value abbreviation, and custom
+ * formatting options with proper number handling and display.
+ */
+
 import * as React from "react";
 import { CellRenderer, MoneyFormatterOptions } from "../types";
 

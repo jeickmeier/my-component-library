@@ -1,3 +1,9 @@
+/**
+ * Range slider filter component that provides a visual slider interface for range selection.
+ * Implements a dual-thumb slider for min/max value selection with real-time updates
+ * and support for custom step sizes and value formatting.
+ */
+
 import * as React from "react";
 import { Column, Row } from "@tanstack/react-table";
 import { Slider } from "@/components/ui/slider";

@@ -1,3 +1,9 @@
+/**
+ * Column header component that displays column titles and provides access to
+ * column-specific actions like sorting, filtering, and grouping. Integrates
+ * with the column actions menu for advanced column operations.
+ */
+
 import * as React from "react";
 import { Column } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ArrowUpDown, Filter } from "lucide-react";
@@ -9,8 +15,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { ColumnFilter } from "../../types";
-import { ColumnActions } from "./ColumnActions";
+import { ColumnFilter } from "@/components/data-table/types";
+import { ColumnActions } from "@/components/data-table/ui/column-header/ColumnActions";
 
 interface DataTableColumnHeaderProps<TData, TValue> {
   column: Column<TData, TValue>;

@@ -1,3 +1,9 @@
+/**
+ * Column visibility panel component that manages which columns are shown in the table.
+ * Provides checkboxes for toggling column visibility with support for column
+ * groups, search filtering, and bulk visibility actions.
+ */
+
 import * as React from "react";
 import { VisibilityState } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
