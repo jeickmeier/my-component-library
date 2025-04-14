@@ -49,8 +49,6 @@ const starRenderer = createStarRatingRenderer<Payment>();
 const dateRenderer = createDateRenderer<Payment>();
 const extentRenderer = createExtentRenderer<Payment>();
 
-const getNull = () => null;
-
 // Create a multi-aggregation renderer for the amount column
 const amountAggregatedRenderer = createMultiAggregationRenderer<Payment>({
   numBins: 10,
@@ -64,13 +62,8 @@ const amountAggregatedRenderer = createMultiAggregationRenderer<Payment>({
 export const columns = [
   columnHelper.accessor('status', {
     header: "Status",
-    enableGrouping: true,
-    enableSorting: true,
-    enableColumnFilter: true,
-    enableHiding: true,
     filterFn: 'equals',
-    aggregationFn: getNull,
-    aggregatedCell: () => getNull(),
+    enableGrouping: true,
     meta: {
       options: [
         { label: "Pending", value: "pending" },
@@ -84,12 +77,6 @@ export const columns = [
   columnHelper.accessor('category', {
     header: "Category",
     enableGrouping: true,
-    enableSorting: true,
-    enableColumnFilter: true,
-    enableHiding: true,
-    aggregationFn: getNull,
-    aggregatedCell: () => getNull(),
-
     filterFn: 'equals',
     meta: {
       options: [
@@ -108,7 +95,6 @@ export const columns = [
 
   columnHelper.accessor('amount', {
     header: "Amount",
-    enableGrouping: true,
     filterFn: 'numberRange',
     meta: {
       filterConfig: {
@@ -123,7 +109,6 @@ export const columns = [
   }),
   columnHelper.accessor('reviewRating', {
     header: "Rating",
-    enableGrouping: false,
     aggregationFn: 'mean',
     filterFn: 'starRating',
     meta: {
@@ -140,7 +125,6 @@ export const columns = [
   }),
   columnHelper.accessor('reviewDate', {
     header: "Review Date",
-    enableGrouping: false,
     aggregationFn: 'extent',
     cell: (props) => dateRenderer({ cell: props.cell, row: props.row, value: props.getValue() }),
     aggregatedCell: (props) => extentRenderer({ cell: props.cell, row: props.row, value: props.getValue() })

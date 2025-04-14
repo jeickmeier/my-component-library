@@ -22,10 +22,10 @@ import { numberRangeFilterFn, starRatingFilterFn } from "@/components/data-table
 import { firstAggregation, lastAggregation, sparklineAggregation, AggregationFunction } from "@/components/data-table/utils/aggregationFunctions";
 
 // Import custom hooks
-import { useDataTableFilters } from "./useDataTableFilters";
-import { useDataTableGrouping } from "./useDataTableGrouping";
-import { useDataTableState } from "./useDataTableState";
-import { useDataTableRefs } from "./useDataTableRefs";
+import { useDataTableFilters } from "@/components/data-table/hooks/useDataTableFilters";
+import { useDataTableGrouping } from "@/components/data-table/hooks/useDataTableGrouping";
+import { useDataTableState } from "@/components/data-table/hooks/useDataTableState";
+import { useDataTableRefs } from "@/components/data-table/hooks/useDataTableRefs";
 
 // Define the explicit return type for the hook
 interface UseDataTableLogicReturn<TData> {
