@@ -78,4 +78,11 @@ export interface DataTableProps<TData, TValue> {
   groupableColumns?: string[];
   defaultPageSize?: number; // Number of rows to display per page
   containerHeight?: string; // CSS height value (e.g., '500px', '70vh', 'calc(100vh - 200px)')
+  enableSorting?: boolean;
+  enableColumnVisibility?: boolean;
+  enableColumnFilters?: boolean;
+  enablePagination?: boolean;
+  enableRowSelection?: boolean;
+  defaultExpanded?: boolean | number | Record<string, boolean>;
+  defaultGrouping?: string[];
 }

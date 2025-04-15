@@ -11,6 +11,8 @@ interface UseDataTableGroupingProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   enableGrouping?: boolean;
   groupableColumns?: string[];
+  defaultExpanded?: boolean | number | Record<string, boolean>;
+  defaultGrouping?: string[];
 }
 
 interface UseDataTableGroupingReturn {
@@ -27,10 +29,20 @@ export function useDataTableGrouping<TData, TValue>({
   columns,
   enableGrouping = false,
   groupableColumns = [],
+  defaultExpanded,
+  defaultGrouping,
 }: UseDataTableGroupingProps<TData, TValue>): UseDataTableGroupingReturn {
   // Grouping states
-  const [grouping, setGrouping] = React.useState<GroupingState>([]);
-  const [expanded, setExpanded] = React.useState<ExpandedState>({});
+  const [grouping, setGrouping] = React.useState<GroupingState>(defaultGrouping ?? []);
+  const [expanded, setExpanded] = React.useState<ExpandedState>(() => {
+    if (defaultExpanded === true) {
+      return true; // Expand all
+    } else if (typeof defaultExpanded === 'object') {
+      return defaultExpanded; // Expand specific groups
+    } else { // Covers false, undefined, and now number
+      return {}; // Default: no expansion
+    }
+  });
   const [isGroupingDialogOpen, setIsGroupingDialogOpen] = React.useState(false);
 
   // Compute groupable columns

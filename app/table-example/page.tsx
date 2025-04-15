@@ -16,8 +16,10 @@ export default function DemoPage() {
         columns={columns as ColumnDef<Payment>[]}
         data={data}
         enableGrouping={true}
+        defaultGrouping={["status","category"]}
         defaultPageSize={50}
         containerHeight="70vh" 
+        defaultExpanded={1}
       />
     </div>
   );

@@ -16,6 +16,7 @@ import {
   Row,
   aggregationFns,
   GroupingState,
+  ExpandedState,
 } from "@tanstack/react-table";
 import { DataTableProps, ColumnFilter } from "@/components/data-table/types";
 import { numberRangeFilterFn, starRatingFilterFn } from "@/components/data-table/utils/filterFunctions";
@@ -56,6 +57,8 @@ export function useDataTableLogic<TData, TValue>({
   groupableColumns = [],
   columnFilters = [],
   defaultPageSize = 50,
+  defaultExpanded,
+  defaultGrouping,
 }: DataTableProps<TData, TValue>): UseDataTableLogicReturn<TData> {
   // Use the custom hooks
   const {
@@ -74,7 +77,7 @@ export function useDataTableLogic<TData, TValue>({
     isGroupingDialogOpen,
     setIsGroupingDialogOpen,
     groupableColumnObjects,
-  } = useDataTableGrouping({ columns, enableGrouping, groupableColumns });
+  } = useDataTableGrouping({ columns, enableGrouping, groupableColumns, defaultExpanded, defaultGrouping });
 
   const {
     sorting,
@@ -165,6 +168,35 @@ export function useDataTableLogic<TData, TValue>({
       tableRef.current = table;
     }
   }, [table, tableRef]);
+
+  // Effect to handle numeric defaultExpanded after rows are available
+  React.useEffect(() => {
+    // Check if defaultExpanded is a number and greater than 0
+    if (typeof defaultExpanded === 'number' && defaultExpanded > 0) {
+      // Defer execution slightly to allow table rows to process
+      const timeoutId = setTimeout(() => {
+        const newExpandedState: ExpandedState = {};
+        // Iterate over the row model after grouping/expansion models have run
+        table.getRowModel().rows.forEach(row => {
+          // Expand rows whose depth is less than the specified level
+          // row.depth is 0-indexed, defaultExpanded is 1-indexed level
+          if (row.depth < defaultExpanded) {
+            newExpandedState[row.id] = true;
+          }
+        });
+        // Only update state if there are rows to expand
+        if (Object.keys(newExpandedState).length > 0) {
+          setExpanded(newExpandedState);
+        }
+      }, 0); // setTimeout with 0ms delay
+
+      // Cleanup function to clear the timeout if the component unmounts
+      return () => clearTimeout(timeoutId);
+    }
+    // Dependencies: run only when these change.
+    // table instance should be stable, setExpanded is stable.
+    // defaultExpanded triggers the effect if it changes.
+  }, [defaultExpanded, setExpanded, table]); 
 
   const { rows } = table.getRowModel();
 
