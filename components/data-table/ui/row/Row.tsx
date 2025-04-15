@@ -99,7 +99,7 @@ export function TableRowComponent<TData>({
       data-state={row.getIsSelected() && "selected"}
       className={`flex items-center w-full ${
         isSticky ? "sticky backdrop-blur bg-background/95 border-b border-border z-5" : ""
-      } ${isParentRow ? "bg-gray-100 cursor-pointer" : ""} py-0`}
+      } ${isParentRow && row.depth === 0 ? "bg-gray-100 cursor-pointer" : ""} py-0`}
       onClick={handleRowClick}
       ref={(node: HTMLTableRowElement | null) => {
         if (node) {
