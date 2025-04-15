@@ -29,12 +29,14 @@ interface UseDataTableStateReturn {
     pageIndex: number;
     pageSize: number;
   };
-  setPagination: React.Dispatch<React.SetStateAction<{ pageIndex: number; pageSize: number }>>;
+  setPagination: React.Dispatch<
+    React.SetStateAction<{ pageIndex: number; pageSize: number }>
+  >;
   forceRenderCount: number;
   setForceRenderCount: React.Dispatch<React.SetStateAction<number>>;
   createTableMeta: <TData>(
     tableRef: React.MutableRefObject<ReactTable<TData> | null>,
-    grouping: GroupingState
+    grouping: GroupingState,
   ) => {
     forceRender: () => void;
     recomputeAggregations: () => void;
@@ -47,7 +49,8 @@ export function useDataTableState({
 }: UseDataTableStateProps): UseDataTableStateReturn {
   // Table state
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [columnOrder, setColumnOrder] = React.useState<ColumnOrderState>([]);
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
@@ -56,32 +59,35 @@ export function useDataTableState({
   const [forceRenderCount, setForceRenderCount] = React.useState(0);
 
   // Create table meta object factory
-  const createTableMeta = React.useCallback(<TData,>(
-    tableRef: React.MutableRefObject<ReactTable<TData> | null>,
-    grouping: GroupingState
-  ) => {
-    return {
-      forceRender: () => {
-        if (isMountedRef.current) {
-          setForceRenderCount((count) => count + 1);
-        }
-      },
-      recomputeAggregations: () => {
-        if (isMountedRef.current && tableRef.current && grouping.length > 0) {
-          // First, temporarily clear grouping
-          const tempGrouping = [...grouping];
-          tableRef.current.setGrouping([]);
+  const createTableMeta = React.useCallback(
+    <TData>(
+      tableRef: React.MutableRefObject<ReactTable<TData> | null>,
+      grouping: GroupingState,
+    ) => {
+      return {
+        forceRender: () => {
+          if (isMountedRef.current) {
+            setForceRenderCount((count) => count + 1);
+          }
+        },
+        recomputeAggregations: () => {
+          if (isMountedRef.current && tableRef.current && grouping.length > 0) {
+            // First, temporarily clear grouping
+            const tempGrouping = [...grouping];
+            tableRef.current.setGrouping([]);
 
-          // Then restore it to force recalculation
-          setTimeout(() => {
-            if (tableRef.current) {
-              tableRef.current.setGrouping(tempGrouping);
-            }
-          }, 0);
-        }
-      },
-    };
-  }, [isMountedRef]);
+            // Then restore it to force recalculation
+            setTimeout(() => {
+              if (tableRef.current) {
+                tableRef.current.setGrouping(tempGrouping);
+              }
+            }, 0);
+          }
+        },
+      };
+    },
+    [isMountedRef],
+  );
 
   return {
     sorting,
@@ -96,4 +102,4 @@ export function useDataTableState({
     setForceRenderCount,
     createTableMeta,
   };
-} 
+}

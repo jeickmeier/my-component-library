@@ -19,8 +19,16 @@ import {
   ExpandedState,
 } from "@tanstack/react-table";
 import { DataTableProps, ColumnFilter } from "@/components/data-table/types";
-import { numberRangeFilterFn, starRatingFilterFn } from "@/components/data-table/utils/filterFunctions";
-import { firstAggregation, lastAggregation, sparklineAggregation, AggregationFunction } from "@/components/data-table/utils/aggregationFunctions";
+import {
+  numberRangeFilterFn,
+  starRatingFilterFn,
+} from "@/components/data-table/utils/filterFunctions";
+import {
+  firstAggregation,
+  lastAggregation,
+  sparklineAggregation,
+  AggregationFunction,
+} from "@/components/data-table/utils/aggregationFunctions";
 
 // Import custom hooks
 import { useDataTableFilters } from "@/components/data-table/hooks/useDataTableFilters";
@@ -77,7 +85,13 @@ export function useDataTableLogic<TData, TValue>({
     isGroupingDialogOpen,
     setIsGroupingDialogOpen,
     groupableColumnObjects,
-  } = useDataTableGrouping({ columns, enableGrouping, groupableColumns, defaultExpanded, defaultGrouping });
+  } = useDataTableGrouping({
+    columns,
+    enableGrouping,
+    groupableColumns,
+    defaultExpanded,
+    defaultGrouping,
+  });
 
   const {
     sorting,
@@ -137,7 +151,7 @@ export function useDataTableLogic<TData, TValue>({
       first: firstAggregation,
       last: lastAggregation,
       sparkline: sparklineAggregation,
-      
+
       sum: aggregationFns.sum,
       count: aggregationFns.count,
       min: aggregationFns.min,
@@ -172,12 +186,12 @@ export function useDataTableLogic<TData, TValue>({
   // Effect to handle numeric defaultExpanded after rows are available
   React.useEffect(() => {
     // Check if defaultExpanded is a number and greater than 0
-    if (typeof defaultExpanded === 'number' && defaultExpanded > 0) {
+    if (typeof defaultExpanded === "number" && defaultExpanded > 0) {
       // Defer execution slightly to allow table rows to process
       const timeoutId = setTimeout(() => {
         const newExpandedState: ExpandedState = {};
         // Iterate over the row model after grouping/expansion models have run
-        table.getRowModel().rows.forEach(row => {
+        table.getRowModel().rows.forEach((row) => {
           // Expand rows whose depth is less than the specified level
           // row.depth is 0-indexed, defaultExpanded is 1-indexed level
           if (row.depth < defaultExpanded) {
@@ -196,7 +210,7 @@ export function useDataTableLogic<TData, TValue>({
     // Dependencies: run only when these change.
     // table instance should be stable, setExpanded is stable.
     // defaultExpanded triggers the effect if it changes.
-  }, [defaultExpanded, setExpanded, table]); 
+  }, [defaultExpanded, setExpanded, table]);
 
   const { rows } = table.getRowModel();
 

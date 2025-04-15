@@ -31,7 +31,6 @@ export function DataTableColumnHeader<TData, TValue>({
   filterConfig,
   onAggregationChange,
 }: DataTableColumnHeaderProps<TData, TValue>) {
-
   const isSortable = column.getCanSort();
 
   if (!isSortable) {

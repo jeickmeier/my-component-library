@@ -27,7 +27,7 @@ export function SelectFilter<TData>({
   filter,
 }: SelectFilterProps<TData>) {
   const currentValue = (column.getFilterValue() as string) || "all";
-  
+
   const clearFilter = React.useCallback(() => {
     column.setFilterValue(undefined);
   }, [column]);

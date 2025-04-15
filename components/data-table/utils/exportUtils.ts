@@ -11,7 +11,7 @@ import { Table } from "@tanstack/react-table";
  */
 export function tableToCSV<TData>(
   table: Table<TData>,
-  includeAllColumns = true
+  includeAllColumns = true,
 ): string {
   // Get headers and rows
   const headers = table.getAllColumns();
@@ -22,10 +22,11 @@ export function tableToCSV<TData>(
   // Generate the header row
   const headerRow = columnsToUse
     .map((column) => {
-      const headerValue = typeof column.columnDef.header === 'function'
-        ? column.columnDef.header.toString()
-        : column.columnDef.header || column.id;
-      
+      const headerValue =
+        typeof column.columnDef.header === "function"
+          ? column.columnDef.header.toString()
+          : column.columnDef.header || column.id;
+
       return escapeCSVValue(String(headerValue));
     })
     .join(",");
@@ -38,7 +39,7 @@ export function tableToCSV<TData>(
         try {
           cellValue = row.getValue(column.id);
         } catch {
-          cellValue = '';
+          cellValue = "";
         }
         return escapeCSVValue(formatCellValueForCSV(cellValue));
       })
@@ -56,7 +57,7 @@ function formatCellValueForCSV(value: unknown): string {
   if (value === null || value === undefined) {
     return "";
   }
-  
+
   if (typeof value === "object") {
     // Handle Date objects
     if (value instanceof Date) {
@@ -65,7 +66,7 @@ function formatCellValueForCSV(value: unknown): string {
     // Other objects - convert to JSON string
     return JSON.stringify(value);
   }
-  
+
   return String(value);
 }
 
@@ -73,13 +74,14 @@ function formatCellValueForCSV(value: unknown): string {
  * Escape CSV value - wrap in quotes if needed and escape quotes
  */
 function escapeCSVValue(value: string): string {
-  const needsQuotes = value.includes(",") || value.includes("\n") || value.includes('"');
-  
+  const needsQuotes =
+    value.includes(",") || value.includes("\n") || value.includes('"');
+
   if (needsQuotes) {
     // Escape quotes by doubling them and wrap in quotes
     return `"${value.replace(/"/g, '""')}"`;
   }
-  
+
   return value;
 }
 
@@ -89,18 +91,18 @@ function escapeCSVValue(value: string): string {
 export function downloadCSV(csvContent: string, filename: string): void {
   // Create a blob with the CSV data
   const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-  
+
   // Create a download link
   const link = document.createElement("a");
   const url = URL.createObjectURL(blob);
-  
+
   // Set link properties
   link.setAttribute("href", url);
   link.setAttribute("download", filename);
   link.style.visibility = "hidden";
-  
+
   // Add to document, trigger click and remove
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-} 
+}

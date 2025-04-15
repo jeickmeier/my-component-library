@@ -74,31 +74,33 @@ export function ColumnOrderingPanel({
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   // Keep a local copy of orderedColumns that's derived from props but doesn't
   // directly update the parent state until drag ends
-  const [localOrderedColumns, setLocalOrderedColumns] = React.useState<ColumnOrderItem[]>([]);
-  
+  const [localOrderedColumns, setLocalOrderedColumns] = React.useState<
+    ColumnOrderItem[]
+  >([]);
+
   // Initialize the ordered columns based on columnOrder state and available columns
   React.useEffect(() => {
     // Create a map of all columns
-    const columnsMap = new Map(columns.map(c => [c.id, c]));
-    
+    const columnsMap = new Map(columns.map((c) => [c.id, c]));
+
     // First include columns that are in columnOrder
     const ordered: ColumnOrderItem[] = columnOrder
-      .filter(id => columnsMap.has(id))
-      .map(id => columnsMap.get(id)!)
-      .map(c => ({ id: c.id, label: c.label }));
-    
+      .filter((id) => columnsMap.has(id))
+      .map((id) => columnsMap.get(id)!)
+      .map((c) => ({ id: c.id, label: c.label }));
+
     // Then add any remaining columns that are not in columnOrder
-    columns.forEach(column => {
+    columns.forEach((column) => {
       if (!columnOrder.includes(column.id)) {
         ordered.push({ id: column.id, label: column.label });
       }
     });
-    
+
     setLocalOrderedColumns(ordered);
   }, [columns, columnOrder]);
 
@@ -107,24 +109,35 @@ export function ColumnOrderingPanel({
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      const oldIndex = localOrderedColumns.findIndex(col => col.id === active.id);
-      const newIndex = localOrderedColumns.findIndex(col => col.id === over.id);
+      const oldIndex = localOrderedColumns.findIndex(
+        (col) => col.id === active.id,
+      );
+      const newIndex = localOrderedColumns.findIndex(
+        (col) => col.id === over.id,
+      );
 
       // First update local state for immediate visual feedback
-      const newLocalOrderedColumns = arrayMove(localOrderedColumns, oldIndex, newIndex);
+      const newLocalOrderedColumns = arrayMove(
+        localOrderedColumns,
+        oldIndex,
+        newIndex,
+      );
       setLocalOrderedColumns(newLocalOrderedColumns);
-      
+
       // Then propagate the change to parent component
-      onColumnOrderChange(newLocalOrderedColumns.map(col => col.id));
+      onColumnOrderChange(newLocalOrderedColumns.map((col) => col.id));
     }
   };
 
   // Reset to default ordering
   const resetColumnOrder = () => {
     // Clear local state
-    const defaultOrder = columns.map(col => ({ id: col.id, label: col.label }));
+    const defaultOrder = columns.map((col) => ({
+      id: col.id,
+      label: col.label,
+    }));
     setLocalOrderedColumns(defaultOrder);
-    
+
     // Propagate to parent
     onColumnOrderChange([]);
   };
@@ -151,11 +164,11 @@ export function ColumnOrderingPanel({
           onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={localOrderedColumns.map(col => col.id)}
+            items={localOrderedColumns.map((col) => col.id)}
             strategy={verticalListSortingStrategy}
           >
             <div>
-              {localOrderedColumns.map(column => (
+              {localOrderedColumns.map((column) => (
                 <SortableColumnItem key={column.id} column={column} />
               ))}
             </div>
@@ -168,4 +181,4 @@ export function ColumnOrderingPanel({
       </div>
     </div>
   );
-} 
+}

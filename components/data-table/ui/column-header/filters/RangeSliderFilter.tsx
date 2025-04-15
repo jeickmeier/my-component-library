@@ -7,7 +7,10 @@
 import * as React from "react";
 import { Column, Row } from "@tanstack/react-table";
 import { Slider } from "@/components/ui/slider";
-import { RangeColumnFilter, RangeSliderColumnFilter } from "@/components/data-table/types";
+import {
+  RangeColumnFilter,
+  RangeSliderColumnFilter,
+} from "@/components/data-table/types";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -24,30 +27,35 @@ export function RangeSliderFilter<TData>({
   const columnValues = React.useMemo(() => {
     const values: number[] = [];
     const table = column.getFacetedRowModel();
-    
+
     table.rows.forEach((row: Row<TData>) => {
       const value = row.getValue(column.id) as number;
-      if (typeof value === 'number' && !isNaN(value)) {
+      if (typeof value === "number" && !isNaN(value)) {
         values.push(value);
       }
     });
-    
+
     return values;
   }, [column]);
-  
+
   // Calculate min and max from filter props or column values
-  const minPossible = React.useMemo(() => 
-    filter.min !== undefined ? filter.min : Math.min(...columnValues, 0),
-  [filter.min, columnValues]);
-  
-  const maxPossible = React.useMemo(() => 
-    filter.max !== undefined ? filter.max : Math.max(...columnValues, 100),
-  [filter.max, columnValues]);
-  
+  const minPossible = React.useMemo(
+    () =>
+      filter.min !== undefined ? filter.min : Math.min(...columnValues, 0),
+    [filter.min, columnValues],
+  );
+
+  const maxPossible = React.useMemo(
+    () =>
+      filter.max !== undefined ? filter.max : Math.max(...columnValues, 100),
+    [filter.max, columnValues],
+  );
+
   // Get step from filter props if available (for RangeSliderColumnFilter)
-  const step = React.useMemo(() => 
-    'step' in filter && filter.step !== undefined ? filter.step : 1,
-  [filter]);
+  const step = React.useMemo(
+    () => ("step" in filter && filter.step !== undefined ? filter.step : 1),
+    [filter],
+  );
 
   // Get the current filter value directly from the column
   const currentFilterValue = column.getFilterValue() as
@@ -75,9 +83,9 @@ export function RangeSliderFilter<TData>({
   const updateFilterValue = React.useCallback(
     (newRange: [number, number]) => {
       // Only set the filter if the range is different from min/max possible values
-      const isDefaultRange = 
+      const isDefaultRange =
         newRange[0] === minPossible && newRange[1] === maxPossible;
-      
+
       column.setFilterValue(isDefaultRange ? undefined : newRange);
     },
     [column, minPossible, maxPossible],
@@ -89,10 +97,10 @@ export function RangeSliderFilter<TData>({
   }, [column, minPossible, maxPossible]);
 
   const hasFilter = range[0] !== minPossible || range[1] !== maxPossible;
-  
+
   // Format numbers with commas for better readability
   const formatNumber = (num: number): string => {
-    return num.toLocaleString('en-US');
+    return num.toLocaleString("en-US");
   };
 
   return (
@@ -101,7 +109,7 @@ export function RangeSliderFilter<TData>({
         <span>{formatNumber(range[0])}</span>
         <span>{formatNumber(range[1])}</span>
       </div>
-      
+
       <Slider
         min={minPossible}
         max={maxPossible}
@@ -115,7 +123,7 @@ export function RangeSliderFilter<TData>({
         }}
         className="w-full"
       />
-      
+
       {hasFilter && (
         <Button
           variant="ghost"
@@ -129,4 +137,4 @@ export function RangeSliderFilter<TData>({
       )}
     </div>
   );
-} 
+}

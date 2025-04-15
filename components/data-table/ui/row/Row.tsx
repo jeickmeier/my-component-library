@@ -33,18 +33,18 @@ interface TableRowProps<TData> {
 
 /**
  * Renders a table row with support for grouping, virtualization, and sticky headers.
- * 
+ *
  * Rendering logic flow:
  * 1. Determines if row is a parent row (has subRows and grouping is active)
  * 2. Calculates sticky positioning for parent rows if needed
  * 3. Renders each cell with appropriate content based on grouping context
- * 
+ *
  * Cell content rendering rules:
  * - Parent rows with subRows show expand/collapse controls for the active grouping level
  * - Group header cells include the count of subrows in parentheses
- * - Leaf nodes (rows without children) don't display content for grouped columns 
+ * - Leaf nodes (rows without children) don't display content for grouped columns
  * - Cells are indented based on their depth in the grouping hierarchy
- * 
+ *
  * @returns A table row with properly styled and positioned cells
  */
 export function TableRowComponent<TData>({
@@ -98,7 +98,9 @@ export function TableRowComponent<TData>({
       data-index={virtualRow.index}
       data-state={row.getIsSelected() && "selected"}
       className={`flex items-center w-full ${
-        isSticky ? "sticky backdrop-blur bg-background/95 border-b border-border z-5" : ""
+        isSticky
+          ? "sticky backdrop-blur bg-background/95 border-b border-border z-5"
+          : ""
       } ${isParentRow && row.depth === 0 ? "bg-gray-100 cursor-pointer" : ""} py-0`}
       onClick={handleRowClick}
       ref={(node: HTMLTableRowElement | null) => {
@@ -127,18 +129,21 @@ export function TableRowComponent<TData>({
          */
         const columnIndex = grouping.indexOf(cell.column.id);
         const isActiveGroupingLevel = columnIndex === row.depth;
-        
+
         const isGroupedColumn = grouping.includes(cell.column.id);
         const shouldHideInLeafNode = isLeafNode && isGroupedColumn;
-        const shouldShowContent = (!isGroupedColumn || isActiveGroupingLevel) && !shouldHideInLeafNode;
-        
+        const shouldShowContent =
+          (!isGroupedColumn || isActiveGroupingLevel) && !shouldHideInLeafNode;
+
         // For leaf nodes with grouped columns, render empty cells to maintain structure
         if (shouldHideInLeafNode) {
           return (
             <TableCell
               key={cell.id}
               style={{
-                flex: cell.column.getSize() ? `${cell.column.getSize()} 0 0` : 1,
+                flex: cell.column.getSize()
+                  ? `${cell.column.getSize()} 0 0`
+                  : 1,
                 width: cell.column.getSize()
                   ? `${cell.column.getSize()}px`
                   : "auto",
@@ -148,7 +153,7 @@ export function TableRowComponent<TData>({
             </TableCell>
           );
         }
-        
+
         return (
           <TableCell
             key={cell.id}
@@ -167,11 +172,11 @@ export function TableRowComponent<TData>({
                 <div
                   style={{
                     paddingLeft: `${row.depth * 1.5}rem`,
-                    display: 'flex',
-                    alignItems: 'center'
+                    display: "flex",
+                    alignItems: "center",
                   }}
                 >
-                  {/* 
+                  {/*
                    * For parent rows at their active grouping level:
                    * 1. Show expand/collapse button
                    * 2. When expanded, show chevron down; when collapsed, show chevron right
@@ -193,7 +198,7 @@ export function TableRowComponent<TData>({
                       )}
                     </Button>
                   )}
-                  {/* 
+                  {/*
                    * Cell content rendering:
                    * 1. For grouped columns, show cell content only at the active level
                    * 2. For active grouping levels, show number of children in parentheses
@@ -203,10 +208,11 @@ export function TableRowComponent<TData>({
                     <>
                       <span className="block overflow-hidden text-ellipsis">
                         {flexRender(
-                          cell.getIsAggregated() && cell.column.columnDef.aggregatedCell
+                          cell.getIsAggregated() &&
+                            cell.column.columnDef.aggregatedCell
                             ? cell.column.columnDef.aggregatedCell
-                            : cell.column.columnDef.cell, 
-                          cell.getContext()
+                            : cell.column.columnDef.cell,
+                          cell.getContext(),
                         )}
                       </span>
                       {isActiveGroupingLevel && (
@@ -225,7 +231,7 @@ export function TableRowComponent<TData>({
                   paddingLeft: isGroupedColumn ? `${row.depth * 1.5}rem` : 0,
                 }}
               >
-                {/* 
+                {/*
                  * For non-group cells or leaf nodes:
                  * 1. Render cell content with appropriate indentation
                  * 2. Use aggregatedCell renderer for aggregated cells if available
@@ -233,8 +239,8 @@ export function TableRowComponent<TData>({
                 {flexRender(
                   cell.getIsAggregated() && cell.column.columnDef.aggregatedCell
                     ? cell.column.columnDef.aggregatedCell
-                    : cell.column.columnDef.cell, 
-                  cell.getContext()
+                    : cell.column.columnDef.cell,
+                  cell.getContext(),
                 )}
               </span>
             )}

@@ -44,17 +44,21 @@ export const lastAggregation: AggregationFunction = (columnId, leafRows) => {
   return value != null ? String(value) : null;
 };
 
-
 // Sparkline aggregation - returns all numeric values as an array
-export const sparklineAggregation: AggregationFunction = (columnId, leafRows) => {
+export const sparklineAggregation: AggregationFunction = (
+  columnId,
+  leafRows,
+) => {
   if (!leafRows.length) return [];
-  
+
   // Extract values from all rows
-  const values = leafRows.map(row => {
+  const values = leafRows.map((row) => {
     const value = row.getValue(columnId);
     return typeof value === "number" ? value : null;
   });
-  
+
   // Filter out null/undefined values and return the array of numbers
-  return values.filter((val): val is number => val !== null && val !== undefined);
+  return values.filter(
+    (val): val is number => val !== null && val !== undefined,
+  );
 };

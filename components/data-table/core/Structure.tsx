@@ -60,7 +60,7 @@ const MemoizedTableHeader = React.memo(function TableHeaderComponent<TData>({
 }) {
   // We use columnVisibility and columnOrder as dependencies to force re-renders
   // when visibility or ordering changes, even though we don't reference them directly
-  
+
   return (
     <Table
       style={{
@@ -91,9 +91,11 @@ const MemoizedTableHeader = React.memo(function TableHeaderComponent<TData>({
           >
             {headerGroup.headers
               // Only include headers that have at least one visible leaf column
-              .filter(header => 
+              .filter((header) =>
                 // Check if this header or any of its children are visible
-                header.column.getLeafColumns().some(column => column.getIsVisible())
+                header.column
+                  .getLeafColumns()
+                  .some((column) => column.getIsVisible()),
               )
               .map((header) => (
                 <TableHead
@@ -153,7 +155,7 @@ export function DataTableStructure<TData, TValue>({
 
   // Get column visibility from table state to force re-renders when it changes
   const columnVisibility = table.getState().columnVisibility;
-  
+
   // Get column order from table state to force re-renders when it changes
   const columnOrder = table.getState().columnOrder;
 

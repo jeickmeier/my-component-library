@@ -38,15 +38,17 @@ const defaultFormatter = (value: number): string => {
   }
 };
 
-const SparklineHistogramComponent = <TData,>({ 
-  value, 
-  options 
-}: { 
-  value: number[] | null; 
-  options: SparklineHistogramOptions<TData> 
+const SparklineHistogramComponent = <TData,>({
+  value,
+  options,
+}: {
+  value: number[] | null;
+  options: SparklineHistogramOptions<TData>;
 }) => {
   if (!value || !Array.isArray(value) || value.length === 0) {
-    return <div className="text-center text-xs text-muted-foreground">No data</div>;
+    return (
+      <div className="text-center text-xs text-muted-foreground">No data</div>
+    );
   }
 
   const {
@@ -55,7 +57,7 @@ const SparklineHistogramComponent = <TData,>({
     width = DEFAULT_WIDTH,
     barColor = DEFAULT_BAR_COLOR,
     formatTooltipValue = defaultFormatter,
-    showTooltip = DEFAULT_SHOW_TOOLTIP
+    showTooltip = DEFAULT_SHOW_TOOLTIP,
   } = options;
 
   return (
@@ -71,18 +73,20 @@ const SparklineHistogramComponent = <TData,>({
   );
 };
 
-SparklineHistogramComponent.displayName = 'SparklineHistogramComponent';
+SparklineHistogramComponent.displayName = "SparklineHistogramComponent";
 
 export function createSparklineHistogramRenderer<TData>(
-  options: SparklineHistogramOptions<TData> = {}
+  options: SparklineHistogramOptions<TData> = {},
 ): CellRenderer<TData, number[]> {
-  const SparklineHistogramRenderer = ({ value }: { value: number[] | null }) => (
-    <SparklineHistogramComponent<TData> value={value} options={options} />
-  );
-  
-  SparklineHistogramRenderer.displayName = 'SparklineHistogramRenderer';
+  const SparklineHistogramRenderer = ({
+    value,
+  }: {
+    value: number[] | null;
+  }) => <SparklineHistogramComponent<TData> value={value} options={options} />;
+
+  SparklineHistogramRenderer.displayName = "SparklineHistogramRenderer";
   return SparklineHistogramRenderer;
-} 
+}
 
 // Helper type for cell renderer input
 interface CellRenderProps<TData, TValue> {
@@ -98,7 +102,7 @@ interface CellRenderProps<TData, TValue> {
  * - For all other aggregations (sum, mean, etc), uses a different renderer
  */
 export function createMultiAggregationRenderer<TData>(
-  options: SparklineHistogramOptions<TData>
+  options: SparklineHistogramOptions<TData>,
 ): (props: CellContext<TData, unknown>) => React.ReactNode {
   const countRenderer = options.countRenderer;
   const aggregatedRenderer = options.aggregatedRenderer;
@@ -106,36 +110,41 @@ export function createMultiAggregationRenderer<TData>(
   const MultiAggregationRenderer = (props: CellContext<TData, unknown>) => {
     const value = props.getValue();
     const column = props.column;
-    const aggFn = column && typeof column.columnDef.aggregationFn === 'string'
-      ? column.columnDef.aggregationFn
-      : 'custom';
-    
+    const aggFn =
+      column && typeof column.columnDef.aggregationFn === "string"
+        ? column.columnDef.aggregationFn
+        : "custom";
+
     // Handle sparkline aggregation (returns array of numbers)
-    if (aggFn === 'sparkline' && Array.isArray(value)) {
+    if (aggFn === "sparkline" && Array.isArray(value)) {
       return (
-        <SparklineHistogramComponent<TData> 
-          value={value as number[]} 
-          options={options} 
+        <SparklineHistogramComponent<TData>
+          value={value as number[]}
+          options={options}
         />
       );
     }
-    
+
     // For count aggregations, use the count renderer if provided
-    if ((aggFn === 'count' || aggFn === 'uniqueCount') && countRenderer && typeof value === 'number') {
+    if (
+      (aggFn === "count" || aggFn === "uniqueCount") &&
+      countRenderer &&
+      typeof value === "number"
+    ) {
       const cellProps: CellRenderProps<TData, number> = {
         cell: props.cell as Cell<TData, number>,
         row: props.row,
-        value
+        value,
       };
       return countRenderer(cellProps);
     }
-    
+
     // For all other numeric aggregations (sum, mean, etc.) use the aggregated renderer
-    if (aggregatedRenderer && typeof value === 'number') {
+    if (aggregatedRenderer && typeof value === "number") {
       const cellProps: CellRenderProps<TData, number> = {
         cell: props.cell as Cell<TData, number>,
         row: props.row,
-        value
+        value,
       };
       return aggregatedRenderer(cellProps);
     }
@@ -144,6 +153,6 @@ export function createMultiAggregationRenderer<TData>(
     return String(value);
   };
 
-  MultiAggregationRenderer.displayName = 'MultiAggregationRenderer';
+  MultiAggregationRenderer.displayName = "MultiAggregationRenderer";
   return MultiAggregationRenderer;
-} 
+}

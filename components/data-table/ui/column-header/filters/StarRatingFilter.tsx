@@ -21,7 +21,7 @@ export function StarRatingFilter<TData>({
 }: StarRatingFilterProps<TData>) {
   const maxStars = filter.maxStars || 5;
   const currentValue = (column.getFilterValue() as number) || null;
-  
+
   const clearFilter = React.useCallback(() => {
     column.setFilterValue(undefined);
   }, [column]);
@@ -57,8 +57,8 @@ export function StarRatingFilter<TData>({
         ))}
       </div>
       <div className="text-xs mt-1 text-muted-foreground">
-        {currentValue 
-          ? `${currentValue} star${currentValue !== 1 ? "s" : ""} or more` 
+        {currentValue
+          ? `${currentValue} star${currentValue !== 1 ? "s" : ""} or more`
           : "Select rating"}
       </div>
       {currentValue && (
@@ -74,4 +74,4 @@ export function StarRatingFilter<TData>({
       )}
     </div>
   );
-} 
+}

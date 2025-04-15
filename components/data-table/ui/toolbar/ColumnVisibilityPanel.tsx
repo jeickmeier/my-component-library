@@ -17,7 +17,9 @@ import { cn } from "@/lib/utils";
 export interface ColumnVisibilityPanelProps {
   columns: { id: string; label: unknown }[];
   columnVisibility: VisibilityState;
-  onColumnVisibilityChange: (updater: React.SetStateAction<VisibilityState>) => void;
+  onColumnVisibilityChange: (
+    updater: React.SetStateAction<VisibilityState>,
+  ) => void;
 }
 
 // Type for React component function with optional displayName
@@ -29,10 +31,10 @@ interface ComponentWithDisplayName {
 // Helper function to safely get a clean column display name
 function getColumnDisplayName(label: unknown): string {
   if (label === null || label === undefined) return "Unknown Column";
-  
+
   // If it's a string, return it directly
   if (typeof label === "string") return label;
-  
+
   // If it's a function, try to call it and see if result is usable
   if (typeof label === "function") {
     try {
@@ -43,7 +45,7 @@ function getColumnDisplayName(label: unknown): string {
       // Ignore errors from calling the function
     }
   }
-  
+
   // If it's a React element, try to extract text
   if (React.isValidElement(label)) {
     try {
@@ -52,7 +54,7 @@ function getColumnDisplayName(label: unknown): string {
       if (props && typeof props.children === "string") {
         return props.children;
       }
-      
+
       // Try component name with type safety
       if (typeof label.type === "function") {
         const compFn = label.type as unknown as ComponentWithDisplayName;
@@ -67,7 +69,7 @@ function getColumnDisplayName(label: unknown): string {
       // Ignore any errors from accessing properties
     }
   }
-  
+
   // Try toString() as a last resort
   try {
     const stringValue = String(label);
@@ -78,7 +80,7 @@ function getColumnDisplayName(label: unknown): string {
   } catch {
     // Ignore toString errors
   }
-  
+
   // Default fallback
   return "Column";
 }
@@ -89,8 +91,9 @@ export function ColumnVisibilityPanel({
   onColumnVisibilityChange,
 }: ColumnVisibilityPanelProps) {
   // Keep an internal mirror of the table's visibility state to ensure updates are reflected
-  const [localVisibility, setLocalVisibility] = React.useState<VisibilityState>(columnVisibility);
-  
+  const [localVisibility, setLocalVisibility] =
+    React.useState<VisibilityState>(columnVisibility);
+
   // Update local state when parent state changes
   React.useEffect(() => {
     setLocalVisibility(columnVisibility);
@@ -100,18 +103,18 @@ export function ColumnVisibilityPanel({
   const toggleColumnVisibility = React.useCallback(
     (columnId: string, isVisible: boolean) => {
       // Update local state immediately for responsive UI
-      setLocalVisibility(prev => ({
+      setLocalVisibility((prev) => ({
         ...prev,
         [columnId]: isVisible,
       }));
-      
+
       // Propagate change to parent component
-      onColumnVisibilityChange(prev => ({
+      onColumnVisibilityChange((prev) => ({
         ...prev,
         [columnId]: isVisible,
       }));
     },
-    [onColumnVisibilityChange]
+    [onColumnVisibilityChange],
   );
 
   // Function to reset all columns to visible
@@ -120,19 +123,18 @@ export function ColumnVisibilityPanel({
     columns.forEach((column) => {
       resetState[column.id] = true;
     });
-    
+
     // Update local state immediately for responsive UI
     setLocalVisibility(resetState);
-    
+
     // Propagate change to parent component
     onColumnVisibilityChange(resetState);
   }, [columns, onColumnVisibilityChange]);
 
   // Count visible columns
   const visibleColumnsCount = React.useMemo(() => {
-    return columns.filter(
-      (column) => localVisibility[column.id] !== false
-    ).length;
+    return columns.filter((column) => localVisibility[column.id] !== false)
+      .length;
   }, [columns, localVisibility]);
 
   return (
@@ -152,7 +154,9 @@ export function ColumnVisibilityPanel({
           disabled={visibleColumnsCount === columns.length}
         >
           <Eye className="h-3.5 w-3.5" />
-          <span className="sr-only md:not-sr-only md:inline-block">Show All</span>
+          <span className="sr-only md:not-sr-only md:inline-block">
+            Show All
+          </span>
         </Button>
       </div>
 
@@ -163,15 +167,15 @@ export function ColumnVisibilityPanel({
             const isVisible = localVisibility[column.id] !== false;
             // Get a clean display name
             const displayName = getColumnDisplayName(column.label);
-            
+
             return (
-              <div 
-                key={column.id} 
+              <div
+                key={column.id}
                 className={cn(
                   "flex items-center py-2 px-3 rounded-md transition-colors cursor-pointer",
-                  isVisible 
-                    ? "bg-accent/50 text-accent-foreground" 
-                    : "hover:bg-muted/50"
+                  isVisible
+                    ? "bg-accent/50 text-accent-foreground"
+                    : "hover:bg-muted/50",
                 )}
                 onClick={() => toggleColumnVisibility(column.id, !isVisible)}
               >
@@ -205,4 +209,4 @@ export function ColumnVisibilityPanel({
       </div>
     </div>
   );
-} 
+}

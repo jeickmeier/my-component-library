@@ -10,8 +10,11 @@ import { ColumnFilter } from "@/components/data-table/types";
 import { GlobalFilter } from "@/components/data-table/ui/toolbar/GlobalFilter";
 import { Button } from "@/components/ui/button";
 import { Download, ChevronDown } from "lucide-react";
-import { tableToCSV, downloadCSV } from "@/components/data-table/utils/exportUtils";
-import { TableCustomizationControl } from "@/components/data-table/ui/toolbar/TableCustomizationControl"
+import {
+  tableToCSV,
+  downloadCSV,
+} from "@/components/data-table/utils/exportUtils";
+import { TableCustomizationControl } from "@/components/data-table/ui/toolbar/TableCustomizationControl";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,7 +29,7 @@ interface DataTableToolbarProps<TData> {
   globalFilter: string;
   setGlobalFilter: (value: string) => void;
   groupableColumnObjects?: { id: string; label: string }[];
-  isCustomizationDialogOpen?: boolean; 
+  isCustomizationDialogOpen?: boolean;
   setIsCustomizationDialogOpen?: (open: boolean) => void;
   enableCustomization?: boolean;
 }
@@ -39,16 +42,15 @@ export const DataTableToolbar = React.memo(function DataTableToolbar<TData>({
   groupableColumnObjects = [],
   isCustomizationDialogOpen = false,
   setIsCustomizationDialogOpen,
-  enableCustomization = false
+  enableCustomization = false,
 }: DataTableToolbarProps<TData>) {
-  
   // Function to handle CSV export
   const handleExportCSV = React.useCallback(() => {
     const csvData = tableToCSV(table);
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
     downloadCSV(csvData, `table-export-${timestamp}.csv`);
   }, [table]);
-  
+
   return (
     <div className="flex items-center justify-between">
       {/* Filters Section */}
@@ -58,7 +60,7 @@ export const DataTableToolbar = React.memo(function DataTableToolbar<TData>({
           setGlobalFilter={setGlobalFilter}
         />
       </div>
-      
+
       <div className="flex items-center">
         {/* Table Customization Controls */}
         <div className="flex items-center pl-2">
@@ -71,7 +73,7 @@ export const DataTableToolbar = React.memo(function DataTableToolbar<TData>({
             />
           )}
         </div>
-        
+
         {/* Export Dropdown Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -83,9 +85,7 @@ export const DataTableToolbar = React.memo(function DataTableToolbar<TData>({
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={handleExportCSV}>
-              CSV
-            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleExportCSV}>CSV</DropdownMenuItem>
             {/* Additional export options can be added here in the future */}
           </DropdownMenuContent>
         </DropdownMenu>

@@ -1,7 +1,7 @@
 /**
  * Type definitions for the data table component library. Includes interfaces for various
  * filter types (select, range, star rating), table props, and extends @tanstack/react-table
- * with custom filter and aggregation functions. These types provide type safety and 
+ * with custom filter and aggregation functions. These types provide type safety and
  * documentation for the component's configuration options.
  */
 
@@ -56,9 +56,9 @@ export interface StarRatingColumnFilter {
   maxStars?: number;
 }
 
-export type ColumnFilter = 
-  | SelectColumnFilter 
-  | RangeColumnFilter 
+export type ColumnFilter =
+  | SelectColumnFilter
+  | RangeColumnFilter
   | RangeSliderColumnFilter
   | StarRatingColumnFilter;
 

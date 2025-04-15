@@ -13,13 +13,16 @@ export default function DemoPage() {
   return (
     <div className="container mx-auto py-5">
       <DataTable
+        // Core Options
         columns={columns as ColumnDef<Payment>[]}
         data={data}
+        // Grouping Options
         enableGrouping={true}
-        defaultGrouping={["status","category"]}
-        defaultPageSize={50}
-        containerHeight="70vh" 
+        defaultGrouping={["status", "category"]}
         defaultExpanded={1}
+        // Formatting Options
+        defaultPageSize={50}
+        containerHeight="70vh"
       />
     </div>
   );

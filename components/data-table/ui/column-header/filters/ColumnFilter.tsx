@@ -13,9 +13,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuPortal,
 } from "@/components/ui/dropdown-menu";
-import {
-  ColumnFilter as ColumnFilterType,
-} from "@/components/data-table/types";
+import { ColumnFilter as ColumnFilterType } from "@/components/data-table/types";
 import { SelectFilter } from "./SelectFilter";
 import { RangeFilter } from "./RangeFilter";
 import { TextFilter } from "./TextFilter";

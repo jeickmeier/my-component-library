@@ -20,7 +20,7 @@ export interface MoneyFormatterOptions {
   digits?: number;
   className?: string;
   abbreviate?: boolean;
-  abbreviationDivider?: 'K' | 'M' | 'B' | 'T';
+  abbreviationDivider?: "K" | "M" | "B" | "T";
   showCurrencySymbol?: boolean;
 }
 
@@ -39,8 +39,8 @@ type CategoryStyle<T extends string> = {
   [K in T]: {
     label?: string;
   } & (
-    | { type: 'color'; color: string }
-    | { type: 'icon'; icon: React.ReactNode }
+    | { type: "color"; color: string }
+    | { type: "icon"; icon: React.ReactNode }
   );
 };
 
@@ -57,20 +57,20 @@ export interface DateOptions {
   locale?: string;
   formatOptions?: Intl.DateTimeFormatOptions;
   className?: string;
-} 
+}
 
 export interface ExtentOptions {
-    // Date formatting options if the extent is for dates
-    dateOptions?: DateOptions;
-    // Number formatting options if the extent is for numbers
-    numberOptions?: MoneyFormatterOptions;
-    // Separator between min and max values
-    separator?: string;
-    // Custom class name for the container
-    className?: string;
-    // Whether to show labels for min/max
-    showLabels?: boolean;
-    // Custom labels (defaults to "Min" and "Max")
-    minLabel?: string;
-    maxLabel?: string;
-  } 
+  // Date formatting options if the extent is for dates
+  dateOptions?: DateOptions;
+  // Number formatting options if the extent is for numbers
+  numberOptions?: MoneyFormatterOptions;
+  // Separator between min and max values
+  separator?: string;
+  // Custom class name for the container
+  className?: string;
+  // Whether to show labels for min/max
+  showLabels?: boolean;
+  // Custom labels (defaults to "Min" and "Max")
+  minLabel?: string;
+  maxLabel?: string;
+}

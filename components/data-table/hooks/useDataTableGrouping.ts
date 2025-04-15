@@ -33,13 +33,16 @@ export function useDataTableGrouping<TData, TValue>({
   defaultGrouping,
 }: UseDataTableGroupingProps<TData, TValue>): UseDataTableGroupingReturn {
   // Grouping states
-  const [grouping, setGrouping] = React.useState<GroupingState>(defaultGrouping ?? []);
+  const [grouping, setGrouping] = React.useState<GroupingState>(
+    defaultGrouping ?? [],
+  );
   const [expanded, setExpanded] = React.useState<ExpandedState>(() => {
     if (defaultExpanded === true) {
       return true; // Expand all
-    } else if (typeof defaultExpanded === 'object') {
+    } else if (typeof defaultExpanded === "object") {
       return defaultExpanded; // Expand specific groups
-    } else { // Covers false, undefined, and now number
+    } else {
+      // Covers false, undefined, and now number
       return {}; // Default: no expansion
     }
   });
@@ -50,21 +53,27 @@ export function useDataTableGrouping<TData, TValue>({
     if (!enableGrouping) return [];
 
     // Auto-discover groupable columns from column definitions if no explicit list provided
-    const autoDiscoveredGroupableColumns = columns.reduce((acc: string[], col) => {
-      // Check if column is explicitly marked as groupable
-      if ('enableGrouping' in col && col.enableGrouping === true) {
-        const columnId = col.id || (('accessorKey' in col) ? String(col.accessorKey) : undefined);
-        if (columnId) {
-          acc.push(columnId);
+    const autoDiscoveredGroupableColumns = columns.reduce(
+      (acc: string[], col) => {
+        // Check if column is explicitly marked as groupable
+        if ("enableGrouping" in col && col.enableGrouping === true) {
+          const columnId =
+            col.id ||
+            ("accessorKey" in col ? String(col.accessorKey) : undefined);
+          if (columnId) {
+            acc.push(columnId);
+          }
         }
-      }
-      return acc;
-    }, []);
+        return acc;
+      },
+      [],
+    );
 
     // Use provided groupableColumns if defined, otherwise use auto-discovered columns
-    const columnsToUse = groupableColumns.length > 0 
-      ? groupableColumns 
-      : autoDiscoveredGroupableColumns;
+    const columnsToUse =
+      groupableColumns.length > 0
+        ? groupableColumns
+        : autoDiscoveredGroupableColumns;
 
     return columnsToUse.map((columnId) => {
       const col = columns.find(
@@ -91,4 +100,4 @@ export function useDataTableGrouping<TData, TValue>({
     setIsGroupingDialogOpen,
     groupableColumnObjects,
   };
-} 
+}

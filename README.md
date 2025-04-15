@@ -24,17 +24,20 @@ A powerful React component library designed for financial institution dashboards
 ## Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/yourusername/my-component-library.git
 cd my-component-library
 ```
 
 2. Install dependencies:
+
 ```bash
 pnpm install
 ```
 
 3. Run the development server:
+
 ```bash
 pnpm dev
 ```
@@ -79,32 +82,32 @@ const columnHelper = createColumnHelper<Payment>();
 
 // Define columns
 const columns = [
-  columnHelper.accessor('status', {
+  columnHelper.accessor("status", {
     header: "Status",
     enableGrouping: true,
-    filterFn: 'equals',
+    filterFn: "equals",
     meta: {
       options: [
         { label: "Pending", value: "pending" },
         { label: "Processing", value: "processing" },
         { label: "Success", value: "success" },
         { label: "Failed", value: "failed" },
-      ]
+      ],
     },
-    aggregationFn: 'first',
+    aggregationFn: "first",
   }),
-  columnHelper.accessor('amount', {
+  columnHelper.accessor("amount", {
     header: "Amount",
     enableGrouping: false,
-    filterFn: 'numberRange',
+    filterFn: "numberRange",
     meta: {
       filterConfig: {
-        type: 'rangeSlider',
-        column: 'amount',
-        label: 'Amount Range'
-      }
+        type: "rangeSlider",
+        column: "amount",
+        label: "Amount Range",
+      },
     },
-    aggregationFn: 'sum',
+    aggregationFn: "sum",
   }),
 ];
 
@@ -125,15 +128,15 @@ export default function PaymentsTable() {
 
 #### DataTable Props
 
-| Prop | Type | Description | Default |
-|------|------|-------------|---------|
-| `columns` | `ColumnDef<TData, TValue>[]` | Column definitions | Required |
-| `data` | `TData[]` | Table data | Required |
-| `columnFilters` | `ColumnFilter[]` | Filter configurations | Auto-discovered |
-| `enableGrouping` | `boolean` | Enable grouping | `false` |
-| `groupableColumns` | `string[]` | Groupable column IDs | Auto-discovered |
-| `defaultPageSize` | `number` | Rows per page | `50` |
-| `containerHeight` | `string` | Table container height | `"400px"` |
+| Prop               | Type                         | Description            | Default         |
+| ------------------ | ---------------------------- | ---------------------- | --------------- |
+| `columns`          | `ColumnDef<TData, TValue>[]` | Column definitions     | Required        |
+| `data`             | `TData[]`                    | Table data             | Required        |
+| `columnFilters`    | `ColumnFilter[]`             | Filter configurations  | Auto-discovered |
+| `enableGrouping`   | `boolean`                    | Enable grouping        | `false`         |
+| `groupableColumns` | `string[]`                   | Groupable column IDs   | Auto-discovered |
+| `defaultPageSize`  | `number`                     | Rows per page          | `50`            |
+| `containerHeight`  | `string`                     | Table container height | `"400px"`       |
 
 ### DatePickerWithRange
 
@@ -147,14 +150,14 @@ import { subDays } from "date-fns";
 export default function DateRangeSelector() {
   const today = new Date();
   const thirtyDaysAgo = subDays(today, 30);
-  
+
   const [dateRange, setDateRange] = useState<DateRange>({
     from: thirtyDaysAgo,
-    to: today
+    to: today,
   });
 
   return (
-    <DatePickerWithRange 
+    <DatePickerWithRange
       onDateChange={setDateRange}
       defaultFrom={thirtyDaysAgo}
       defaultTo={today}
@@ -165,16 +168,17 @@ export default function DateRangeSelector() {
 
 #### DatePickerWithRange Props
 
-| Prop | Type | Description | Default |
-|------|------|-------------|---------|
-| `onDateChange` | `(date: DateRange) => void` | Date change handler | Required |
-| `defaultFrom` | `Date` | Initial start date | `undefined` |
-| `defaultTo` | `Date` | Initial end date | `undefined` |
-| `className` | `string` | Additional CSS classes | `undefined` |
+| Prop           | Type                        | Description            | Default     |
+| -------------- | --------------------------- | ---------------------- | ----------- |
+| `onDateChange` | `(date: DateRange) => void` | Date change handler    | Required    |
+| `defaultFrom`  | `Date`                      | Initial start date     | `undefined` |
+| `defaultTo`    | `Date`                      | Initial end date       | `undefined` |
+| `className`    | `string`                    | Additional CSS classes | `undefined` |
 
 #### Available Date Presets
 
 Rolling Ranges:
+
 - 1D: Previous business day
 - MTD: Month to date
 - QTD: Quarter to date
@@ -184,6 +188,7 @@ Rolling Ranges:
 - 5Y: Last 5 years
 
 Absolute Ranges:
+
 - F20: FY 2019-2020
 - F21: FY 2020-2021
 - F22: FY 2021-2022

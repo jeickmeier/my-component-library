@@ -55,30 +55,31 @@ export function TableCustomizationControl<T>({
   setIsDialogOpen,
 }: TableCustomizationControlProps<T>) {
   const [activeTab, setActiveTab] = React.useState("grouping");
-  
+
   // Extract state management from the table instance
   const grouping = table.getState().grouping;
   const setGrouping = table.setGrouping;
-  
+
   const columnOrder = table.getState().columnOrder;
   const setColumnOrder = table.setColumnOrder;
-  
+
   const columnVisibility = table.getState().columnVisibility;
   const setColumnVisibility = table.setColumnVisibility;
-  
+
   // All non-grouped columns for ordering panel
   const orderableColumns = React.useMemo(() => {
-    return table.getAllLeafColumns()
-      .filter(column => !grouping.includes(column.id))
-      .map(column => ({
+    return table
+      .getAllLeafColumns()
+      .filter((column) => !grouping.includes(column.id))
+      .map((column) => ({
         id: column.id,
         label: column.columnDef.header?.toString() || column.id,
       }));
   }, [table, grouping]);
-  
+
   // All columns for visibility panel
   const allColumns = React.useMemo(() => {
-    return table.getAllLeafColumns().map(column => ({
+    return table.getAllLeafColumns().map((column) => ({
       id: column.id,
       label: column.columnDef.header?.toString() || column.id,
     }));
@@ -93,18 +94,16 @@ export function TableCustomizationControl<T>({
     <>
       <CustomizationButton onClick={handleOpenDialog} />
 
-      <Dialog
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-      >
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>Column Customization</DialogTitle>
             <DialogDescription>
-              Customize how your column data is displayed by grouping, reordering, or hiding.
+              Customize how your column data is displayed by grouping,
+              reordering, or hiding.
             </DialogDescription>
           </DialogHeader>
-          
+
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid grid-cols-3 mb-4">
               <TabsTrigger value="grouping">
@@ -120,7 +119,7 @@ export function TableCustomizationControl<T>({
                 Ordering
               </TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="grouping">
               <GroupingPanel
                 availableColumns={groupableColumnObjects}
@@ -128,7 +127,7 @@ export function TableCustomizationControl<T>({
                 onGroupingChange={setGrouping}
               />
             </TabsContent>
-            
+
             <TabsContent value="visibility">
               <ColumnVisibilityPanel
                 columns={allColumns}
@@ -136,7 +135,7 @@ export function TableCustomizationControl<T>({
                 onColumnVisibilityChange={setColumnVisibility}
               />
             </TabsContent>
-            
+
             <TabsContent value="ordering">
               <ColumnOrderingPanel
                 columns={orderableColumns}

@@ -193,4 +193,4 @@ export const GroupingPanel = function GroupingPanel({
       </div>
     </div>
   );
-}
+};

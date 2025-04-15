@@ -44,4 +44,4 @@ export function useDataTableRefs<TData>(): UseDataTableRefsReturn<TData> {
     rowRefsMap,
     tableRef,
   };
-} 
+}

@@ -10,7 +10,13 @@ const DEFAULT_SHOW_LABELS = false;
 const DEFAULT_MIN_LABEL = "Min";
 const DEFAULT_MAX_LABEL = "Max";
 
-const ExtentComponent = ({ value, options }: { value: ExtentValue | null; options: ExtentOptions }) => {
+const ExtentComponent = ({
+  value,
+  options,
+}: {
+  value: ExtentValue | null;
+  options: ExtentOptions;
+}) => {
   if (!value) {
     return null;
   }
@@ -22,13 +28,18 @@ const ExtentComponent = ({ value, options }: { value: ExtentValue | null; option
     className = DEFAULT_CLASS_NAME,
     showLabels = DEFAULT_SHOW_LABELS,
     minLabel = DEFAULT_MIN_LABEL,
-    maxLabel = DEFAULT_MAX_LABEL
+    maxLabel = DEFAULT_MAX_LABEL,
   } = options;
 
   // Handle the case when value is a single Date or number
   if (!Array.isArray(value)) {
     const isDate = value instanceof Date;
-    const formattedValue = formatSingleValue(value, isDate, dateOptions, numberOptions);
+    const formattedValue = formatSingleValue(
+      value,
+      isDate,
+      dateOptions,
+      numberOptions,
+    );
     return (
       <div className={cn("flex items-center", className)}>
         <span>{formattedValue}</span>
@@ -65,20 +76,20 @@ const ExtentComponent = ({ value, options }: { value: ExtentValue | null; option
 
 // Helper function to format a single value
 function formatSingleValue(
-  val: number | Date, 
+  val: number | Date,
   isDate: boolean,
-  dateOptions?: ExtentOptions['dateOptions'],
-  numberOptions?: ExtentOptions['numberOptions']
+  dateOptions?: ExtentOptions["dateOptions"],
+  numberOptions?: ExtentOptions["numberOptions"],
 ): string {
   if (isDate && val instanceof Date) {
     return new Intl.DateTimeFormat(
-      dateOptions?.locale, 
-      dateOptions?.formatOptions
+      dateOptions?.locale,
+      dateOptions?.formatOptions,
     ).format(val);
   }
-  if (!isDate && typeof val === 'number') {
+  if (!isDate && typeof val === "number") {
     return new Intl.NumberFormat(numberOptions?.locale, {
-      style: numberOptions?.showCurrencySymbol ? 'currency' : 'decimal',
+      style: numberOptions?.showCurrencySymbol ? "currency" : "decimal",
       currency: numberOptions?.currency,
       minimumFractionDigits: numberOptions?.digits,
       maximumFractionDigits: numberOptions?.digits,
@@ -87,12 +98,14 @@ function formatSingleValue(
   return String(val);
 }
 
-ExtentComponent.displayName = 'ExtentComponent';
+ExtentComponent.displayName = "ExtentComponent";
 
-export function createExtentRenderer<TData>(options: ExtentOptions = {}): CellRenderer<TData, ExtentValue> {
+export function createExtentRenderer<TData>(
+  options: ExtentOptions = {},
+): CellRenderer<TData, ExtentValue> {
   const ExtentRenderer = ({ value }: { value: ExtentValue | null }) => (
     <ExtentComponent value={value} options={options} />
   );
-  ExtentRenderer.displayName = 'ExtentRenderer';
+  ExtentRenderer.displayName = "ExtentRenderer";
   return ExtentRenderer;
-} 
+}

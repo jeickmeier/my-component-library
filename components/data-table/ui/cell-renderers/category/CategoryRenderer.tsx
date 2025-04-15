@@ -7,12 +7,12 @@
 import * as React from "react";
 import { CellRenderer, CategoryOptions } from "../types";
 
-const CategoryComponent = <TCategory extends string>({ 
-  value, 
-  options 
-}: { 
-  value: TCategory | null; 
-  options: CategoryOptions<TCategory> 
+const CategoryComponent = <TCategory extends string>({
+  value,
+  options,
+}: {
+  value: TCategory | null;
+  options: CategoryOptions<TCategory>;
 }) => {
   if (!value || !options.categories[value]) return String(value);
 
@@ -24,11 +24,13 @@ const CategoryComponent = <TCategory extends string>({
   } = options;
 
   const category = categories[value];
-  const displayText = category.label || (capitalize ? value.charAt(0).toUpperCase() + value.slice(1) : value);
+  const displayText =
+    category.label ||
+    (capitalize ? value.charAt(0).toUpperCase() + value.slice(1) : value);
 
   return (
     <div className={className}>
-      {category.type === 'icon' ? (
+      {category.type === "icon" ? (
         <span className="mr-2">{category.icon}</span>
       ) : (
         <span className={`${dotClassName} ${category.color}`} />
@@ -37,14 +39,14 @@ const CategoryComponent = <TCategory extends string>({
     </div>
   );
 };
-CategoryComponent.displayName = 'CategoryComponent';
+CategoryComponent.displayName = "CategoryComponent";
 
 export function createCategoryRenderer<TData, TCategory extends string>(
-  options: CategoryOptions<TCategory>
+  options: CategoryOptions<TCategory>,
 ): CellRenderer<TData, TCategory> {
   const CategoryRenderer = ({ value }: { value: TCategory | null }) => (
     <CategoryComponent value={value} options={options} />
   );
-  CategoryRenderer.displayName = 'CategoryRenderer';
+  CategoryRenderer.displayName = "CategoryRenderer";
   return CategoryRenderer;
-} 
+}

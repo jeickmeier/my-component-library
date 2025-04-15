@@ -33,21 +33,21 @@ const data: Person[] = [
 const columnHelper = createColumnHelper<Person>();
 
 const columns = [
-  columnHelper.accessor('firstName', {
+  columnHelper.accessor("firstName", {
     header: "First Name",
     enableSorting: true,
     enableColumnFilter: true,
   }),
-  columnHelper.accessor('lastName', {
+  columnHelper.accessor("lastName", {
     header: "Last Name",
   }),
-  columnHelper.accessor('age', {
+  columnHelper.accessor("age", {
     header: "Age",
     enableColumnFilter: true,
     // Custom cell renderer
     cell: ({ row }) => <div className="font-medium">{row.original.age}</div>,
   }),
-  columnHelper.accessor('rating', {
+  columnHelper.accessor("rating", {
     header: "Rating",
     // Custom aggregation function
     aggregationFn: "mean",
@@ -71,65 +71,65 @@ export default function MyTable() {
 
 ## Props
 
-| Prop | Type | Description | Default |
-|------|------|-------------|---------|
-| `columns` | `ColumnDef<TData, TValue>[]` | Array of column definitions | Required |
-| `data` | `TData[]` | Array of data objects | Required |
-| `columnFilters` | `ColumnFilter[]` | Optional array of filter configurations | Auto-discovered |
-| `enableGrouping` | `boolean` | Enable/disable grouping functionality | `false` |
-| `groupableColumns` | `string[]` | Array of column IDs that can be grouped | Auto-discovered |
-| `defaultPageSize` | `number` | Number of rows to display per page | `10` |
-| `containerHeight` | `string` | CSS height value for the table container | `undefined` |
+| Prop               | Type                         | Description                              | Default         |
+| ------------------ | ---------------------------- | ---------------------------------------- | --------------- |
+| `columns`          | `ColumnDef<TData, TValue>[]` | Array of column definitions              | Required        |
+| `data`             | `TData[]`                    | Array of data objects                    | Required        |
+| `columnFilters`    | `ColumnFilter[]`             | Optional array of filter configurations  | Auto-discovered |
+| `enableGrouping`   | `boolean`                    | Enable/disable grouping functionality    | `false`         |
+| `groupableColumns` | `string[]`                   | Array of column IDs that can be grouped  | Auto-discovered |
+| `defaultPageSize`  | `number`                     | Number of rows to display per page       | `10`            |
+| `containerHeight`  | `string`                     | CSS height value for the table container | `undefined`     |
 
 ## Column Configuration
 
 Columns are created using TanStack Table's `createColumnHelper` function:
 
 ```tsx
-import { createColumnHelper } from "@tanstack/react-table"
+import { createColumnHelper } from "@tanstack/react-table";
 
 // Define your data type
 type Payment = {
-  id: string
-  amount: number
-  status: "pending" | "processing" | "success" | "failed"
-  email: string
-  category: string
-}
+  id: string;
+  amount: number;
+  status: "pending" | "processing" | "success" | "failed";
+  email: string;
+  category: string;
+};
 
 // Create a helper for this data type
 const columnHelper = createColumnHelper<Payment>();
 
 // Define columns using the helper
 export const columns = [
-  columnHelper.accessor('status', {
+  columnHelper.accessor("status", {
     header: "Status",
     enableGrouping: true,
-    filterFn: 'equals',
+    filterFn: "equals",
     meta: {
       options: [
         { label: "Pending", value: "pending" },
         { label: "Processing", value: "processing" },
         { label: "Success", value: "success" },
         { label: "Failed", value: "failed" },
-      ]
-    },    
-    aggregationFn: 'first',
+      ],
+    },
+    aggregationFn: "first",
   }),
-  columnHelper.accessor('email', {
+  columnHelper.accessor("email", {
     header: "Email",
     enableGrouping: true,
   }),
-  columnHelper.accessor('amount', {
+  columnHelper.accessor("amount", {
     header: "Amount",
     enableGrouping: false,
-    filterFn: 'numberRange',
+    filterFn: "numberRange",
     meta: {
       filterConfig: {
-        type: 'rangeSlider',
-        column: 'amount', 
-        label: 'Amount Range'
-      }
+        type: "rangeSlider",
+        column: "amount",
+        label: "Amount Range",
+      },
     },
   }),
 ];
@@ -145,13 +145,13 @@ The DataTable supports several filter types:
 const columnFilters = [
   {
     type: "select",
-    column: "status", 
+    column: "status",
     label: "Status",
     options: [
       { label: "Active", value: "active" },
-      { label: "Inactive", value: "inactive" }
-    ]
-  }
+      { label: "Inactive", value: "inactive" },
+    ],
+  },
 ];
 ```
 
@@ -164,8 +164,8 @@ const columnFilters = [
     column: "age",
     label: "Age Range",
     min: 0,
-    max: 100
-  }
+    max: 100,
+  },
 ];
 ```
 
@@ -179,8 +179,8 @@ const columnFilters = [
     label: "Price Range",
     min: 0,
     max: 1000,
-    step: 10
-  }
+    step: 10,
+  },
 ];
 ```
 
@@ -192,8 +192,8 @@ const columnFilters = [
     type: "starRating",
     column: "rating",
     label: "Minimum Rating",
-    maxStars: 5
-  }
+    maxStars: 5,
+  },
 ];
 ```
 
@@ -204,17 +204,19 @@ const columnFilters = [
 You can provide custom cell renderers directly in the column definition:
 
 ```tsx
-columnHelper.accessor('status', {
+columnHelper.accessor("status", {
   header: "Status",
   cell: ({ row }) => {
     const status = row.getValue("status");
     return (
-      <div className={`badge ${status === 'active' ? 'bg-green-500' : 'bg-red-500'}`}>
+      <div
+        className={`badge ${status === "active" ? "bg-green-500" : "bg-red-500"}`}
+      >
         {status}
       </div>
     );
-  }
-})
+  },
+});
 ```
 
 ### 2. Using Cell Renderer Factory Functions
@@ -222,59 +224,63 @@ columnHelper.accessor('status', {
 The component provides factory functions for common cell renderers:
 
 ```tsx
-import { 
-  createMoneyRenderer, 
-  createCategoryRenderer, 
-  createStarRatingRenderer, 
-  createDateRenderer, 
-  createExtentRenderer 
-} from "@/components/data-table/ui/cell-renderers"
-import { CheckCircle, Clock, RefreshCcw, XCircle } from "lucide-react"
+import {
+  createMoneyRenderer,
+  createCategoryRenderer,
+  createStarRatingRenderer,
+  createDateRenderer,
+  createExtentRenderer,
+} from "@/components/data-table/ui/cell-renderers";
+import { CheckCircle, Clock, RefreshCcw, XCircle } from "lucide-react";
 
 // Create reusable renderers with proper typing
-const moneyRenderer = createMoneyRenderer<Payment>({ 
-  digits: 2, 
-  showCurrencySymbol: false 
+const moneyRenderer = createMoneyRenderer<Payment>({
+  digits: 2,
+  showCurrencySymbol: false,
 });
 
 // Example using icons
-const iconCategoryRenderer = createCategoryRenderer<Payment, Payment['status']>({
-  categories: {
-    pending: { 
-      type: 'icon',
-      icon: <Clock className="h-4 w-4 text-yellow-500" />,
+const iconCategoryRenderer = createCategoryRenderer<Payment, Payment["status"]>(
+  {
+    categories: {
+      pending: {
+        type: "icon",
+        icon: <Clock className="h-4 w-4 text-yellow-500" />,
+      },
+      processing: {
+        type: "icon",
+        icon: <RefreshCcw className="h-4 w-4 text-blue-500" />,
+      },
+      success: {
+        type: "icon",
+        icon: <CheckCircle className="h-4 w-4 text-green-500" />,
+      },
+      failed: {
+        type: "icon",
+        icon: <XCircle className="h-4 w-4 text-red-500" />,
+      },
     },
-    processing: { 
-      type: 'icon',
-      icon: <RefreshCcw className="h-4 w-4 text-blue-500" />
-    },
-    success: { 
-      type: 'icon',
-      icon: <CheckCircle className="h-4 w-4 text-green-500" />
-    },
-    failed: { 
-      type: 'icon',
-      icon: <XCircle className="h-4 w-4 text-red-500" />
-    }
-  }
-});
+  },
+);
 
 const starRenderer = createStarRatingRenderer<Payment>();
 const dateRenderer = createDateRenderer<Payment>();
 const extentRenderer = createExtentRenderer<Payment>();
 
 // Use the renderers in your columns
-columnHelper.accessor('status', {
+columnHelper.accessor("status", {
   header: "Status",
-  cell: (props) => iconCategoryRenderer({ 
-    cell: props.cell, 
-    row: props.row, 
-    value: props.getValue() 
-  })
-})
+  cell: (props) =>
+    iconCategoryRenderer({
+      cell: props.cell,
+      row: props.row,
+      value: props.getValue(),
+    }),
+});
 ```
 
 Available cell renderer factories:
+
 - `createMoneyRenderer`: For currency/number formatting with options for digits, abbreviation, etc.
 - `createCategoryRenderer`: For rendering categories with icons or colors
 - `createStarRatingRenderer`: For rendering star ratings
@@ -288,6 +294,7 @@ There are two ways to add custom aggregation functions:
 ### 1. Use Built-in Aggregation Functions
 
 TanStack Table provides several built-in aggregation functions:
+
 - `sum`
 - `avg`/`mean`
 - `min`
@@ -297,10 +304,10 @@ TanStack Table provides several built-in aggregation functions:
 - `extent` (min and max as a range)
 
 ```tsx
-columnHelper.accessor('amount', {
+columnHelper.accessor("amount", {
   header: "Amount",
-  aggregationFn: "sum" // Use built-in aggregation
-})
+  aggregationFn: "sum", // Use built-in aggregation
+});
 ```
 
 ### 2. Create Custom Aggregation Functions
@@ -312,27 +319,27 @@ You can define custom aggregation functions in your application:
 const weightedAverageAggregation = (
   columnId: string,
   leafRows: Row<TData>[],
-  childRows: Row<TData>[]
+  childRows: Row<TData>[],
 ) => {
   // Your custom aggregation logic here
   let sum = 0;
   let totalWeight = 0;
-  
+
   for (const row of leafRows) {
     const value = row.getValue(columnId) as number;
     const weight = row.original.weight as number;
     sum += value * weight;
     totalWeight += weight;
   }
-  
+
   return totalWeight ? sum / totalWeight : 0;
 };
 
 // 2. Use it in your column definition
-columnHelper.accessor('score', {
+columnHelper.accessor("score", {
   header: "Weighted Score",
-  aggregationFn: weightedAverageAggregation
-})
+  aggregationFn: weightedAverageAggregation,
+});
 ```
 
 ### 3. Different Renderers for Regular and Aggregated Cells
@@ -341,32 +348,34 @@ You can specify different renderers for regular and aggregated cells:
 
 ```tsx
 // Create specialized renderers for regular and aggregated cells
-const moneyRenderer = createMoneyRenderer<Payment>({ 
-  digits: 2, 
-  showCurrencySymbol: false 
+const moneyRenderer = createMoneyRenderer<Payment>({
+  digits: 2,
+  showCurrencySymbol: false,
 });
 
-const moneyAggregatedRenderer = createMoneyRenderer<Payment>({ 
-  digits: 1, 
-  abbreviate: true, 
-  abbreviationDivider: 'B' 
+const moneyAggregatedRenderer = createMoneyRenderer<Payment>({
+  digits: 1,
+  abbreviate: true,
+  abbreviationDivider: "B",
 });
 
 // Use in column definition
-columnHelper.accessor('amount', {
+columnHelper.accessor("amount", {
   header: "Amount",
-  aggregationFn: 'sum',
-  cell: (props) => moneyRenderer({ 
-    cell: props.cell, 
-    row: props.row, 
-    value: props.getValue() 
-  }),
-  aggregatedCell: (props) => moneyAggregatedRenderer({ 
-    cell: props.cell, 
-    row: props.row, 
-    value: props.getValue() 
-  })
-})
+  aggregationFn: "sum",
+  cell: (props) =>
+    moneyRenderer({
+      cell: props.cell,
+      row: props.row,
+      value: props.getValue(),
+    }),
+  aggregatedCell: (props) =>
+    moneyAggregatedRenderer({
+      cell: props.cell,
+      row: props.row,
+      value: props.getValue(),
+    }),
+});
 ```
 
 ## Custom Filter Functions
@@ -378,7 +387,7 @@ You can create custom filter functions:
 const myCustomFilter = <TData extends RowData>(
   row: Row<TData>,
   columnId: string,
-  value: any
+  value: any,
 ) => {
   const cellValue = row.getValue(columnId);
   // Your custom filter logic
@@ -387,13 +396,13 @@ const myCustomFilter = <TData extends RowData>(
 
 // 2. Register it with TanStack Table (in your setup or context)
 // In some initialization code:
-registerFilterFn('myCustom', myCustomFilter);
+registerFilterFn("myCustom", myCustomFilter);
 
 // 3. Use it in column definition
-columnHelper.accessor('myColumn', {
+columnHelper.accessor("myColumn", {
   header: "My Column",
-  filterFn: 'myCustom'
-})
+  filterFn: "myCustom",
+});
 ```
 
 ## Advanced Usage
@@ -406,16 +415,12 @@ For large datasets, virtualization is enabled automatically. You can control thi
 import { useTableVirtualization } from "@/components/data-table";
 
 // Within your component
-const { 
-  virtualizer, 
-  virtualItems, 
-  totalSize, 
-  scrollToIndex 
-} = useTableVirtualization({
-  rows,
-  containerRef,
-  itemHeight: 40 // Optional
-});
+const { virtualizer, virtualItems, totalSize, scrollToIndex } =
+  useTableVirtualization({
+    rows,
+    containerRef,
+    itemHeight: 40, // Optional
+  });
 ```
 
 ### Sticky Group Headers
@@ -425,12 +430,12 @@ The component provides sticky group headers when grouping is enabled:
 ```tsx
 import { useStickyGroupHeaders } from "@/components/data-table";
 
-// Within your component 
+// Within your component
 useStickyGroupHeaders({
   tableRef: tableRef,
   headerRef: headerRef,
   rowRefs: rowRefsMap,
-  isGrouped: grouping.length > 0
+  isGrouped: grouping.length > 0,
 });
 ```
 
@@ -450,175 +455,186 @@ The DataTable is composed of several subcomponents that can be used independentl
 Here's a complete example that follows the structure of our example files:
 
 ### columns.tsx
-```tsx
-"use client"
 
-import { createColumnHelper } from "@tanstack/react-table"
-import { 
-  createMoneyRenderer, 
-  createCategoryRenderer, 
-  createStarRatingRenderer, 
-  createDateRenderer, 
-  createExtentRenderer 
-} from "@/components/data-table/ui/cell-renderers"
-import { CheckCircle, Clock, RefreshCcw, XCircle } from "lucide-react"
+```tsx
+"use client";
+
+import { createColumnHelper } from "@tanstack/react-table";
+import {
+  createMoneyRenderer,
+  createCategoryRenderer,
+  createStarRatingRenderer,
+  createDateRenderer,
+  createExtentRenderer,
+} from "@/components/data-table/ui/cell-renderers";
+import { CheckCircle, Clock, RefreshCcw, XCircle } from "lucide-react";
 
 // Define your data type
 export type Payment = {
-  id: string
-  amount: number
-  status: "pending" | "processing" | "success" | "failed"
-  email: string
-  category: string
-  reviewRating: number
-  reviewDate: Date
-}
+  id: string;
+  amount: number;
+  status: "pending" | "processing" | "success" | "failed";
+  email: string;
+  category: string;
+  reviewRating: number;
+  reviewDate: Date;
+};
 
 const columnHelper = createColumnHelper<Payment>();
 
 // Create reusable renderers with proper typing
-const moneyRenderer = createMoneyRenderer<Payment>({ 
-  digits: 2, 
-  showCurrencySymbol: false 
+const moneyRenderer = createMoneyRenderer<Payment>({
+  digits: 2,
+  showCurrencySymbol: false,
 });
 
-const moneyAggregatedRenderer = createMoneyRenderer<Payment>({ 
-  digits: 1, 
-  abbreviate: true, 
-  abbreviationDivider: 'B' 
+const moneyAggregatedRenderer = createMoneyRenderer<Payment>({
+  digits: 1,
+  abbreviate: true,
+  abbreviationDivider: "B",
 });
 
 // Example using icons
-const iconCategoryRenderer = createCategoryRenderer<Payment, Payment['status']>({
-  categories: {
-    pending: { 
-      type: 'icon',
-      icon: <Clock className="h-4 w-4 text-yellow-500" />,
+const iconCategoryRenderer = createCategoryRenderer<Payment, Payment["status"]>(
+  {
+    categories: {
+      pending: {
+        type: "icon",
+        icon: <Clock className="h-4 w-4 text-yellow-500" />,
+      },
+      processing: {
+        type: "icon",
+        icon: <RefreshCcw className="h-4 w-4 text-blue-500" />,
+      },
+      success: {
+        type: "icon",
+        icon: <CheckCircle className="h-4 w-4 text-green-500" />,
+      },
+      failed: {
+        type: "icon",
+        icon: <XCircle className="h-4 w-4 text-red-500" />,
+      },
     },
-    processing: { 
-      type: 'icon',
-      icon: <RefreshCcw className="h-4 w-4 text-blue-500" />
-    },
-    success: { 
-      type: 'icon',
-      icon: <CheckCircle className="h-4 w-4 text-green-500" />
-    },
-    failed: { 
-      type: 'icon',
-      icon: <XCircle className="h-4 w-4 text-red-500" />
-    }
-  }
-});
+  },
+);
 
 const starRenderer = createStarRatingRenderer<Payment>();
 const dateRenderer = createDateRenderer<Payment>();
 const extentRenderer = createExtentRenderer<Payment>();
 
 export const columns = [
-  columnHelper.accessor('status', {
+  columnHelper.accessor("status", {
     header: "Status",
     enableGrouping: true,
-    filterFn: 'equals',
+    filterFn: "equals",
     meta: {
       options: [
         { label: "Pending", value: "pending" },
         { label: "Processing", value: "processing" },
         { label: "Success", value: "success" },
         { label: "Failed", value: "failed" },
-      ]
-    },    
-    aggregationFn: 'first',
-    cell: (props) => iconCategoryRenderer({ 
-      cell: props.cell, 
-      row: props.row, 
-      value: props.getValue() 
-    })
+      ],
+    },
+    aggregationFn: "first",
+    cell: (props) =>
+      iconCategoryRenderer({
+        cell: props.cell,
+        row: props.row,
+        value: props.getValue(),
+      }),
   }),
-  columnHelper.accessor('category', {
+  columnHelper.accessor("category", {
     header: "Category",
     enableGrouping: true,
-    filterFn: 'equals',
+    filterFn: "equals",
     meta: {
       options: [
         { label: "Retail", value: "retail" },
         { label: "Corporate", value: "corporate" },
         { label: "Investment", value: "investment" },
         { label: "Treasury", value: "treasury" },
-      ]
+      ],
     },
-    aggregationFn: 'first',
+    aggregationFn: "first",
   }),
-  columnHelper.accessor('email', {
+  columnHelper.accessor("email", {
     header: "Email",
     enableGrouping: true,
   }),
-  columnHelper.accessor('amount', {
+  columnHelper.accessor("amount", {
     header: "Amount",
     enableGrouping: false,
-    filterFn: 'numberRange',
+    filterFn: "numberRange",
     meta: {
       filterConfig: {
-        type: 'rangeSlider',
-        column: 'amount', 
-        label: 'Amount Range'
-      }
+        type: "rangeSlider",
+        column: "amount",
+        label: "Amount Range",
+      },
     },
-    aggregationFn: 'sum',
-    cell: (props) => moneyRenderer({ 
-      cell: props.cell, 
-      row: props.row, 
-      value: props.getValue() 
-    }),
-    aggregatedCell: (props) => moneyAggregatedRenderer({ 
-      cell: props.cell, 
-      row: props.row, 
-      value: props.getValue() 
-    })
+    aggregationFn: "sum",
+    cell: (props) =>
+      moneyRenderer({
+        cell: props.cell,
+        row: props.row,
+        value: props.getValue(),
+      }),
+    aggregatedCell: (props) =>
+      moneyAggregatedRenderer({
+        cell: props.cell,
+        row: props.row,
+        value: props.getValue(),
+      }),
   }),
-  columnHelper.accessor('reviewRating', {
+  columnHelper.accessor("reviewRating", {
     header: "Rating",
     enableGrouping: false,
-    aggregationFn: 'mean',
-    filterFn: 'starRating',
+    aggregationFn: "mean",
+    filterFn: "starRating",
     meta: {
       maxStars: 5,
       filterConfig: {
-        type: 'starRating',
-        column: 'reviewRating',
-        label: 'Rating',
-        maxStars: 5
-      }
+        type: "starRating",
+        column: "reviewRating",
+        label: "Rating",
+        maxStars: 5,
+      },
     },
-    cell: (props) => starRenderer({ 
-      cell: props.cell, 
-      row: props.row, 
-      value: props.getValue() 
-    }),
-    aggregatedCell: (props) => starRenderer({ 
-      cell: props.cell, 
-      row: props.row, 
-      value: props.getValue() 
-    })
+    cell: (props) =>
+      starRenderer({
+        cell: props.cell,
+        row: props.row,
+        value: props.getValue(),
+      }),
+    aggregatedCell: (props) =>
+      starRenderer({
+        cell: props.cell,
+        row: props.row,
+        value: props.getValue(),
+      }),
   }),
-  columnHelper.accessor('reviewDate', {
+  columnHelper.accessor("reviewDate", {
     header: "Review Date",
     enableGrouping: false,
-    aggregationFn: 'extent',
-    cell: (props) => dateRenderer({ 
-      cell: props.cell, 
-      row: props.row, 
-      value: props.getValue() 
-    }),
-    aggregatedCell: (props) => extentRenderer({ 
-      cell: props.cell, 
-      row: props.row, 
-      value: props.getValue() 
-    })
-  })
+    aggregationFn: "extent",
+    cell: (props) =>
+      dateRenderer({
+        cell: props.cell,
+        row: props.row,
+        value: props.getValue(),
+      }),
+    aggregatedCell: (props) =>
+      extentRenderer({
+        cell: props.cell,
+        row: props.row,
+        value: props.getValue(),
+      }),
+  }),
 ];
 ```
 
 ### page.tsx
+
 ```tsx
 "use client";
 
@@ -636,7 +652,7 @@ const data: Payment[] = [
     email: "user1@example.com",
     category: "retail",
     reviewRating: 4.5,
-    reviewDate: new Date("2023-01-15")
+    reviewDate: new Date("2023-01-15"),
   },
   {
     id: "2",
@@ -645,7 +661,7 @@ const data: Payment[] = [
     email: "user2@example.com",
     category: "corporate",
     reviewRating: 3.5,
-    reviewDate: new Date("2023-02-21")
+    reviewDate: new Date("2023-02-21"),
   },
   // More data would go here
 ];
@@ -661,14 +677,15 @@ export default function DemoPage() {
         by status, then email to see hierarchical data.
       </p>
       <p className="text-muted-foreground mb-4">
-        Filters are automatically discovered from column definitions with filterFn.
+        Filters are automatically discovered from column definitions with
+        filterFn.
       </p>
       <DataTable
         columns={columns as ColumnDef<Payment>[]}
         data={data}
         enableGrouping={true}
         defaultPageSize={50}
-        containerHeight="65vh" 
+        containerHeight="65vh"
       />
     </div>
   );
@@ -677,4 +694,4 @@ export default function DemoPage() {
 
 ## Contributing
 
-If you find bugs or have feature requests, please open an issue or submit a PR. 
+If you find bugs or have feature requests, please open an issue or submit a PR.
